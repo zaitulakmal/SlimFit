@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Redirect, Slot } from 'expo-router';
+import { Slot, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useProfileStore } from '../stores/profileStore';
 import '../i18n';
@@ -8,8 +8,10 @@ import '../i18n';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const router = useRouter();
   const { profile, isLoaded, loadProfile } = useProfileStore();
   const [error, setError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     loadProfile()
@@ -17,8 +19,20 @@ export default function RootLayout() {
         console.error('[Layout] loadProfile failed:', e);
         setError(String(e));
       })
-      .finally(() => SplashScreen.hideAsync());
+      .finally(() => {
+        SplashScreen.hideAsync();
+        setReady(true);
+      });
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!profile?.onboardingCompleted) {
+      router.replace('/onboarding' as any);
+    } else {
+      router.replace('/(tabs)' as any);
+    }
+  }, [ready]);
 
   if (error) {
     return (
@@ -29,16 +43,12 @@ export default function RootLayout() {
     );
   }
 
-  if (!isLoaded) {
+  if (!ready) {
     return (
       <View style={s.center}>
         <Text style={s.msg}>Loading...</Text>
       </View>
     );
-  }
-
-  if (!profile?.onboardingCompleted) {
-    return <Redirect href="/onboarding" />;
   }
 
   return <Slot />;
