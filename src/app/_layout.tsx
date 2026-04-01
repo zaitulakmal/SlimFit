@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Redirect, Slot } from 'expo-router';
-import { SQLiteProvider } from 'expo-sqlite';
 import * as SplashScreen from 'expo-splash-screen';
-import { DATABASE_NAME } from '../db';
 import { useProfileStore } from '../stores/profileStore';
 import '../i18n';
 
@@ -11,12 +9,25 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { profile, isLoaded, loadProfile } = useProfileStore();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadProfile()
-      .catch((e) => console.warn('[Layout] loadProfile error:', e))
+      .catch((e) => {
+        console.error('[Layout] loadProfile failed:', e);
+        setError(String(e));
+      })
       .finally(() => SplashScreen.hideAsync());
   }, []);
+
+  if (error) {
+    return (
+      <View style={s.center}>
+        <Text style={s.errTitle}>Startup Error</Text>
+        <Text style={s.errMsg}>{error}</Text>
+      </View>
+    );
+  }
 
   if (!isLoaded) {
     return (
@@ -27,21 +38,15 @@ export default function RootLayout() {
   }
 
   if (!profile?.onboardingCompleted) {
-    return (
-      <SQLiteProvider databaseName={DATABASE_NAME}>
-        <Redirect href="/onboarding" />
-      </SQLiteProvider>
-    );
+    return <Redirect href="/onboarding" />;
   }
 
-  return (
-    <SQLiteProvider databaseName={DATABASE_NAME}>
-      <Slot />
-    </SQLiteProvider>
-  );
+  return <Slot />;
 }
 
 const s = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
   msg: { fontSize: 16, color: '#6B7280' },
+  errTitle: { fontSize: 18, fontWeight: '700', color: '#FF6B6B', marginBottom: 12 },
+  errMsg: { fontSize: 12, color: '#6B7280', textAlign: 'center' },
 });
