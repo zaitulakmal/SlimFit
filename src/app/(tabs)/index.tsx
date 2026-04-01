@@ -43,8 +43,15 @@ export default function HomeScreen() {
   const profile = useProfileStore((s) => s.profile);
   const { todayLog: weightToday, logs: weightLogs } = useWeightStore();
   const waterToday = useWaterStore((s) => s.today);
-  const foodTotals = useFoodStore((s) => s.getTotals());
-  const foodStreak = useStatsStore((s) => s.streakMap['food']?.current ?? 0);
+  const dayLogs = useFoodStore((s) => s.dayLogs);
+  const foodTotals = {
+    calories: dayLogs.reduce((a, l) => a + l.calories, 0),
+    proteinG: dayLogs.reduce((a, l) => a + l.proteinG, 0),
+    carbsG: dayLogs.reduce((a, l) => a + l.carbsG, 0),
+    fatG: dayLogs.reduce((a, l) => a + l.fatG, 0),
+  };
+  const streakMap = useStatsStore((s) => s.streakMap);
+  const foodStreak = streakMap['food']?.current ?? 0;
 
   // Animate rings on focus
   const [calorieProgress, setCalorieProgress] = useState(0);
