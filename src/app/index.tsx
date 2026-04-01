@@ -1,7 +1,6 @@
-import { Redirect } from 'expo-router';
+import { View } from 'react-native';
 
-// Redirect root to the main tab navigator
-// D-06: App always opens to Home tab on launch
+// Navigation is handled by _layout.tsx on startup
 export default function Index() {
-  return <Redirect href="/(tabs)" />;
+  return <View />;
 }
