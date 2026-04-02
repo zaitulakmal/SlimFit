@@ -18,6 +18,7 @@ import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { searchLocalFoods, type LocalFood } from '../../../data/malaysian-foods';
 import { searchFoodsNix, type NixFood } from '../../../services/nutritionix';
+import { searchFoodsOFF, type OFFFood } from '../../../services/openFoodFacts';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -65,6 +66,21 @@ function nixToItem(f: NixFood, idx: number): FoodItem {
   };
 }
 
+function offToItem(f: OFFFood, idx: number): FoodItem {
+  return {
+    id: `off-${idx}-${f.foodName}`,
+    foodName: f.foodName,
+    brandName: f.brandName,
+    calories: f.calories,
+    proteinG: f.proteinG,
+    carbsG: f.carbsG,
+    fatG: f.fatG,
+    servingQty: f.servingQty,
+    servingUnit: f.servingUnit,
+    source: 'openfoodfacts',
+  };
+}
+
 export default function FoodSearchScreen() {
   const { t } = useTranslation();
   const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
@@ -88,10 +104,21 @@ export default function FoodSearchScreen() {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       const local = searchLocalFoods(query).map(localToItem);
-      const nix = (await searchFoodsNix(query)).map(nixToItem);
-      // Local results first, then Nutritionix (deduped by name)
-      const localNames = new Set(local.map((f) => f.foodName.toLowerCase()));
-      const merged = [...local, ...nix.filter((f) => !localNames.has(f.foodName.toLowerCase()))];
+      const [nixResults, offResults] = await Promise.all([
+        searchFoodsNix(query),
+        searchFoodsOFF(query),
+      ]);
+      const nix = nixResults.map(nixToItem);
+      const off = offResults.map(offToItem);
+      // Local first, then Nutritionix, then Open Food Facts — dedupe by name
+      const seen = new Set(local.map((f) => f.foodName.toLowerCase()));
+      const merged = [...local];
+      for (const f of [...nix, ...off]) {
+        if (!seen.has(f.foodName.toLowerCase())) {
+          seen.add(f.foodName.toLowerCase());
+          merged.push(f);
+        }
+      }
       setResults(merged);
       setLoading(false);
     }, 450);
