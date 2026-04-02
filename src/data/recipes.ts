@@ -378,8 +378,6 @@ export const RECIPES: Recipe[] = [
       'Serve with fresh fruit if desired.',
     ],
   },
-];
-
   // ── MORE RECIPES ──────────────────────────────────────────────────────────
   {
     id: 'r016',
