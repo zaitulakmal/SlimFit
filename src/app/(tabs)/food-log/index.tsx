@@ -9,20 +9,40 @@ import {
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  CaretLeft,
+  CaretRight,
+  Sun,
+  CloudSun,
+  Moon,
+  Coffee,
+  PlusCircle,
+  Trash,
+} from 'phosphor-react-native';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { useProfileStore } from '../../../stores/profileStore';
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
-const MEAL_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  breakfast: 'sunny-outline',
-  lunch: 'partly-sunny-outline',
-  dinner: 'moon-outline',
-  snack: 'cafe-outline',
+const MEAL_ACCENT: Record<string, string> = {
+  breakfast: colors.amber,
+  lunch: colors.vividGreen,
+  dinner: colors.purple,
+  snack: colors.coral,
+  drink: colors.skyBlue,
 };
+
+function MealIcon({ meal, size, color }: { meal: string; size: number; color: string }) {
+  switch (meal) {
+    case 'breakfast': return <Sun size={size} weight="regular" color={color} />;
+    case 'lunch':     return <CloudSun size={size} weight="regular" color={color} />;
+    case 'dinner':    return <Moon size={size} weight="regular" color={color} />;
+    case 'snack':     return <Coffee size={size} weight="regular" color={color} />;
+    default:          return <Sun size={size} weight="regular" color={color} />;
+  }
+}
 
 function todayStr(): string {
   return new Date().toISOString().split('T')[0];
@@ -77,7 +97,7 @@ export default function FoodLogScreen() {
       {/* Date navigation */}
       <View style={s.dateNav}>
         <TouchableOpacity onPress={() => navigateDate(-1)} style={s.navBtn} accessibilityLabel="Previous day">
-          <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
+          <CaretLeft size={22} weight="bold" color={colors.textPrimary} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => loadDayLogs(todayStr())} style={s.datePill}>
           <Text style={s.dateText}>{formatDate(currentDateStr)}</Text>
@@ -88,9 +108,9 @@ export default function FoodLogScreen() {
           disabled={currentDateStr >= todayStr()}
           accessibilityLabel="Next day"
         >
-          <Ionicons
-            name="chevron-forward"
+          <CaretRight
             size={22}
+            weight="bold"
             color={currentDateStr >= todayStr() ? colors.border : colors.textPrimary}
           />
         </TouchableOpacity>
@@ -141,11 +161,12 @@ export default function FoodLogScreen() {
           const mealLogs = getMealLogs(meal);
           const mealCals = mealLogs.reduce((a, l) => a + l.calories, 0);
 
+          const accentColor = MEAL_ACCENT[meal] ?? colors.primary;
           return (
-            <View key={meal} style={s.mealSection}>
+            <View key={meal} style={[s.mealSection, { borderLeftWidth: 4, borderLeftColor: accentColor }]}>
               <View style={s.mealHeader}>
                 <View style={s.mealTitleRow}>
-                  <Ionicons name={MEAL_ICONS[meal]} size={18} color={colors.primary} />
+                  <MealIcon meal={meal} size={18} color={accentColor} />
                   <Text style={s.mealTitle}>{t(`food.meal_${meal}`)}</Text>
                   {mealCals > 0 && (
                     <Text style={s.mealCalories}>{Math.round(mealCals)} kcal</Text>
@@ -161,7 +182,7 @@ export default function FoodLogScreen() {
                   }
                   accessibilityLabel={`Add food to ${meal}`}
                 >
-                  <Ionicons name="add-circle" size={26} color={colors.primary} />
+                  <PlusCircle size={26} weight="fill" color={colors.primary} />
                 </TouchableOpacity>
               </View>
 
@@ -189,7 +210,7 @@ export default function FoodLogScreen() {
                       onPress={() => handleDelete(log.id, log.foodName)}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Ionicons name="trash-outline" size={18} color={colors.coral} />
+                      <Trash size={18} weight="regular" color={colors.coral} />
                     </TouchableOpacity>
                   </View>
                 ))
@@ -219,11 +240,11 @@ const s = StyleSheet.create({
   dateText: { ...typography.body, color: colors.textPrimary },
   summaryBar: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
+    backgroundColor: colors.card,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.borderLight,
   },
   summaryItem: { flex: 1, alignItems: 'center', gap: 2 },
   summaryValue: { ...typography.body, color: colors.textPrimary },
@@ -232,9 +253,10 @@ const s = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.md },
   mealSection: {
-    backgroundColor: colors.background,
-    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
     overflow: 'hidden',
+    ...shadow.sm,
   },
   mealHeader: {
     flexDirection: 'row',

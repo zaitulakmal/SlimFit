@@ -2,19 +2,21 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { ArrowLeft, MagnifyingGlass, Sun, CloudSun, Moon, Coffee, Drop, Clock, CaretUp, CaretDown } from 'phosphor-react-native';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { RECIPES, searchRecipes, type Recipe } from '../../../data/recipes';
 
 const CATS = ['all', 'breakfast', 'lunch', 'dinner', 'snack', 'drink'] as const;
-const CAT_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  breakfast: 'sunny-outline',
-  lunch: 'partly-sunny-outline',
-  dinner: 'moon-outline',
-  snack: 'cafe-outline',
-  drink: 'water-outline',
+type CatIconMap = Record<string, React.ComponentType<{ size: number; color: string; weight?: string }>>;
+const CAT_ICONS: CatIconMap = {
+  breakfast: Sun as any,
+  lunch:     CloudSun as any,
+  dinner:    Moon as any,
+  snack:     Coffee as any,
+  drink:     Drop as any,
 };
+import React from 'react';
 
 const DIFF_COLOR = { easy: colors.primary, medium: colors.amber };
 
@@ -33,7 +35,7 @@ export default function RecipesScreen() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <ArrowLeft size={24} weight="regular" color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>{t('recipe.title')}</Text>
         <View style={{ width: 40 }} />
@@ -41,7 +43,7 @@ export default function RecipesScreen() {
 
       {/* Search */}
       <View style={s.searchBar}>
-        <Ionicons name="search" size={18} color={colors.textSecondary} />
+        <MagnifyingGlass size={18} weight="regular" color={colors.textSecondary} />
         <TextInput
           style={s.searchInput}
           value={query}
@@ -60,13 +62,7 @@ export default function RecipesScreen() {
             style={[s.catChip, filterCat === cat && s.catChipActive]}
             onPress={() => setFilterCat(cat)}
           >
-            {cat !== 'all' && (
-              <Ionicons
-                name={CAT_ICONS[cat]}
-                size={13}
-                color={filterCat === cat ? colors.white : colors.textSecondary}
-              />
-            )}
+            {cat !== 'all' && (() => { const CatIcon = CAT_ICONS[cat]; return CatIcon ? <CatIcon size={13} color={filterCat === cat ? colors.white : colors.textSecondary} weight="regular" /> : null; })()}
             <Text style={[s.catChipText, filterCat === cat && s.catChipTextActive]}>
               {cat === 'all' ? t('activity.all') : t(`food.meal_${cat}`)}
             </Text>
@@ -95,9 +91,10 @@ export default function RecipesScreen() {
                         {r.difficulty}
                       </Text>
                     </View>
-                    <Text style={s.metaText}>
-                      <Ionicons name="time-outline" size={11} color={colors.textSecondary} /> {r.prepMin + r.cookMin} min
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                      <Clock size={11} weight="regular" color={colors.textSecondary} />
+                      <Text style={s.metaText}>{r.prepMin + r.cookMin} min</Text>
+                    </View>
                     <Text style={s.metaText}>{r.servings} serving{r.servings > 1 ? 's' : ''}</Text>
                   </View>
                 </View>
@@ -131,12 +128,10 @@ export default function RecipesScreen() {
                 </View>
               )}
 
-              <Ionicons
-                name={isOpen ? 'chevron-up' : 'chevron-down'}
-                size={16}
-                color={colors.textSecondary}
-                style={{ alignSelf: 'center', marginTop: spacing.xs }}
-              />
+              {isOpen
+                ? <CaretUp size={16} weight="bold" color={colors.textSecondary} style={{ alignSelf: 'center', marginTop: spacing.xs }} />
+                : <CaretDown size={16} weight="bold" color={colors.textSecondary} style={{ alignSelf: 'center', marginTop: spacing.xs }} />
+              }
             </TouchableOpacity>
           );
         })}

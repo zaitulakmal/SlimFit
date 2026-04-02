@@ -6,9 +6,9 @@ import {
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { ArrowsCounterClockwise, MapPin, Crosshair, NavigationArrow } from 'phosphor-react-native';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 
 interface Place {
   id: string;
@@ -143,7 +143,7 @@ export default function GroceryScreen() {
         <TouchableOpacity onPress={load} style={s.refreshBtn} disabled={loading}>
           {loading
             ? <ActivityIndicator size="small" color={colors.primary} />
-            : <Ionicons name="refresh" size={20} color={colors.primary} />
+            : <ArrowsCounterClockwise size={20} weight="regular" color={colors.primary} />
           }
         </TouchableOpacity>
       </View>
@@ -179,7 +179,7 @@ export default function GroceryScreen() {
           <View style={s.mapPlaceholder}>
             {loading
               ? <ActivityIndicator size="large" color={colors.primary} />
-              : <Ionicons name="location-outline" size={48} color={colors.border} />
+              : <MapPin size={48} weight="regular" color={colors.border} />
             }
             {!!error && <Text style={s.errorText}>{error}</Text>}
           </View>
@@ -198,7 +198,7 @@ export default function GroceryScreen() {
               }, 600);
             }}
           >
-            <Ionicons name="locate" size={22} color={colors.primary} />
+            <Crosshair size={22} weight="regular" color={colors.primary} />
           </TouchableOpacity>
         )}
       </View>
@@ -216,7 +216,7 @@ export default function GroceryScreen() {
             style={s.directionsBtn}
             onPress={() => openDirections(selected.lat, selected.lng, selected.name)}
           >
-            <Ionicons name="navigate" size={16} color={colors.white} />
+            <NavigationArrow size={16} weight="fill" color={colors.white} />
             <Text style={s.directionsBtnText}>{t('grocery.directions')}</Text>
           </TouchableOpacity>
         </View>
@@ -270,7 +270,7 @@ export default function GroceryScreen() {
                   onPress={() => openDirections(item.lat, item.lng, item.name)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Ionicons name="navigate-outline" size={18} color={colors.primary} />
+                  <NavigationArrow size={18} weight="regular" color={colors.primary} />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -286,7 +286,7 @@ export default function GroceryScreen() {
       {/* Error state (no location yet) */}
       {!loading && !!error && places.length === 0 && (
         <View style={s.errorState}>
-          <Ionicons name="location-outline" size={52} color={colors.border} />
+          <MapPin size={52} weight="regular" color={colors.border} />
           <Text style={s.errorStateText}>{error}</Text>
           <TouchableOpacity style={s.retryBtn} onPress={load}>
             <Text style={s.retryBtnText}>{t('grocery.retry')}</Text>
@@ -313,10 +313,8 @@ const s = StyleSheet.create({
 
   myLocBtn: {
     position: 'absolute', bottom: spacing.sm, right: spacing.sm,
-    backgroundColor: colors.white, borderRadius: 24,
-    padding: spacing.sm, shadowColor: '#000',
-    shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    backgroundColor: colors.white, borderRadius: radius.full,
+    padding: spacing.sm, ...shadow.md,
   },
 
   selectedBar: {
@@ -357,7 +355,7 @@ const s = StyleSheet.create({
   },
   placeRowSelected: { backgroundColor: colors.selectedTint },
   placeIndex: {
-    width: 28, height: 28, borderRadius: 14, backgroundColor: colors.background,
+    width: 28, height: 28, borderRadius: radius.full, backgroundColor: colors.borderLight,
     alignItems: 'center', justifyContent: 'center',
   },
   placeIndexText: { ...typography.label, color: colors.textPrimary, fontWeight: '700' as any },

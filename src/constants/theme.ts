@@ -1,28 +1,20 @@
-/**
- * SlimTrack Design System Constants
- * Matches UI-SPEC Phase 1 specification exactly.
- * Light theme only — dark mode is out of scope for v1.
- */
-
 export const colors = {
-  // 60% dominant — screen backgrounds
   white: '#FFFFFF',
-  // 30% secondary — card backgrounds, tab bar surface, input fills
-  background: '#F5F7FA',
-  // 10% accents
-  primary: '#4CAF50',       // CTA buttons, active tab, selected states
-  vividGreen: '#00C853',    // Calorie ring filled arc (on-track)
-  coral: '#FF6B6B',         // Destructive actions only (delete, confirmation)
-  amber: '#FFB300',         // Over-budget state (positive framing — never red)
-  skyBlue: '#2196F3',       // Water ring and water tab accent
-  purple: '#9C27B0',        // Onboarding progress bar fill
-  // Text
-  textPrimary: '#1A1A2E',   // Body text, headings on white
-  textSecondary: '#6B7280', // Sublabels, helper text, placeholders
-  textOnAccent: '#FFFFFF',  // Text on filled accent backgrounds
-  // Structure
-  border: '#E5E7EB',        // Card borders, dividers, input borders
-  selectedTint: '#E8F5E9',  // Activity card selected background tint
+  background: '#F6F7FB',
+  card: '#FFFFFF',
+  primary: '#4CAF50',
+  vividGreen: '#00C853',
+  coral: '#FF6B6B',
+  amber: '#FFB300',
+  skyBlue: '#2196F3',
+  purple: '#9C27B0',
+  textPrimary: '#111827',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
+  textOnAccent: '#FFFFFF',
+  border: '#E9ECF0',
+  borderLight: '#F3F4F6',
+  selectedTint: '#E8F5E9',
 } as const;
 
 export const spacing = {
@@ -35,32 +27,70 @@ export const spacing = {
   '3xl': 64,
 } as const;
 
+export const radius = {
+  sm: 10,
+  md: 14,
+  lg: 20,
+  xl: 28,
+  full: 999,
+} as const;
+
+// Shadow presets (iOS + Android)
+export const shadow = {
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+} as const;
+
 export const typography = {
   display: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '700' as const,
-    lineHeight: 34,
+    lineHeight: 36,
+    letterSpacing: -0.5,
   },
   heading: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     lineHeight: 26,
+    letterSpacing: -0.3,
   },
-  body: {
+  subheading: {
     fontSize: 16,
     fontWeight: '600' as const,
-    lineHeight: 24,
+    lineHeight: 22,
+  },
+  body: {
+    fontSize: 15,
+    fontWeight: '500' as const,
+    lineHeight: 22,
   },
   label: {
     fontSize: 12,
-    fontWeight: '600' as const,
-    lineHeight: 17,
+    fontWeight: '500' as const,
+    lineHeight: 16,
+  },
+  caption: {
+    fontSize: 11,
+    fontWeight: '400' as const,
+    lineHeight: 15,
+    letterSpacing: 0.2,
   },
 } as const;
 
 // ---------------------------------------------------------------------------
-// Legacy compat exports — used by template components only
-// These components will be replaced in Phase 2; do not use in new code.
+// Legacy compat
 // ---------------------------------------------------------------------------
 export const Colors = {
   light: {
@@ -81,7 +111,6 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
-// Font config (system fonts — Nunito loaded separately via useFonts)
 export const Fonts = {
   sans: 'system-ui',
   serif: 'ui-serif',
@@ -89,7 +118,6 @@ export const Fonts = {
   mono: 'ui-monospace',
 } as const;
 
-// Legacy numeric spacing map (maps to our spacing tokens)
 export const Spacing = {
   half: 2,
   one: spacing.xs,

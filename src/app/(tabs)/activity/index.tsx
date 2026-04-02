@@ -5,19 +5,24 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Fire, Clock, CheckCircle, Trash, X, Heart, Barbell, Leaf, Football, Activity } from 'phosphor-react-native';
+import React from 'react';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 import { useWorkoutStore } from '../../../stores/workoutStore';
 import { useProfileStore } from '../../../stores/profileStore';
 import { WORKOUT_TYPES, calcCaloriesBurned, type WorkoutType } from '../../../data/workout-types';
 
-const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  cardio: 'heart-outline',
-  strength: 'barbell-outline',
-  flexibility: 'leaf-outline',
-  sport: 'football-outline',
-};
+function WorkoutIcon({ category, size, color }: { category: string; size: number; color: string }) {
+  const props = { size, color, weight: 'regular' as const };
+  switch (category) {
+    case 'cardio':      return <Heart {...props} />;
+    case 'strength':    return <Barbell {...props} />;
+    case 'flexibility': return <Leaf {...props} />;
+    case 'sport':       return <Football {...props} />;
+    default:            return <Activity {...props} />;
+  }
+}
 
 export default function ActivityScreen() {
   const { t } = useTranslation();
@@ -75,13 +80,13 @@ export default function ActivityScreen() {
       {/* Today summary */}
       <View style={s.summaryCard}>
         <View style={s.summaryItem}>
-          <Ionicons name="flame" size={22} color={colors.coral} />
+          <Fire size={22} weight="fill" color={colors.coral} />
           <Text style={[s.summaryValue, { color: colors.coral }]}>{totalBurned}</Text>
           <Text style={s.summaryLabel}>{t('activity.burned')}</Text>
         </View>
         <View style={s.summaryDivider} />
         <View style={s.summaryItem}>
-          <Ionicons name="time-outline" size={22} color={colors.primary} />
+          <Clock size={22} weight="regular" color={colors.primary} />
           <Text style={s.summaryValue}>
             {todayWorkouts.reduce((a, w) => a + w.durationMin, 0)}
           </Text>
@@ -89,7 +94,7 @@ export default function ActivityScreen() {
         </View>
         <View style={s.summaryDivider} />
         <View style={s.summaryItem}>
-          <Ionicons name="checkmark-circle-outline" size={22} color={colors.skyBlue} />
+          <CheckCircle size={22} weight="regular" color={colors.skyBlue} />
           <Text style={s.summaryValue}>{todayWorkouts.length}</Text>
           <Text style={s.summaryLabel}>{t('activity.sessions')}</Text>
         </View>
@@ -103,17 +108,13 @@ export default function ActivityScreen() {
             const def = WORKOUT_TYPES.find((x) => x.id === w.activityType);
             return (
               <View key={w.id} style={s.workoutRow}>
-                <Ionicons
-                  name={(def?.icon ?? 'fitness-outline') as any}
-                  size={20}
-                  color={colors.primary}
-                />
+                <WorkoutIcon category={def?.category ?? 'cardio'} size={20} color={colors.primary} />
                 <View style={s.workoutInfo}>
                   <Text style={s.workoutName}>{def?.name ?? w.activityType}</Text>
                   <Text style={s.workoutSub}>{w.durationMin} min · {w.caloriesBurned} kcal burned</Text>
                 </View>
                 <TouchableOpacity onPress={() => handleDelete(w.id, def?.name ?? w.activityType)}>
-                  <Ionicons name="trash-outline" size={18} color={colors.coral} />
+                  <Trash size={18} weight="regular" color={colors.coral} />
                 </TouchableOpacity>
               </View>
             );
@@ -143,7 +144,7 @@ export default function ActivityScreen() {
               <Text style={s.logBtnText}>{t('activity.log_btn')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setSelectedType(null)} style={s.cancelBtn}>
-              <Ionicons name="close" size={20} color={colors.textSecondary} />
+              <X size={20} weight="bold" color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -176,7 +177,7 @@ export default function ActivityScreen() {
               setDuration('30');
             }}
           >
-            <Ionicons name={type.icon as any} size={26} color={selectedType?.id === type.id ? colors.white : colors.primary} />
+            <WorkoutIcon category={type.category} size={26} color={selectedType?.id === type.id ? colors.white : colors.primary} />
             <Text style={[s.workoutCardName, selectedType?.id === type.id && { color: colors.white }]} numberOfLines={2}>
               {type.name}
             </Text>
@@ -197,11 +198,12 @@ const s = StyleSheet.create({
   screenTitle: { ...typography.heading, color: colors.textPrimary, marginBottom: spacing.md },
   summaryCard: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
-    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
     alignItems: 'center',
+    ...shadow.sm,
   },
   summaryItem: { flex: 1, alignItems: 'center', gap: 2 },
   summaryValue: { ...typography.heading, color: colors.textPrimary },
@@ -213,10 +215,11 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.background,
-    borderRadius: 10,
+    backgroundColor: colors.card,
+    borderRadius: radius.sm,
     padding: spacing.md,
     marginBottom: spacing.sm,
+    ...shadow.sm,
   },
   workoutInfo: { flex: 1 },
   workoutName: { ...typography.body, color: colors.textPrimary },
@@ -276,13 +279,14 @@ const s = StyleSheet.create({
   workoutGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
   workoutCard: {
     width: '30%',
-    backgroundColor: colors.background,
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderRadius: radius.sm,
     padding: spacing.sm,
     alignItems: 'center',
     gap: spacing.xs,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderLight,
+    ...shadow.sm,
   },
   workoutCardSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   workoutCardName: { ...typography.label, color: colors.textPrimary, textAlign: 'center' },
