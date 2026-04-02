@@ -5,6 +5,7 @@
     "weight": "Berat",
     "water": "Air",
     "activity": "Aktiviti",
+    "recipes": "Resipi",
     "profile": "Profil"
   },
   "home": {
@@ -105,6 +106,7 @@
     "meal_lunch": "Makan Tengahari",
     "meal_dinner": "Makan Malam",
     "meal_snack": "Snek",
+    "meal_drink": "Minuman",
     "meal_empty": "Ketuk + untuk tambah makanan",
     "kcal": "kal",
     "protein": "Protein",
@@ -180,9 +182,13 @@
   },
   "recipe": {
     "title": "Resipi Sihat",
+    "subtitle": "Resipi Malaysia, mudah dimasak",
     "search_placeholder": "Cari resipi...",
+    "count_label": "resipi",
     "ingredients": "Bahan-bahan",
-    "steps": "Cara Masak"
+    "steps": "Cara Masak",
+    "see_detail": "Lihat resipi",
+    "hide_detail": "Sembunyikan"
   },
   "common": {
     "error_save": "Profil anda tidak dapat disimpan. Sila cuba semula.",

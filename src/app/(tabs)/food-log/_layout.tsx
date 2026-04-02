@@ -9,7 +9,6 @@ export default function FoodLogLayout() {
       <Stack.Screen name="index" options={{ title: t('tabs.food') }} />
       <Stack.Screen name="search" options={{ presentation: 'card' }} />
       <Stack.Screen name="scan" options={{ presentation: 'fullScreenModal' }} />
-      <Stack.Screen name="recipes" options={{ presentation: 'card' }} />
     </Stack>
   );
 }

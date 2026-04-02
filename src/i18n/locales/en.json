@@ -5,6 +5,7 @@
     "weight": "Weight",
     "water": "Water",
     "activity": "Activity",
+    "recipes": "Recipes",
     "profile": "Profile"
   },
   "home": {
@@ -105,6 +106,7 @@
     "meal_lunch": "Lunch",
     "meal_dinner": "Dinner",
     "meal_snack": "Snacks",
+    "meal_drink": "Drinks",
     "meal_empty": "Tap + to add food",
     "kcal": "kcal",
     "protein": "Protein",
@@ -180,9 +182,13 @@
   },
   "recipe": {
     "title": "Healthy Recipes",
+    "subtitle": "Malaysian recipes, easy to cook",
     "search_placeholder": "Search recipes...",
+    "count_label": "recipes",
     "ingredients": "Ingredients",
-    "steps": "Instructions"
+    "steps": "Instructions",
+    "see_detail": "Show recipe",
+    "hide_detail": "Hide recipe"
   },
   "common": {
     "error_save": "Couldn't save your profile. Please try again.",
