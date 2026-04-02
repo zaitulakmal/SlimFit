@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View, Text, StyleSheet, TouchableOpacity,
+  ActivityIndicator, ScrollView,
+} from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +10,23 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { lookupBarcodeNix } from '../../../services/nutritionix';
-import { lookupBarcodeOFF } from '../../../services/openFoodFacts';
+import { lookupBarcodeOFF, type OFFFood } from '../../../services/openFoodFacts';
 import { useFoodStore } from '../../../stores/foodStore';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+interface ScannedFood {
+  foodName: string;
+  brandName?: string;
+  calories: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  servingQty: number;
+  servingUnit: string;
+  source: string;
+  barcode: string;
+}
 
 export default function BarcodeScanScreen() {
   const { t } = useTranslation();
@@ -19,6 +35,7 @@ export default function BarcodeScanScreen() {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState<ScannedFood | null>(null);
   const { logFood, currentDateStr } = useFoodStore();
 
   const handleBarcode = async ({ data }: { data: string }) => {
@@ -26,32 +43,48 @@ export default function BarcodeScanScreen() {
     setScanned(true);
     setLoading(true);
     setError('');
+    setPreview(null);
 
-    // Try Nutritionix first, then Open Food Facts as free fallback
-    let food = await lookupBarcodeNix(data);
-    if (!food) food = await lookupBarcodeOFF(data) as any;
-    setLoading(false);
+    try {
+      // Try Nutritionix first (if API key configured), then Open Food Facts
+      let food: any = await lookupBarcodeNix(data);
+      if (!food) food = await lookupBarcodeOFF(data);
 
-    if (food) {
-      await logFood({
-        mealType: (mealType as MealType) ?? 'snack',
-        foodName: food.foodName,
-        brandName: food.brandName ?? undefined,
-        calories: food.calories,
-        proteinG: food.proteinG,
-        carbsG: food.carbsG,
-        fatG: food.fatG,
-        servingQty: food.servingQty,
-        servingUnit: food.servingUnit,
-        source: food.source ?? 'nutritionix',
-        nixItemId: (food as any).nixItemId ?? undefined,
-        barcode: data,
-        dateStr: currentDateStr,
-      });
-      router.back();
-    } else {
+      if (food) {
+        setPreview({ ...food, barcode: data });
+      } else {
+        setError(t('food.barcode_not_found'));
+      }
+    } catch {
       setError(t('food.barcode_not_found'));
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleConfirm = async () => {
+    if (!preview) return;
+    await logFood({
+      mealType: (mealType as MealType) ?? 'snack',
+      foodName: preview.foodName,
+      brandName: preview.brandName ?? undefined,
+      calories: preview.calories,
+      proteinG: preview.proteinG,
+      carbsG: preview.carbsG,
+      fatG: preview.fatG,
+      servingQty: preview.servingQty,
+      servingUnit: preview.servingUnit,
+      source: preview.source,
+      barcode: preview.barcode,
+      dateStr: currentDateStr,
+    });
+    router.back();
+  };
+
+  const handleRetry = () => {
+    setScanned(false);
+    setError('');
+    setPreview(null);
   };
 
   if (!permission) {
@@ -79,13 +112,18 @@ export default function BarcodeScanScreen() {
         style={StyleSheet.absoluteFillObject}
         facing="back"
         barcodeScannerSettings={{
-          barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'qr'],
+          barcodeTypes: [
+            'ean13', 'ean8', 'upc_a', 'upc_e',
+            'code128', 'code39', 'code93',
+            'itf14', 'codabar', 'qr', 'datamatrix',
+          ],
         }}
         onBarcodeScanned={scanned ? undefined : handleBarcode}
       />
 
-      {/* Dark overlay with scan frame cutout */}
+      {/* Overlay */}
       <View style={s.overlay}>
+        {/* Top bar */}
         <View style={s.topBar}>
           <TouchableOpacity style={s.closeBtn} onPress={() => router.back()}>
             <Ionicons name="close" size={28} color={colors.white} />
@@ -94,37 +132,86 @@ export default function BarcodeScanScreen() {
           <View style={{ width: 44 }} />
         </View>
 
-        <View style={s.scanArea}>
-          <View style={s.scanFrame}>
-            {/* Corner markers */}
-            <View style={[s.corner, s.cornerTL]} />
-            <View style={[s.corner, s.cornerTR]} />
-            <View style={[s.corner, s.cornerBL]} />
-            <View style={[s.corner, s.cornerBR]} />
-          </View>
-          <Text style={s.scanHint}>{t('food.scan_hint')}</Text>
-        </View>
-
-        {loading && (
-          <View style={s.statusBadge}>
-            <ActivityIndicator color={colors.white} size="small" />
-            <Text style={s.statusText}>{t('food.looking_up')}</Text>
+        {/* Scan frame — only show when not yet scanned */}
+        {!preview && !loading && !error && (
+          <View style={s.scanArea}>
+            <View style={s.scanFrame}>
+              <View style={[s.corner, s.cornerTL]} />
+              <View style={[s.corner, s.cornerTR]} />
+              <View style={[s.corner, s.cornerBL]} />
+              <View style={[s.corner, s.cornerBR]} />
+            </View>
+            <Text style={s.scanHint}>{t('food.scan_hint')}</Text>
           </View>
         )}
 
+        {/* Loading */}
+        {loading && (
+          <View style={s.centered}>
+            <View style={s.statusBadge}>
+              <ActivityIndicator color={colors.white} size="small" />
+              <Text style={s.statusText}>{t('food.looking_up')}</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Error */}
         {error && !loading && (
-          <View style={s.errorBadge}>
-            <Ionicons name="alert-circle-outline" size={20} color={colors.white} />
-            <Text style={s.errorText}>{error}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setScanned(false);
-                setError('');
-              }}
-              style={s.retryBtn}
-            >
-              <Text style={s.retryText}>{t('food.scan_again')}</Text>
-            </TouchableOpacity>
+          <View style={s.centered}>
+            <View style={s.errorBadge}>
+              <Ionicons name="alert-circle-outline" size={24} color={colors.white} />
+              <Text style={s.errorText}>{error}</Text>
+              <TouchableOpacity onPress={handleRetry} style={s.retryBtn}>
+                <Text style={s.retryText}>{t('food.scan_again')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* Preview card — confirm before logging */}
+        {preview && !loading && (
+          <View style={s.previewContainer}>
+            <ScrollView contentContainerStyle={s.previewCard} showsVerticalScrollIndicator={false}>
+              {preview.brandName ? (
+                <Text style={s.previewBrand}>{preview.brandName}</Text>
+              ) : null}
+              <Text style={s.previewName}>{preview.foodName}</Text>
+              <Text style={s.previewServing}>
+                Per {preview.servingQty}{preview.servingUnit}
+              </Text>
+
+              {/* Macro grid */}
+              <View style={s.macroGrid}>
+                <View style={s.macroBox}>
+                  <Text style={[s.macroValue, { color: colors.amber }]}>{preview.calories}</Text>
+                  <Text style={s.macroLabel}>kcal</Text>
+                </View>
+                <View style={s.macroBox}>
+                  <Text style={s.macroValue}>{preview.proteinG}g</Text>
+                  <Text style={s.macroLabel}>Protein</Text>
+                </View>
+                <View style={s.macroBox}>
+                  <Text style={s.macroValue}>{preview.carbsG}g</Text>
+                  <Text style={s.macroLabel}>Carbs</Text>
+                </View>
+                <View style={s.macroBox}>
+                  <Text style={s.macroValue}>{preview.fatG}g</Text>
+                  <Text style={s.macroLabel}>Fat</Text>
+                </View>
+              </View>
+
+              {/* Action buttons */}
+              <View style={s.actionRow}>
+                <TouchableOpacity style={s.retryBtnDark} onPress={handleRetry}>
+                  <Ionicons name="scan-outline" size={18} color={colors.textPrimary} />
+                  <Text style={s.retryBtnText}>{t('food.scan_again')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={s.confirmBtn} onPress={handleConfirm}>
+                  <Ionicons name="add-circle" size={18} color={colors.white} />
+                  <Text style={s.confirmBtnText}>{t('food.add')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         )}
       </View>
@@ -139,93 +226,79 @@ const CORNER_THICKNESS = 3;
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#000' },
   permissionContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    padding: spacing.xl,
-    gap: spacing.lg,
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.white, padding: spacing.xl, gap: spacing.lg,
   },
-  permissionText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
+  permissionText: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },
   permBtn: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    borderRadius: 12,
+    backgroundColor: colors.primary, paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md, borderRadius: 12,
   },
   permBtnText: { ...typography.body, color: colors.textOnAccent },
   backLink: { padding: spacing.md },
   backLinkText: { ...typography.body, color: colors.textSecondary },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-  },
+  overlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center' },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingTop: spacing.xl,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    width: '100%', paddingTop: spacing.xl, paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md, backgroundColor: 'rgba(0,0,0,0.55)',
   },
   closeBtn: { padding: spacing.xs },
   topBarTitle: { ...typography.body, color: colors.white },
-  scanArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.lg,
-  },
-  scanFrame: {
-    width: FRAME_SIZE,
-    height: FRAME_SIZE,
-    position: 'relative',
-  },
-  corner: {
-    position: 'absolute',
-    width: CORNER_SIZE,
-    height: CORNER_SIZE,
-    borderColor: colors.white,
-  },
+  scanArea: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg },
+  scanFrame: { width: FRAME_SIZE, height: FRAME_SIZE, position: 'relative' },
+  corner: { position: 'absolute', width: CORNER_SIZE, height: CORNER_SIZE, borderColor: colors.white },
   cornerTL: { top: 0, left: 0, borderTopWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS },
   cornerTR: { top: 0, right: 0, borderTopWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS },
   cornerBL: { bottom: 0, left: 0, borderBottomWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS },
   cornerBR: { bottom: 0, right: 0, borderBottomWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS },
   scanHint: { ...typography.body, color: colors.white, textAlign: 'center' },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%' },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: 24,
-    marginBottom: spacing.xl,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md, borderRadius: 24,
   },
   statusText: { ...typography.body, color: colors.white },
   errorBadge: {
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    marginHorizontal: spacing.lg,
-    padding: spacing.lg,
-    borderRadius: 16,
-    marginBottom: spacing.xl,
+    alignItems: 'center', gap: spacing.sm, backgroundColor: 'rgba(0,0,0,0.85)',
+    marginHorizontal: spacing.lg, padding: spacing.lg, borderRadius: 16,
   },
   errorText: { ...typography.body, color: colors.white, textAlign: 'center' },
   retryBtn: {
-    borderWidth: 1,
-    borderColor: colors.white,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 8,
-    marginTop: spacing.xs,
+    borderWidth: 1, borderColor: colors.white, paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm, borderRadius: 8, marginTop: spacing.xs,
   },
   retryText: { ...typography.body, color: colors.white },
+  previewContainer: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    maxHeight: '55%',
+  },
+  previewCard: {
+    backgroundColor: colors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    padding: spacing.lg, gap: spacing.sm,
+  },
+  previewBrand: { ...typography.label, color: colors.textSecondary },
+  previewName: { ...typography.heading, color: colors.textPrimary },
+  previewServing: { ...typography.label, color: colors.textSecondary },
+  macroGrid: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+  macroBox: {
+    flex: 1, alignItems: 'center', backgroundColor: colors.background,
+    borderRadius: 10, paddingVertical: spacing.sm,
+  },
+  macroValue: { ...typography.body, color: colors.textPrimary },
+  macroLabel: { ...typography.label, color: colors.textSecondary },
+  actionRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+  retryBtnDark: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.xs, borderWidth: 1, borderColor: colors.border,
+    borderRadius: 12, paddingVertical: spacing.md, backgroundColor: colors.white,
+  },
+  retryBtnText: { ...typography.body, color: colors.textPrimary },
+  confirmBtn: {
+    flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.xs, backgroundColor: colors.primary, borderRadius: 12,
+    paddingVertical: spacing.md,
+  },
+  confirmBtnText: { ...typography.body, color: colors.textOnAccent },
 });
