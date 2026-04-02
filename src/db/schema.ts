@@ -134,3 +134,18 @@ export const notificationSettings = sqliteTable('notification_settings', {
   minute: integer('minute').notNull().default(0),
 });
 export type NotificationSetting = typeof notificationSettings.$inferSelect;
+
+// ---------------------------------------------------------------------------
+// Workouts
+// ---------------------------------------------------------------------------
+export const workouts = sqliteTable('workouts', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull(),
+  activityType: text('activity_type').notNull(),
+  durationMin: integer('duration_min').notNull(),
+  caloriesBurned: integer('calories_burned').notNull(),
+  notes: text('notes'),
+  loggedAt: text('logged_at').notNull(),
+});
+export type Workout = typeof workouts.$inferSelect;
+export type NewWorkout = typeof workouts.$inferInsert;

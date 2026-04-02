@@ -4,6 +4,7 @@
     "food": "Makanan",
     "weight": "Berat",
     "water": "Air",
+    "activity": "Aktiviti",
     "profile": "Profil"
   },
   "home": {
@@ -161,6 +162,27 @@
     "half_way_desc": "Separuh jalan ke sasaran berat anda",
     "goal_reached": "Matlamat Dicapai!",
     "goal_reached_desc": "Mencapai berat sasaran anda"
+  },
+  "activity": {
+    "title": "Aktiviti",
+    "burned": "Dibakar",
+    "minutes": "min",
+    "sessions": "Sesi",
+    "today_log": "Senaman Hari Ini",
+    "pick_activity": "Pilih Aktiviti",
+    "all": "Semua",
+    "cat_cardio": "Kardio",
+    "cat_strength": "Kekuatan",
+    "cat_flexibility": "Fleksibiliti",
+    "cat_sport": "Sukan",
+    "log_btn": "Rekod Senaman",
+    "find_mart": "Cari Kedai Runcit Berdekatan"
+  },
+  "recipe": {
+    "title": "Resipi Sihat",
+    "search_placeholder": "Cari resipi...",
+    "ingredients": "Bahan-bahan",
+    "steps": "Cara Masak"
   },
   "common": {
     "error_save": "Profil anda tidak dapat disimpan. Sila cuba semula.",

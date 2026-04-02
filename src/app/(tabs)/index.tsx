@@ -29,6 +29,7 @@ import { useWeightStore } from '../../stores/weightStore';
 import { useWaterStore } from '../../stores/waterStore';
 import { useFoodStore } from '../../stores/foodStore';
 import { useStatsStore } from '../../stores/statsStore';
+import { useWorkoutStore } from '../../stores/workoutStore';
 import ProgressRing from '../../components/common/ProgressRing';
 
 function getGreetingKey(): string {
@@ -52,6 +53,7 @@ export default function HomeScreen() {
   };
   const streakMap = useStatsStore((s) => s.streakMap);
   const foodStreak = streakMap['food']?.current ?? 0;
+  const totalBurned = useWorkoutStore((s) => s.totalBurned);
 
   // Animate rings on focus
   const [calorieProgress, setCalorieProgress] = useState(0);
@@ -64,6 +66,7 @@ export default function HomeScreen() {
       useWaterStore.getState().loadToday();
       useFoodStore.getState().loadDayLogs();
       useStatsStore.getState().loadStats();
+      useWorkoutStore.getState().loadToday();
 
       // Trigger ring animations
       setCalorieProgress(0);
@@ -235,6 +238,16 @@ export default function HomeScreen() {
           </Text>
           <Text style={s.summaryLabel}>{t('tabs.water')}</Text>
         </View>
+        {totalBurned > 0 && (
+          <>
+            <View style={s.summaryDivider} />
+            <View style={s.summaryItem}>
+              <Ionicons name="barbell-outline" size={18} color={colors.coral} />
+              <Text style={s.summaryValue}>{totalBurned}</Text>
+              <Text style={s.summaryLabel}>{t('activity.burned')}</Text>
+            </View>
+          </>
+        )}
       </View>
     </ScrollView>
   );

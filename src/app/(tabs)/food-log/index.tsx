@@ -74,6 +74,16 @@ export default function FoodLogScreen() {
 
   return (
     <View style={s.root}>
+      {/* Recipes shortcut */}
+      <TouchableOpacity
+        style={s.recipesBtn}
+        onPress={() => router.push('/(tabs)/food-log/recipes')}
+      >
+        <Ionicons name="restaurant-outline" size={16} color={colors.skyBlue} />
+        <Text style={s.recipesBtnText}>{t('recipe.title')}</Text>
+        <Ionicons name="chevron-forward" size={14} color={colors.skyBlue} />
+      </TouchableOpacity>
+
       {/* Date navigation */}
       <View style={s.dateNav}>
         <TouchableOpacity onPress={() => navigateDate(-1)} style={s.navBtn} accessibilityLabel="Previous day">
@@ -266,4 +276,15 @@ const s = StyleSheet.create({
   foodName: { ...typography.body, color: colors.textPrimary },
   brandName: { ...typography.label, color: colors.textSecondary },
   foodMacros: { ...typography.label, color: colors.textSecondary, marginTop: 2 },
+  recipesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  recipesBtnText: { ...typography.label, color: colors.skyBlue, flex: 1 },
 });

@@ -92,6 +92,15 @@ const tables = [
     hour INTEGER NOT NULL DEFAULT 8,
     minute INTEGER NOT NULL DEFAULT 0
   )`,
+  `CREATE TABLE IF NOT EXISTS workouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    date_str TEXT NOT NULL,
+    activity_type TEXT NOT NULL,
+    duration_min INTEGER NOT NULL,
+    calories_burned INTEGER NOT NULL,
+    notes TEXT,
+    logged_at TEXT NOT NULL
+  )`,
 ];
 
 for (const sql of tables) {

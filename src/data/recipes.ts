@@ -1,0 +1,392 @@
+export interface Recipe {
+  id: string;
+  name: string;
+  nameMy: string;
+  category: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink';
+  calories: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  servings: number;
+  prepMin: number;
+  cookMin: number;
+  difficulty: 'easy' | 'medium';
+  tags: string[];
+  ingredients: string[];
+  steps: string[];
+}
+
+export const RECIPES: Recipe[] = [
+  {
+    id: 'r001',
+    name: 'Oat Porridge with Banana',
+    nameMy: 'Bubur Oat dengan Pisang',
+    category: 'breakfast',
+    calories: 320, proteinG: 10, carbsG: 58, fatG: 6,
+    servings: 1, prepMin: 2, cookMin: 5, difficulty: 'easy',
+    tags: ['high-fibre', 'no-cook', 'quick'],
+    ingredients: [
+      '½ cup rolled oats',
+      '1 cup low-fat milk or soy milk',
+      '1 banana, sliced',
+      '1 tsp honey',
+      'Pinch of cinnamon',
+    ],
+    steps: [
+      'Combine oats and milk in a saucepan over medium heat.',
+      'Stir continuously for 5 minutes until thickened.',
+      'Pour into bowl, top with banana slices.',
+      'Drizzle honey and sprinkle cinnamon.',
+    ],
+  },
+  {
+    id: 'r002',
+    name: 'Egg White Omelette with Vegetables',
+    nameMy: 'Telur Putih Omelette dengan Sayur',
+    category: 'breakfast',
+    calories: 180, proteinG: 22, carbsG: 8, fatG: 5,
+    servings: 1, prepMin: 5, cookMin: 8, difficulty: 'easy',
+    tags: ['high-protein', 'low-carb'],
+    ingredients: [
+      '4 egg whites',
+      '¼ cup diced tomato',
+      '¼ cup diced bell pepper',
+      '¼ cup baby spinach',
+      '1 tsp olive oil',
+      'Salt and pepper',
+    ],
+    steps: [
+      'Whisk egg whites with salt and pepper.',
+      'Heat olive oil in non-stick pan over medium heat.',
+      'Sauté vegetables for 2 minutes.',
+      'Pour egg whites over vegetables.',
+      'Cook until set, fold in half and serve.',
+    ],
+  },
+  {
+    id: 'r003',
+    name: 'Grilled Chicken with Ulam',
+    nameMy: 'Ayam Bakar dengan Ulam',
+    category: 'lunch',
+    calories: 350, proteinG: 42, carbsG: 12, fatG: 14,
+    servings: 1, prepMin: 15, cookMin: 20, difficulty: 'medium',
+    tags: ['high-protein', 'traditional', 'gluten-free'],
+    ingredients: [
+      '150g chicken breast',
+      '2 tbsp low-sodium soy sauce',
+      '1 tsp turmeric',
+      '1 tsp chilli powder',
+      '2 cloves garlic, minced',
+      'Ulam: cucumber, long beans, pegaga',
+    ],
+    steps: [
+      'Marinate chicken with soy sauce, turmeric, chilli and garlic for 15 mins.',
+      'Grill on medium-high heat, 8–10 mins per side.',
+      'Rest for 3 minutes before slicing.',
+      'Serve with fresh ulam on the side.',
+    ],
+  },
+  {
+    id: 'r004',
+    name: 'Asam Pedas Fish (Light)',
+    nameMy: 'Ikan Asam Pedas Ringan',
+    category: 'lunch',
+    calories: 280, proteinG: 30, carbsG: 18, fatG: 8,
+    servings: 2, prepMin: 10, cookMin: 20, difficulty: 'medium',
+    tags: ['traditional', 'omega-3', 'spicy'],
+    ingredients: [
+      '300g ikan tenggiri or senangin',
+      '3 tbsp asam jawa paste',
+      '2 tbsp chilli paste',
+      '1 onion, sliced',
+      '2 tomatoes, quartered',
+      '1 cup water',
+      'Salt to taste',
+    ],
+    steps: [
+      'Mix asam jawa paste with water.',
+      'Bring to boil, add chilli paste and onion.',
+      'Add fish and tomatoes, simmer 15 minutes.',
+      'Season with salt and serve.',
+    ],
+  },
+  {
+    id: 'r005',
+    name: 'Nasi Ulam',
+    nameMy: 'Nasi Ulam',
+    category: 'lunch',
+    calories: 380, proteinG: 12, carbsG: 62, fatG: 10,
+    servings: 1, prepMin: 15, cookMin: 20, difficulty: 'medium',
+    tags: ['traditional', 'herbal', 'nutritious'],
+    ingredients: [
+      '1 cup cooked white rice (or brown rice)',
+      '2 tbsp kerisik (toasted coconut)',
+      'Ulam: daun kaduk, daun kesum, bunga kantan, lemongrass (thinly sliced)',
+      '1 tbsp ikan bilis (dried anchovies), fried',
+      '1 tsp belacan',
+      'Salt and pepper',
+    ],
+    steps: [
+      'Prepare all ulam leaves, wash and slice thinly.',
+      'Slice bunga kantan and lemongrass finely.',
+      'Mix all ulam with warm rice.',
+      'Add kerisik, ikan bilis and belacan.',
+      'Season with salt and pepper, mix well.',
+    ],
+  },
+  {
+    id: 'r006',
+    name: 'Stir-fried Kangkung with Tofu',
+    nameMy: 'Kangkung Tumis dengan Tahu',
+    category: 'dinner',
+    calories: 180, proteinG: 12, carbsG: 14, fatG: 8,
+    servings: 2, prepMin: 5, cookMin: 10, difficulty: 'easy',
+    tags: ['vegetarian', 'quick', 'low-calorie'],
+    ingredients: [
+      '200g kangkung (water spinach)',
+      '150g firm tofu, cubed',
+      '3 cloves garlic, minced',
+      '1 tbsp oyster sauce (or soy sauce)',
+      '1 tsp sesame oil',
+      '1 tbsp cooking oil',
+      'Chilli padi (optional)',
+    ],
+    steps: [
+      'Heat oil in wok on high heat.',
+      'Fry tofu until golden, set aside.',
+      'Stir-fry garlic and chilli 30 seconds.',
+      'Add kangkung, toss for 2 minutes.',
+      'Add tofu back, season with oyster sauce and sesame oil.',
+    ],
+  },
+  {
+    id: 'r007',
+    name: 'Sup Ayam Herba',
+    nameMy: 'Sup Ayam Herba',
+    category: 'dinner',
+    calories: 220, proteinG: 28, carbsG: 8, fatG: 7,
+    servings: 2, prepMin: 10, cookMin: 30, difficulty: 'easy',
+    tags: ['low-calorie', 'comfort food', 'high-protein'],
+    ingredients: [
+      '300g chicken (skinless)',
+      '2 cups water',
+      '1 stalk serai (lemongrass)',
+      '3 slices halia (ginger)',
+      '1 onion, halved',
+      '2 carrots, sliced',
+      'Salt and white pepper',
+      'Daun sup (Chinese celery leaves)',
+    ],
+    steps: [
+      'Boil chicken in water, skim off foam.',
+      'Add lemongrass, ginger and onion.',
+      'Simmer 20 minutes, add carrots.',
+      'Cook another 10 minutes until tender.',
+      'Season with salt and pepper.',
+      'Garnish with daun sup.',
+    ],
+  },
+  {
+    id: 'r008',
+    name: 'Grilled Ikan Kembung with Sambal',
+    nameMy: 'Ikan Kembung Bakar dengan Sambal',
+    category: 'dinner',
+    calories: 250, proteinG: 32, carbsG: 6, fatG: 10,
+    servings: 1, prepMin: 10, cookMin: 15, difficulty: 'easy',
+    tags: ['omega-3', 'traditional', 'gluten-free'],
+    ingredients: [
+      '2 ikan kembung (mackerel)',
+      '2 tbsp sambal belacan',
+      '1 lime, juiced',
+      '1 tsp turmeric',
+      'Salt to taste',
+    ],
+    steps: [
+      'Score fish with a knife 2-3 times each side.',
+      'Rub with turmeric and salt.',
+      'Grill on medium heat 6-7 mins per side.',
+      'Serve with sambal belacan and lime.',
+    ],
+  },
+  {
+    id: 'r009',
+    name: 'Mango Yogurt Smoothie',
+    nameMy: 'Smoothi Mangga Yogurt',
+    category: 'snack',
+    calories: 180, proteinG: 8, carbsG: 34, fatG: 2,
+    servings: 1, prepMin: 5, cookMin: 0, difficulty: 'easy',
+    tags: ['no-cook', 'quick', 'refreshing'],
+    ingredients: [
+      '1 ripe mango, cubed',
+      '¾ cup plain low-fat yogurt',
+      '½ cup low-fat milk',
+      '1 tsp honey',
+      'Ice cubes',
+    ],
+    steps: [
+      'Add all ingredients to blender.',
+      'Blend until smooth.',
+      'Pour into glass and serve immediately.',
+    ],
+  },
+  {
+    id: 'r010',
+    name: 'Kerabu Mangga',
+    nameMy: 'Kerabu Mangga',
+    category: 'snack',
+    calories: 120, proteinG: 3, carbsG: 26, fatG: 2,
+    servings: 2, prepMin: 10, cookMin: 0, difficulty: 'easy',
+    tags: ['no-cook', 'traditional', 'low-calorie'],
+    ingredients: [
+      '1 green mango, shredded',
+      '2 tbsp ikan bilis, fried',
+      '1 shallot, thinly sliced',
+      '1 tbsp lime juice',
+      '1 tsp sugar',
+      '½ tsp chilli',
+      'Salt to taste',
+    ],
+    steps: [
+      'Shred green mango into thin strips.',
+      'Mix lime juice, sugar, chilli and salt.',
+      'Toss mango with dressing.',
+      'Top with fried ikan bilis and shallots.',
+    ],
+  },
+  {
+    id: 'r011',
+    name: 'Tempeh Salad',
+    nameMy: 'Salad Tempeh',
+    category: 'lunch',
+    calories: 290, proteinG: 18, carbsG: 22, fatG: 14,
+    servings: 1, prepMin: 10, cookMin: 8, difficulty: 'easy',
+    tags: ['vegetarian', 'high-protein', 'local'],
+    ingredients: [
+      '100g tempeh, sliced',
+      '1 cup mixed salad greens',
+      '½ cucumber, sliced',
+      '1 tomato, quartered',
+      '1 tbsp olive oil',
+      '1 tbsp apple cider vinegar',
+      'Salt and pepper',
+      '1 tsp sesame seeds',
+    ],
+    steps: [
+      'Pan-fry tempeh in 1 tsp oil until golden, set aside.',
+      'Arrange greens, cucumber and tomato in bowl.',
+      'Top with tempeh.',
+      'Drizzle with olive oil and vinegar.',
+      'Season and garnish with sesame seeds.',
+    ],
+  },
+  {
+    id: 'r012',
+    name: 'Brown Rice with Stir-fried Vegetables',
+    nameMy: 'Nasi Perang dengan Sayur Tumis',
+    category: 'dinner',
+    calories: 340, proteinG: 10, carbsG: 60, fatG: 8,
+    servings: 1, prepMin: 5, cookMin: 20, difficulty: 'easy',
+    tags: ['high-fibre', 'vegetarian', 'balanced'],
+    ingredients: [
+      '¾ cup cooked brown rice',
+      '100g mixed vegetables (carrot, broccoli, capsicum)',
+      '½ cup tofu, cubed',
+      '2 cloves garlic',
+      '1 tbsp low-sodium soy sauce',
+      '1 tsp sesame oil',
+    ],
+    steps: [
+      'Cook brown rice per package instructions.',
+      'Heat oil, stir-fry garlic 30 seconds.',
+      'Add vegetables and tofu, stir-fry 5 minutes.',
+      'Season with soy sauce and sesame oil.',
+      'Serve over brown rice.',
+    ],
+  },
+  {
+    id: 'r013',
+    name: 'Tuna Sandwich (Wholegrain)',
+    nameMy: 'Sandwic Tuna (Roti Bijirin)',
+    category: 'breakfast',
+    calories: 320, proteinG: 28, carbsG: 32, fatG: 8,
+    servings: 1, prepMin: 5, cookMin: 0, difficulty: 'easy',
+    tags: ['no-cook', 'quick', 'high-protein'],
+    ingredients: [
+      '2 slices wholegrain bread',
+      '1 can tuna in water, drained',
+      '1 tbsp plain yogurt (instead of mayo)',
+      '¼ onion, diced',
+      '1 tomato, sliced',
+      'Lettuce leaves',
+      'Black pepper',
+    ],
+    steps: [
+      'Mix tuna with yogurt, onion and black pepper.',
+      'Layer lettuce and tomato on bread.',
+      'Spread tuna mixture.',
+      'Top with second slice of bread.',
+    ],
+  },
+  {
+    id: 'r014',
+    name: 'Lentil Dal Soup',
+    nameMy: 'Sup Dal Lentil',
+    category: 'dinner',
+    calories: 260, proteinG: 16, carbsG: 40, fatG: 4,
+    servings: 2, prepMin: 5, cookMin: 25, difficulty: 'easy',
+    tags: ['vegetarian', 'high-protein', 'high-fibre'],
+    ingredients: [
+      '1 cup red lentils',
+      '1 onion, diced',
+      '2 tomatoes, diced',
+      '3 cups water',
+      '1 tsp cumin',
+      '1 tsp turmeric',
+      '2 cloves garlic',
+      '1 tsp olive oil',
+      'Salt and coriander leaves',
+    ],
+    steps: [
+      'Sauté garlic, onion and spices in oil 3 minutes.',
+      'Add tomatoes, cook 2 minutes.',
+      'Add lentils and water, bring to boil.',
+      'Simmer 20 minutes until lentils are soft.',
+      'Season with salt, garnish with coriander.',
+    ],
+  },
+  {
+    id: 'r015',
+    name: 'Banana Oat Pancake',
+    nameMy: 'Penkek Oat Pisang',
+    category: 'breakfast',
+    calories: 280, proteinG: 12, carbsG: 44, fatG: 6,
+    servings: 1, prepMin: 5, cookMin: 10, difficulty: 'easy',
+    tags: ['no-sugar', 'quick', 'gluten-optional'],
+    ingredients: [
+      '1 ripe banana',
+      '2 eggs',
+      '½ cup rolled oats',
+      '¼ tsp cinnamon',
+      'Cooking spray',
+    ],
+    steps: [
+      'Mash banana in a bowl.',
+      'Add eggs and oats, mix until combined.',
+      'Heat pan over medium heat, spray with cooking oil.',
+      'Pour small rounds of batter, cook 2-3 mins per side.',
+      'Serve with fresh fruit if desired.',
+    ],
+  },
+];
+
+export function getRecipesByCategory(category: Recipe['category']): Recipe[] {
+  return RECIPES.filter((r) => r.category === category);
+}
+
+export function searchRecipes(query: string): Recipe[] {
+  if (!query.trim()) return RECIPES;
+  const q = query.toLowerCase();
+  return RECIPES.filter(
+    (r) => r.name.toLowerCase().includes(q) || r.nameMy.toLowerCase().includes(q) || r.tags.some((t) => t.includes(q))
+  );
+}
