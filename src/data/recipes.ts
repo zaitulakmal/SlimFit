@@ -781,8 +781,6 @@ export const RECIPES: Recipe[] = [
       'Dip vegetables into sambal belacan.',
     ],
   },
-];
-
   // ── EASY MALAY RECIPES (groceries only) ────────────────────────────────────
   {
     id: 'r031',
