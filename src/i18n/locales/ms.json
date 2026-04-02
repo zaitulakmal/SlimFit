@@ -6,6 +6,7 @@
     "water": "Air",
     "activity": "Aktiviti",
     "recipes": "Resipi",
+    "grocery": "Kedai",
     "profile": "Profil"
   },
   "home": {
@@ -179,6 +180,15 @@
     "cat_sport": "Sukan",
     "log_btn": "Rekod Senaman",
     "find_mart": "Cari Kedai Runcit Berdekatan"
+  },
+  "grocery": {
+    "title": "Kedai Runcit Berdekatan",
+    "permission_denied": "Kebenaran lokasi diperlukan untuk mencari kedai berdekatan.",
+    "none_found": "Tiada kedai runcit dijumpai berdekatan.",
+    "load_error": "Tidak dapat memuatkan kedai berdekatan. Semak sambungan anda.",
+    "retry": "Cuba Lagi",
+    "directions": "Arah",
+    "places": "kedai dijumpai"
   },
   "recipe": {
     "title": "Resipi Sihat",

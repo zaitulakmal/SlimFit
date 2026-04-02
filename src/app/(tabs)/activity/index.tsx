@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Alert, Linking, Platform,
+  TextInput, Alert,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -59,15 +59,6 @@ export default function ActivityScreen() {
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('common.delete'), style: 'destructive', onPress: () => deleteWorkout(id) },
     ]);
-  };
-
-  const openNearbyMart = () => {
-    const query = encodeURIComponent('fresh mart OR supermarket OR kedai near me');
-    if (Platform.OS === 'ios') {
-      Linking.openURL(`maps://?q=${query}`);
-    } else {
-      Linking.openURL(`https://maps.google.com/?q=${query}`);
-    }
   };
 
   const filteredTypes = filterCat === 'all'
@@ -196,11 +187,6 @@ export default function ActivityScreen() {
         ))}
       </View>
 
-      {/* Nearby Fresh Mart */}
-      <TouchableOpacity style={s.martBtn} onPress={openNearbyMart}>
-        <Ionicons name="location-outline" size={20} color={colors.white} />
-        <Text style={s.martBtnText}>{t('activity.find_mart')}</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -301,14 +287,4 @@ const s = StyleSheet.create({
   workoutCardSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   workoutCardName: { ...typography.label, color: colors.textPrimary, textAlign: 'center' },
   workoutCardMet: { fontSize: 10, fontWeight: '600', color: colors.textSecondary },
-  martBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.skyBlue,
-    borderRadius: 12,
-    padding: spacing.md,
-  },
-  martBtnText: { ...typography.body, color: colors.white },
 });
