@@ -178,10 +178,222 @@ export const MALAYSIAN_FOODS: LocalFood[] = [
   { id: 'my-193', name: 'Masak Lemak Cili Api', calories: 300, proteinG: 20, carbsG: 14, fatG: 20, servingQty: 1, servingUnit: 'serving', category: 'soup' },
   { id: 'my-194', name: 'Soto Ayam', calories: 320, proteinG: 22, carbsG: 30, fatG: 12, servingQty: 1, servingUnit: 'bowl', category: 'soup' },
   { id: 'my-195', name: 'Tom Yam', calories: 150, proteinG: 12, carbsG: 14, fatG: 6, servingQty: 1, servingUnit: 'bowl', category: 'soup' },
+
+  // ── RAW INGREDIENTS (per 100g) ─────────────────────────────────────────────
+  // Grains & cereals
+  { id: 'my-200', name: 'Beras Putih (mentah)', calories: 364, proteinG: 7, carbsG: 80, fatG: 0.7, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-201', name: 'Beras Perang (mentah)', calories: 370, proteinG: 8, carbsG: 77, fatG: 2.9, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-202', name: 'Oat (gulung)', calories: 389, proteinG: 17, carbsG: 66, fatG: 7, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-203', name: 'Tepung Gandum', calories: 364, proteinG: 10, carbsG: 76, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-204', name: 'Tepung Beras', calories: 366, proteinG: 6, carbsG: 80, fatG: 0.6, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-205', name: 'Mee (mentah)', calories: 350, proteinG: 12, carbsG: 70, fatG: 2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-206', name: 'Bihun (mentah)', calories: 364, proteinG: 6, carbsG: 82, fatG: 0.5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-207', name: 'Kuey Teow (mentah)', calories: 109, proteinG: 2, carbsG: 25, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-208', name: 'Roti Putih', calories: 265, proteinG: 9, carbsG: 51, fatG: 3, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-209', name: 'Roti Wholemeal', calories: 247, proteinG: 10, carbsG: 44, fatG: 3, servingQty: 100, servingUnit: 'g', category: 'raw' },
+
+  // Legumes & beans
+  { id: 'my-210', name: 'Kacang Merah (masak)', calories: 127, proteinG: 9, carbsG: 23, fatG: 0.5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-211', name: 'Kacang Hijau (masak)', calories: 105, proteinG: 7, carbsG: 19, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-212', name: 'Kacang Soya (masak)', calories: 173, proteinG: 17, carbsG: 10, fatG: 9, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-213', name: 'Dal Merah (masak)', calories: 116, proteinG: 9, carbsG: 20, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-214', name: 'Kacang Botor (mentah)', calories: 49, proteinG: 3, carbsG: 9, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-215', name: 'Kacang Panjang (mentah)', calories: 47, proteinG: 3, carbsG: 8, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-216', name: 'Taugeh (mentah)', calories: 30, proteinG: 3, carbsG: 6, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+
+  // Meat & poultry (raw, per 100g)
+  { id: 'my-220', name: 'Dada Ayam (mentah)', calories: 110, proteinG: 23, carbsG: 0, fatG: 1.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-221', name: 'Peha Ayam (mentah)', calories: 177, proteinG: 18, carbsG: 0, fatG: 11, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-222', name: 'Daging Lembu (mentah)', calories: 143, proteinG: 22, carbsG: 0, fatG: 6, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-223', name: 'Daging Kambing (mentah)', calories: 109, proteinG: 20, carbsG: 0, fatG: 3, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-224', name: 'Daging Babi (mentah)', calories: 242, proteinG: 17, carbsG: 0, fatG: 19, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-225', name: 'Hati Ayam (mentah)', calories: 119, proteinG: 17, carbsG: 1, fatG: 5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-226', name: 'Telur Ayam (mentah)', calories: 147, proteinG: 13, carbsG: 0.6, fatG: 10, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-227', name: 'Telur Itik (mentah)', calories: 185, proteinG: 13, carbsG: 1, fatG: 14, servingQty: 100, servingUnit: 'g', category: 'raw' },
+
+  // Fish & seafood (raw, per 100g)
+  { id: 'my-230', name: 'Ikan Kembung (mentah)', calories: 109, proteinG: 22, carbsG: 0, fatG: 2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-231', name: 'Ikan Siakap (mentah)', calories: 87, proteinG: 19, carbsG: 0, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-232', name: 'Ikan Tenggiri (mentah)', calories: 103, proteinG: 20, carbsG: 0, fatG: 2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-233', name: 'Ikan Tilapia (mentah)', calories: 96, proteinG: 20, carbsG: 0, fatG: 2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-234', name: 'Ikan Salmon (mentah)', calories: 208, proteinG: 20, carbsG: 0, fatG: 13, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-235', name: 'Ikan Tuna (mentah)', calories: 144, proteinG: 23, carbsG: 0, fatG: 5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-236', name: 'Ikan Bilis (kering)', calories: 295, proteinG: 59, carbsG: 0, fatG: 5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-237', name: 'Udang (mentah)', calories: 85, proteinG: 18, carbsG: 1, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-238', name: 'Ketam (mentah)', calories: 87, proteinG: 18, carbsG: 0, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-239', name: 'Sotong (mentah)', calories: 92, proteinG: 16, carbsG: 3, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-240', name: 'Kerang (mentah)', calories: 74, proteinG: 13, carbsG: 4, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+
+  // Tofu & soy products
+  { id: 'my-245', name: 'Tahu Keras', calories: 144, proteinG: 17, carbsG: 2, fatG: 8, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-246', name: 'Tahu Lembut', calories: 62, proteinG: 6, carbsG: 2, fatG: 4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-247', name: 'Tempe (mentah)', calories: 192, proteinG: 20, carbsG: 8, fatG: 11, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-248', name: 'Susu Kacang Soya (tanpa gula)', calories: 54, proteinG: 4, carbsG: 5, fatG: 2, servingQty: 240, servingUnit: 'ml', category: 'raw' },
+
+  // Vegetables (raw, per 100g)
+  { id: 'my-250', name: 'Bayam (mentah)', calories: 23, proteinG: 3, carbsG: 4, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-251', name: 'Kangkung (mentah)', calories: 19, proteinG: 3, carbsG: 3, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-252', name: 'Kobis (mentah)', calories: 25, proteinG: 1, carbsG: 6, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-253', name: 'Brokoli (mentah)', calories: 34, proteinG: 3, carbsG: 7, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-254', name: 'Lobak Merah (mentah)', calories: 41, proteinG: 1, carbsG: 10, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-255', name: 'Tomato (mentah)', calories: 18, proteinG: 1, carbsG: 4, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-256', name: 'Timun (mentah)', calories: 15, proteinG: 0.7, carbsG: 4, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-257', name: 'Terung (mentah)', calories: 25, proteinG: 1, carbsG: 6, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-258', name: 'Bendi (mentah)', calories: 33, proteinG: 2, carbsG: 7, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-259', name: 'Peria (mentah)', calories: 17, proteinG: 1, carbsG: 4, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-260', name: 'Labu (mentah)', calories: 26, proteinG: 1, carbsG: 7, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-261', name: 'Ubi Kentang (mentah)', calories: 77, proteinG: 2, carbsG: 17, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-262', name: 'Ubi Keledek (mentah)', calories: 86, proteinG: 2, carbsG: 20, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-263', name: 'Keladi (mentah)', calories: 94, proteinG: 1, carbsG: 23, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-264', name: 'Bawang Besar (mentah)', calories: 40, proteinG: 1, carbsG: 9, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-265', name: 'Bawang Putih (mentah)', calories: 149, proteinG: 6, carbsG: 33, fatG: 0.5, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-266', name: 'Halia (mentah)', calories: 80, proteinG: 2, carbsG: 18, fatG: 0.8, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-267', name: 'Cili Merah (mentah)', calories: 40, proteinG: 2, carbsG: 9, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-268', name: 'Bunga Kol (mentah)', calories: 25, proteinG: 2, carbsG: 5, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'raw' },
+  { id: 'my-269', name: 'Pucuk Paku (mentah)', calories: 33, proteinG: 4, carbsG: 5, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'raw' },
+
+  // Fruits (per 100g)
+  { id: 'my-270', name: 'Pisang Berangan', calories: 99, proteinG: 1, carbsG: 26, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-271', name: 'Pisang Emas', calories: 89, proteinG: 1, carbsG: 23, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-272', name: 'Mangga Harum Manis', calories: 70, proteinG: 1, carbsG: 18, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-273', name: 'Tembikai Merah', calories: 30, proteinG: 0.6, carbsG: 8, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-274', name: 'Betik Masak', calories: 43, proteinG: 0.5, carbsG: 11, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-275', name: 'Nenas Segar', calories: 50, proteinG: 0.5, carbsG: 13, fatG: 0.1, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-276', name: 'Rambutan', calories: 68, proteinG: 0.9, carbsG: 16, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-277', name: 'Langsat', calories: 57, proteinG: 1, carbsG: 14, fatG: 0.2, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-278', name: 'Jambu Batu Merah', calories: 68, proteinG: 1, carbsG: 14, fatG: 1, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-279', name: 'Durian D24', calories: 147, proteinG: 1.5, carbsG: 27, fatG: 5, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-280', name: 'Cempedak', calories: 116, proteinG: 2, carbsG: 27, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-281', name: 'Nangka Masak', calories: 95, proteinG: 1.7, carbsG: 23, fatG: 0.6, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-282', name: 'Limau Mandarin', calories: 53, proteinG: 0.8, carbsG: 13, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-283', name: 'Limau Nipis', calories: 29, proteinG: 0.7, carbsG: 9, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-284', name: 'Buah Duku', calories: 66, proteinG: 1, carbsG: 16, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-285', name: 'Manggis', calories: 73, proteinG: 0.5, carbsG: 18, fatG: 0.6, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-286', name: 'Buah Salak', calories: 82, proteinG: 0.8, carbsG: 21, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+  { id: 'my-287', name: 'Belimbing Besi', calories: 31, proteinG: 1, carbsG: 7, fatG: 0.3, servingQty: 100, servingUnit: 'g', category: 'fruit' },
+
+  // Dairy & eggs
+  { id: 'my-290', name: 'Susu Lembu (segar)', calories: 61, proteinG: 3, carbsG: 4.7, fatG: 3.3, servingQty: 240, servingUnit: 'ml', category: 'dairy' },
+  { id: 'my-291', name: 'Susu Rendah Lemak', calories: 46, proteinG: 3.3, carbsG: 4.8, fatG: 1, servingQty: 240, servingUnit: 'ml', category: 'dairy' },
+  { id: 'my-292', name: 'Yogurt Biasa', calories: 61, proteinG: 3.5, carbsG: 5, fatG: 3.3, servingQty: 100, servingUnit: 'g', category: 'dairy' },
+  { id: 'my-293', name: 'Yogurt Greek', calories: 73, proteinG: 10, carbsG: 4, fatG: 0.4, servingQty: 100, servingUnit: 'g', category: 'dairy' },
+  { id: 'my-294', name: 'Keju Cheddar', calories: 403, proteinG: 25, carbsG: 1.3, fatG: 33, servingQty: 30, servingUnit: 'g', category: 'dairy' },
+  { id: 'my-295', name: 'Mentega', calories: 717, proteinG: 0.9, carbsG: 0.1, fatG: 81, servingQty: 10, servingUnit: 'g', category: 'dairy' },
+  { id: 'my-296', name: 'Susu Pekat Manis', calories: 321, proteinG: 8, carbsG: 54, fatG: 8.7, servingQty: 40, servingUnit: 'g', category: 'dairy' },
+
+  // Oils & fats (per 1 tbsp / 15ml)
+  { id: 'my-300', name: 'Minyak Masak (Kelapa Sawit)', calories: 120, proteinG: 0, carbsG: 0, fatG: 14, servingQty: 1, servingUnit: 'tbsp', category: 'raw' },
+  { id: 'my-301', name: 'Minyak Zaitun', calories: 119, proteinG: 0, carbsG: 0, fatG: 14, servingQty: 1, servingUnit: 'tbsp', category: 'raw' },
+  { id: 'my-302', name: 'Minyak Kelapa', calories: 121, proteinG: 0, carbsG: 0, fatG: 14, servingQty: 1, servingUnit: 'tbsp', category: 'raw' },
+  { id: 'my-303', name: 'Santan (pekat)', calories: 93, proteinG: 1, carbsG: 2, fatG: 9, servingQty: 50, servingUnit: 'ml', category: 'raw' },
+  { id: 'my-304', name: 'Santan (cair)', calories: 38, proteinG: 0.4, carbsG: 2, fatG: 3.4, servingQty: 100, servingUnit: 'ml', category: 'raw' },
+
+  // More prepared Malaysian foods ──────────────────────────────────────────
+  { id: 'my-310', name: 'Nasi Impit', calories: 160, proteinG: 3, carbsG: 36, fatG: 0.3, servingQty: 3, servingUnit: 'pieces', category: 'rice' },
+  { id: 'my-311', name: 'Ketupat', calories: 165, proteinG: 3, carbsG: 36, fatG: 0.3, servingQty: 1, servingUnit: 'piece', category: 'rice' },
+  { id: 'my-312', name: 'Lemang', calories: 220, proteinG: 4, carbsG: 38, fatG: 6, servingQty: 1, servingUnit: 'piece', category: 'rice' },
+  { id: 'my-313', name: 'Pulut Kuning', calories: 340, proteinG: 5, carbsG: 70, fatG: 5, servingQty: 1, servingUnit: 'serving', category: 'rice' },
+  { id: 'my-314', name: 'Nasi Goreng Kampung', calories: 480, proteinG: 16, carbsG: 66, fatG: 18, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-315', name: 'Nasi Goreng Pattaya', calories: 520, proteinG: 18, carbsG: 70, fatG: 20, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-316', name: 'Nasi Goreng USA', calories: 560, proteinG: 22, carbsG: 68, fatG: 22, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-317', name: 'Nasi Ambeng', calories: 600, proteinG: 26, carbsG: 74, fatG: 22, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-318', name: 'Nasi Minyak (kenduri)', calories: 420, proteinG: 8, carbsG: 76, fatG: 12, servingQty: 1, servingUnit: 'cup', category: 'rice' },
+
+  // More noodles
+  { id: 'my-320', name: 'Maggi Goreng Mamak', calories: 580, proteinG: 18, carbsG: 78, fatG: 22, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+  { id: 'my-321', name: 'Mee Goreng Basah', calories: 460, proteinG: 16, carbsG: 64, fatG: 16, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+  { id: 'my-322', name: 'Mee Hoon Sup', calories: 280, proteinG: 10, carbsG: 48, fatG: 6, servingQty: 1, servingUnit: 'bowl', category: 'noodles' },
+  { id: 'my-323', name: 'Kuey Teow Goreng', calories: 520, proteinG: 16, carbsG: 72, fatG: 18, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+  { id: 'my-324', name: 'Yee Mee Soup', calories: 380, proteinG: 14, carbsG: 60, fatG: 10, servingQty: 1, servingUnit: 'bowl', category: 'noodles' },
+  { id: 'my-325', name: 'Penang Hokkien Mee', calories: 450, proteinG: 20, carbsG: 58, fatG: 16, servingQty: 1, servingUnit: 'bowl', category: 'noodles' },
+  { id: 'my-326', name: 'Laksa Johor', calories: 420, proteinG: 18, carbsG: 55, fatG: 16, servingQty: 1, servingUnit: 'bowl', category: 'noodles' },
+  { id: 'my-327', name: 'Fried Meehoon', calories: 380, proteinG: 10, carbsG: 60, fatG: 12, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+
+  // Kuih & traditional snacks
+  { id: 'my-330', name: 'Kuih Apam Balik', calories: 280, proteinG: 6, carbsG: 48, fatG: 8, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-331', name: 'Kuih Cara Manis', calories: 90, proteinG: 2, carbsG: 18, fatG: 2, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-332', name: 'Kuih Penyaram', calories: 120, proteinG: 2, carbsG: 24, fatG: 3, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-333', name: 'Kuih Nekbat', calories: 110, proteinG: 2, carbsG: 22, fatG: 2, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-334', name: 'Kuih Keladi', calories: 130, proteinG: 2, carbsG: 24, fatG: 3, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-335', name: 'Dodol', calories: 210, proteinG: 1, carbsG: 50, fatG: 3, servingQty: 50, servingUnit: 'g', category: 'snack' },
+  { id: 'my-336', name: 'Wajik', calories: 190, proteinG: 2, carbsG: 40, fatG: 4, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-337', name: 'Putu Piring', calories: 150, proteinG: 2, carbsG: 30, fatG: 3, servingQty: 3, servingUnit: 'pieces', category: 'snack' },
+  { id: 'my-338', name: 'Putu Bambu', calories: 130, proteinG: 2, carbsG: 28, fatG: 2, servingQty: 3, servingUnit: 'pieces', category: 'snack' },
+  { id: 'my-339', name: 'Rempeyek', calories: 180, proteinG: 5, carbsG: 20, fatG: 9, servingQty: 1, servingUnit: 'serving', category: 'snack' },
+  { id: 'my-340', name: 'Murukku', calories: 470, proteinG: 9, carbsG: 56, fatG: 24, servingQty: 100, servingUnit: 'g', category: 'snack' },
+  { id: 'my-341', name: 'Kacang Goreng Masin', calories: 560, proteinG: 26, carbsG: 26, fatG: 42, servingQty: 100, servingUnit: 'g', category: 'snack' },
+  { id: 'my-342', name: 'Keripik Pisang', calories: 520, proteinG: 2, carbsG: 60, fatG: 28, servingQty: 100, servingUnit: 'g', category: 'snack' },
+  { id: 'my-343', name: 'Keropok Udang', calories: 480, proteinG: 14, carbsG: 62, fatG: 20, servingQty: 100, servingUnit: 'g', category: 'snack' },
+  { id: 'my-344', name: 'Cucur Badak', calories: 140, proteinG: 3, carbsG: 22, fatG: 5, servingQty: 1, servingUnit: 'piece', category: 'snack' },
+  { id: 'my-345', name: 'Jemput-jemput Pisang', calories: 160, proteinG: 2, carbsG: 26, fatG: 6, servingQty: 3, servingUnit: 'pieces', category: 'snack' },
+
+  // More proteins / lauk
+  { id: 'my-350', name: 'Kari Ayam', calories: 340, proteinG: 30, carbsG: 12, fatG: 20, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-351', name: 'Kari Daging', calories: 380, proteinG: 28, carbsG: 14, fatG: 24, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-352', name: 'Kari Ikan', calories: 260, proteinG: 24, carbsG: 10, fatG: 14, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-353', name: 'Sambal Ikan Bilis', calories: 160, proteinG: 12, carbsG: 10, fatG: 8, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-354', name: 'Asam Pedas Ikan', calories: 200, proteinG: 22, carbsG: 12, fatG: 8, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-355', name: 'Ayam Masak Lemak Kuning', calories: 360, proteinG: 30, carbsG: 10, fatG: 22, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-356', name: 'Daging Salai Masak Lemak', calories: 400, proteinG: 28, carbsG: 12, fatG: 28, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-357', name: 'Ayam Percik', calories: 340, proteinG: 35, carbsG: 12, fatG: 18, servingQty: 1, servingUnit: 'piece', category: 'protein' },
+  { id: 'my-358', name: 'Paru Goreng Berlada', calories: 290, proteinG: 26, carbsG: 8, fatG: 18, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-359', name: 'Udang Masak Lemak Nenas', calories: 260, proteinG: 20, carbsG: 16, fatG: 14, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-360', name: 'Sotong Masak Hitam', calories: 200, proteinG: 18, carbsG: 10, fatG: 10, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-361', name: 'Ikan Patin Masak Tempoyak', calories: 280, proteinG: 22, carbsG: 8, fatG: 18, servingQty: 1, servingUnit: 'serving', category: 'protein' },
+  { id: 'my-362', name: 'Kerang Rebus', calories: 110, proteinG: 18, carbsG: 5, fatG: 2, servingQty: 10, servingUnit: 'pieces', category: 'protein' },
+
+  // More beverages
+  { id: 'my-370', name: 'Cham (teh+kopi)', calories: 120, proteinG: 3, carbsG: 22, fatG: 3, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-371', name: 'Teh Ais Limau', calories: 90, proteinG: 0, carbsG: 23, fatG: 0, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-372', name: 'Kopi Ais Susu', calories: 130, proteinG: 3, carbsG: 22, fatG: 4, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-373', name: 'Horlicks Ais', calories: 180, proteinG: 5, carbsG: 34, fatG: 3, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-374', name: 'Ovaltine Susu', calories: 170, proteinG: 5, carbsG: 30, fatG: 4, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-375', name: 'Jus Belimbing', calories: 65, proteinG: 0.5, carbsG: 16, fatG: 0, servingQty: 250, servingUnit: 'ml', category: 'beverage' },
+  { id: 'my-376', name: 'Jus Betik', calories: 75, proteinG: 0.5, carbsG: 19, fatG: 0, servingQty: 250, servingUnit: 'ml', category: 'beverage' },
+  { id: 'my-377', name: 'Air Barli', calories: 60, proteinG: 0, carbsG: 15, fatG: 0, servingQty: 250, servingUnit: 'ml', category: 'beverage' },
+  { id: 'my-378', name: 'Air Asam Boi', calories: 70, proteinG: 0, carbsG: 18, fatG: 0, servingQty: 250, servingUnit: 'ml', category: 'beverage' },
+  { id: 'my-379', name: 'Teh Tarik Kurang Manis', calories: 90, proteinG: 3, carbsG: 14, fatG: 2, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+  { id: 'my-380', name: 'Air Kelapa Muda', calories: 46, proteinG: 0.5, carbsG: 10, fatG: 0.5, servingQty: 350, servingUnit: 'ml', category: 'beverage' },
+  { id: 'my-381', name: 'Cincau Hitam', calories: 10, proteinG: 0, carbsG: 2, fatG: 0, servingQty: 100, servingUnit: 'g', category: 'beverage' },
+
+  // Desserts / sweet
+  { id: 'my-390', name: 'Kuih Bingka Ubi', calories: 180, proteinG: 2, carbsG: 36, fatG: 4, servingQty: 1, servingUnit: 'piece', category: 'dessert' },
+  { id: 'my-391', name: 'Kuih Lopes', calories: 140, proteinG: 2, carbsG: 30, fatG: 2, servingQty: 1, servingUnit: 'piece', category: 'dessert' },
+  { id: 'my-392', name: 'Pengat Durian', calories: 280, proteinG: 3, carbsG: 46, fatG: 10, servingQty: 1, servingUnit: 'bowl', category: 'dessert' },
+  { id: 'my-393', name: 'Ais Kacang Special', calories: 380, proteinG: 7, carbsG: 78, fatG: 6, servingQty: 1, servingUnit: 'bowl', category: 'dessert' },
+  { id: 'my-394', name: 'Bubur Cha-cha', calories: 260, proteinG: 3, carbsG: 50, fatG: 6, servingQty: 1, servingUnit: 'bowl', category: 'dessert' },
+  { id: 'my-395', name: 'Es Cendol (Cendol Kelapa)', calories: 310, proteinG: 3, carbsG: 62, fatG: 7, servingQty: 1, servingUnit: 'bowl', category: 'dessert' },
+  { id: 'my-396', name: 'Kuih Talam Pandan', calories: 120, proteinG: 2, carbsG: 24, fatG: 3, servingQty: 1, servingUnit: 'piece', category: 'dessert' },
+  { id: 'my-397', name: 'Halwa Maskat', calories: 300, proteinG: 1, carbsG: 70, fatG: 5, servingQty: 100, servingUnit: 'g', category: 'dessert' },
+  { id: 'my-398', name: 'Aiskrim Potong', calories: 130, proteinG: 2, carbsG: 20, fatG: 5, servingQty: 1, servingUnit: 'piece', category: 'dessert' },
+
+  // Indian Malaysian foods
+  { id: 'my-400', name: 'Nasi Kandar (dengan lauk lengkap)', calories: 680, proteinG: 32, carbsG: 78, fatG: 28, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-401', name: 'Roti Prata', calories: 300, proteinG: 7, carbsG: 44, fatG: 11, servingQty: 1, servingUnit: 'piece', category: 'bread' },
+  { id: 'my-402', name: 'Roti Tissue', calories: 420, proteinG: 8, carbsG: 68, fatG: 14, servingQty: 1, servingUnit: 'piece', category: 'bread' },
+  { id: 'my-403', name: 'Thosai (Tosai Biasa)', calories: 175, proteinG: 5, carbsG: 32, fatG: 3, servingQty: 1, servingUnit: 'piece', category: 'bread' },
+  { id: 'my-404', name: 'Idli', calories: 58, proteinG: 2, carbsG: 12, fatG: 0.2, servingQty: 1, servingUnit: 'piece', category: 'bread' },
+  { id: 'my-405', name: 'Dhal Curry (restoran)', calories: 200, proteinG: 11, carbsG: 28, fatG: 6, servingQty: 1, servingUnit: 'cup', category: 'protein' },
+  { id: 'my-406', name: 'Chicken Briyani Rice', calories: 580, proteinG: 28, carbsG: 76, fatG: 18, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-407', name: 'Mee Mamak Goreng', calories: 560, proteinG: 18, carbsG: 76, fatG: 20, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+  { id: 'my-408', name: 'Teh Tarik Pekat', calories: 160, proteinG: 4, carbsG: 28, fatG: 4, servingQty: 1, servingUnit: 'cup', category: 'beverage' },
+
+  // Chinese Malaysian foods
+  { id: 'my-410', name: 'Dim Sum (3 pcs har gao)', calories: 105, proteinG: 7, carbsG: 14, fatG: 2, servingQty: 3, servingUnit: 'pieces', category: 'snack' },
+  { id: 'my-411', name: 'Dim Sum (3 pcs siew mai)', calories: 120, proteinG: 9, carbsG: 10, fatG: 5, servingQty: 3, servingUnit: 'pieces', category: 'snack' },
+  { id: 'my-412', name: 'Chee Cheong Fun (sos kicap)', calories: 250, proteinG: 6, carbsG: 48, fatG: 4, servingQty: 1, servingUnit: 'plate', category: 'noodles' },
+  { id: 'my-413', name: 'Yong Tau Fu (5 pcs)', calories: 180, proteinG: 12, carbsG: 20, fatG: 6, servingQty: 5, servingUnit: 'pieces', category: 'protein' },
+  { id: 'my-414', name: 'Claypot Chicken Rice', calories: 580, proteinG: 28, carbsG: 72, fatG: 20, servingQty: 1, servingUnit: 'pot', category: 'rice' },
+  { id: 'my-415', name: 'Wantan Soup', calories: 190, proteinG: 10, carbsG: 26, fatG: 5, servingQty: 1, servingUnit: 'bowl', category: 'soup' },
+  { id: 'my-416', name: 'Char Siu (Siu Bak)', calories: 280, proteinG: 22, carbsG: 14, fatG: 16, servingQty: 100, servingUnit: 'g', category: 'protein' },
+  { id: 'my-417', name: 'Bak Chor Mee', calories: 460, proteinG: 18, carbsG: 64, fatG: 16, servingQty: 1, servingUnit: 'bowl', category: 'noodles' },
+  { id: 'my-418', name: 'Chicken Rice (nasi ayam)', calories: 490, proteinG: 26, carbsG: 66, fatG: 14, servingQty: 1, servingUnit: 'plate', category: 'rice' },
 ];
 
 export function searchLocalFoods(query: string): LocalFood[] {
-  if (!query.trim()) return MALAYSIAN_FOODS.slice(0, 25);
+  if (!query.trim()) return MALAYSIAN_FOODS.slice(0, 30);
   const q = query.toLowerCase();
-  return MALAYSIAN_FOODS.filter((f) => f.name.toLowerCase().includes(q)).slice(0, 30);
+  return MALAYSIAN_FOODS.filter(
+    (f) => f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q)
+  ).slice(0, 50);
 }
