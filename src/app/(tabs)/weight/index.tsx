@@ -19,10 +19,10 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { CheckCircle, ArrowRight, Trash } from 'phosphor-react-native';
 import Svg, { Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 import { useWeightStore } from '../../../stores/weightStore';
 import { useProfileStore } from '../../../stores/profileStore';
 import { calculateBMI, getBMICategory } from '../../../constants/tdee';
@@ -218,7 +218,7 @@ export default function WeightScreen() {
         </TouchableOpacity>
         {todayLog && (
           <View style={s.todayRow}>
-            <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+            <CheckCircle size={16} weight="fill" color={colors.primary} />
             <Text style={s.todayText}>
               {t('weight.today_logged', { n: todayLog.weightKg })}
             </Text>
@@ -235,7 +235,7 @@ export default function WeightScreen() {
               <Text style={s.goalValue}>{currentWeight} kg</Text>
               <Text style={s.goalLabel}>{t('weight.current')}</Text>
             </View>
-            <Ionicons name="arrow-forward" size={20} color={colors.textSecondary} />
+            <ArrowRight size={20} weight="regular" color={colors.textSecondary} />
             <View style={s.goalStat}>
               <Text style={[s.goalValue, { color: colors.primary }]}>{targetWeight} kg</Text>
               <Text style={s.goalLabel}>{t('weight.target')}</Text>
@@ -306,7 +306,7 @@ export default function WeightScreen() {
                 }
                 style={s.deleteBtn}
               >
-                <Ionicons name="trash-outline" size={16} color={colors.textSecondary} />
+                <Trash size={16} weight="regular" color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           ))}
@@ -320,7 +320,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.white },
   content: { padding: spacing.md, paddingBottom: spacing.xl },
   title: { ...typography.heading, color: colors.textPrimary, marginBottom: spacing.md },
-  card: { backgroundColor: colors.background, borderRadius: 12, padding: spacing.md, marginBottom: spacing.md },
+  card: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md, ...shadow.sm },
   cardTitle: { ...typography.body, color: colors.textPrimary, marginBottom: spacing.sm },
   row: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm },
   input: {

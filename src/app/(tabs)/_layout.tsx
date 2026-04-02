@@ -1,6 +1,15 @@
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  House,
+  ForkKnife,
+  Scales,
+  Drop,
+  Barbell,
+  BookOpenText,
+  Storefront,
+  UserCircle,
+} from 'phosphor-react-native';
 import { colors } from '../../constants/theme';
 
 export default function TabLayout() {
@@ -12,9 +21,14 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: colors.white,
+          borderTopColor: colors.borderLight,
           height: 64,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: -2 },
         },
         headerShown: false,
       }}
@@ -26,11 +40,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.home'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={size}
-              color={color}
-            />
+            <House size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -39,11 +49,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.food'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'restaurant' : 'restaurant-outline'}
-              size={size}
-              color={color}
-            />
+            <ForkKnife size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -52,11 +58,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.weight'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'scale' : 'scale-outline'}
-              size={size}
-              color={color}
-            />
+            <Scales size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -65,11 +67,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.water'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'water' : 'water-outline'}
-              size={size}
-              color={color}
-            />
+            <Drop size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -78,11 +76,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.activity'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'barbell' : 'barbell-outline'}
-              size={size}
-              color={color}
-            />
+            <Barbell size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -91,11 +85,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.recipes'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'book' : 'book-outline'}
-              size={size}
-              color={color}
-            />
+            <BookOpenText size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -104,11 +94,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.grocery'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'storefront' : 'storefront-outline'}
-              size={size}
-              color={color}
-            />
+            <Storefront size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -117,11 +103,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.profile'),
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? 'person' : 'person-outline'}
-              size={size}
-              color={color}
-            />
+            <UserCircle size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />

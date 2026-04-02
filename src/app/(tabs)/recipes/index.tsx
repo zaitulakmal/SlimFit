@@ -4,20 +4,22 @@ import {
   TouchableOpacity, TextInput, FlatList,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Clock, Users, CaretUp, CaretDown, Lightbulb, MagnifyingGlass, GridFour, Sun, CloudSun, Moon, Coffee, Drop } from 'phosphor-react-native';
+import React from 'react';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 import { RECIPES, searchRecipes, type Recipe } from '../../../data/recipes';
 
 type Category = 'all' | Recipe['category'];
 
-const CATS: { key: Category; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { key: 'all',       icon: 'grid-outline' },
-  { key: 'breakfast', icon: 'sunny-outline' },
-  { key: 'lunch',     icon: 'partly-sunny-outline' },
-  { key: 'dinner',    icon: 'moon-outline' },
-  { key: 'snack',     icon: 'cafe-outline' },
-  { key: 'drink',     icon: 'water-outline' },
+type IconComponent = React.ComponentType<{ size: number; color: string; weight?: string }>;
+const CATS: { key: Category; Icon: IconComponent }[] = [
+  { key: 'all',       Icon: GridFour as IconComponent },
+  { key: 'breakfast', Icon: Sun as IconComponent },
+  { key: 'lunch',     Icon: CloudSun as IconComponent },
+  { key: 'dinner',    Icon: Moon as IconComponent },
+  { key: 'snack',     Icon: Coffee as IconComponent },
+  { key: 'drink',     Icon: Drop as IconComponent },
 ];
 
 const DIFF_COLOR: Record<string, string> = {
@@ -91,11 +93,11 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
         {/* Meta row */}
         <View style={s.metaRow}>
           <View style={s.metaItem}>
-            <Ionicons name="time-outline" size={13} color={colors.textSecondary} />
+            <Clock size={13} weight="regular" color={colors.textSecondary} />
             <Text style={s.metaText}>{totalMin} min</Text>
           </View>
           <View style={s.metaItem}>
-            <Ionicons name="people-outline" size={13} color={colors.textSecondary} />
+            <Users size={13} weight="regular" color={colors.textSecondary} />
             <Text style={s.metaText}>{recipe.servings} serving{recipe.servings > 1 ? 's' : ''}</Text>
           </View>
         </View>
@@ -120,7 +122,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
         {/* Expand arrow */}
         <View style={s.expandRow}>
           <Text style={s.expandHint}>{open ? t('recipe.hide_detail') : t('recipe.see_detail')}</Text>
-          <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color={colors.primary} />
+          {open ? <CaretUp size={16} weight="bold" color={colors.primary} /> : <CaretDown size={16} weight="bold" color={colors.primary} />}
         </View>
 
         {/* Expanded detail */}
@@ -129,7 +131,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
             {/* Healthy tip */}
             {recipe.tip ? (
               <View style={s.tipBox}>
-                <Ionicons name="bulb-outline" size={16} color={colors.vividGreen} />
+                <Lightbulb size={16} weight="regular" color={colors.vividGreen} />
                 <Text style={s.tipText}>{recipe.tip}</Text>
               </View>
             ) : null}
@@ -177,7 +179,7 @@ export default function RecipesScreen() {
 
       {/* Search bar */}
       <View style={s.searchBar}>
-        <Ionicons name="search" size={18} color={colors.textSecondary} />
+        <MagnifyingGlass size={18} weight="regular" color={colors.textSecondary} />
         <TextInput
           style={s.searchInput}
           value={query}
@@ -190,7 +192,7 @@ export default function RecipesScreen() {
 
       {/* Category filter */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.catRow} contentContainerStyle={s.catContent}>
-        {CATS.map(({ key, icon }) => {
+        {CATS.map(({ key, Icon }) => {
           const active = cat === key;
           const color  = active ? colors.white : CAT_COLOR[key] ?? colors.textSecondary;
           return (
@@ -199,7 +201,7 @@ export default function RecipesScreen() {
               style={[s.catChip, active && { backgroundColor: CAT_COLOR[key] ?? colors.primary, borderColor: 'transparent' }]}
               onPress={() => setCat(key)}
             >
-              <Ionicons name={icon} size={14} color={color} />
+              <Icon size={14} color={color} weight={active ? 'fill' : 'regular'} />
               <Text style={[s.catLabel, active && { color: colors.white }]}>
                 {key === 'all' ? t('activity.all') : t(`food.meal_${key}`, { defaultValue: key })}
               </Text>
@@ -224,7 +226,7 @@ export default function RecipesScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={s.empty}>
-            <Ionicons name="search-outline" size={48} color={colors.border} />
+            <MagnifyingGlass size={48} weight="regular" color={colors.border} />
             <Text style={s.emptyText}>{t('food.no_results')}</Text>
           </View>
         }
@@ -272,11 +274,10 @@ const s = StyleSheet.create({
   list: { padding: spacing.md, gap: spacing.md, paddingBottom: 100 },
 
   card: {
-    backgroundColor: colors.white, borderRadius: 16,
-    borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.card, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.borderLight,
     overflow: 'hidden',
-    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    ...shadow.sm,
   },
   cardBanner: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',

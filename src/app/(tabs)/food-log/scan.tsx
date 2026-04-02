@@ -6,7 +6,7 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Camera, X, Warning, Barcode, PlusCircle } from 'phosphor-react-native';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { lookupBarcodeNix } from '../../../services/nutritionix';
@@ -94,7 +94,7 @@ export default function BarcodeScanScreen() {
   if (!permission.granted) {
     return (
       <View style={s.permissionContainer}>
-        <Ionicons name="camera-outline" size={64} color={colors.border} />
+        <Camera size={64} weight="regular" color={colors.border} />
         <Text style={s.permissionText}>{t('food.camera_permission')}</Text>
         <TouchableOpacity style={s.permBtn} onPress={requestPermission}>
           <Text style={s.permBtnText}>{t('food.grant_permission')}</Text>
@@ -126,7 +126,7 @@ export default function BarcodeScanScreen() {
         {/* Top bar */}
         <View style={s.topBar}>
           <TouchableOpacity style={s.closeBtn} onPress={() => router.back()}>
-            <Ionicons name="close" size={28} color={colors.white} />
+            <X size={28} weight="bold" color={colors.white} />
           </TouchableOpacity>
           <Text style={s.topBarTitle}>{t(`food.meal_${mealType ?? 'snack'}`)}</Text>
           <View style={{ width: 44 }} />
@@ -159,7 +159,7 @@ export default function BarcodeScanScreen() {
         {error && !loading && (
           <View style={s.centered}>
             <View style={s.errorBadge}>
-              <Ionicons name="alert-circle-outline" size={24} color={colors.white} />
+              <Warning size={24} weight="regular" color={colors.white} />
               <Text style={s.errorText}>{error}</Text>
               <TouchableOpacity onPress={handleRetry} style={s.retryBtn}>
                 <Text style={s.retryText}>{t('food.scan_again')}</Text>
@@ -203,11 +203,11 @@ export default function BarcodeScanScreen() {
               {/* Action buttons */}
               <View style={s.actionRow}>
                 <TouchableOpacity style={s.retryBtnDark} onPress={handleRetry}>
-                  <Ionicons name="scan-outline" size={18} color={colors.textPrimary} />
+                  <Barcode size={18} weight="regular" color={colors.textPrimary} />
                   <Text style={s.retryBtnText}>{t('food.scan_again')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={s.confirmBtn} onPress={handleConfirm}>
-                  <Ionicons name="add-circle" size={18} color={colors.white} />
+                  <PlusCircle size={18} weight="fill" color={colors.white} />
                   <Text style={s.confirmBtnText}>{t('food.add')}</Text>
                 </TouchableOpacity>
               </View>

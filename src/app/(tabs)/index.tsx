@@ -21,9 +21,9 @@ import {
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { UserCircle, Drop, Scales, Fire, ForkKnife, Barbell } from 'phosphor-react-native';
 
-import { colors, spacing, typography } from '../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../constants/theme';
 import { useProfileStore } from '../../stores/profileStore';
 import { useWeightStore } from '../../stores/weightStore';
 import { useWaterStore } from '../../stores/waterStore';
@@ -88,7 +88,7 @@ export default function HomeScreen() {
   if (!profile) {
     return (
       <View style={s.emptyContainer}>
-        <Ionicons name="person-circle-outline" size={64} color={colors.border} />
+        <UserCircle size={64} weight="regular" color={colors.border} />
         <Text style={s.emptyText}>{t('home.empty_state')}</Text>
       </View>
     );
@@ -172,7 +172,7 @@ export default function HomeScreen() {
           activeOpacity={0.85}
         >
           <View style={s.cardIconRow}>
-            <Ionicons name="water" size={20} color={colors.skyBlue} />
+            <Drop size={20} weight="fill" color={colors.skyBlue} />
             <Text style={[s.cardLabel, { color: colors.skyBlue }]}>{t('tabs.water')}</Text>
           </View>
           <ProgressRing
@@ -204,7 +204,7 @@ export default function HomeScreen() {
           activeOpacity={0.85}
         >
           <View style={s.cardIconRow}>
-            <Ionicons name="scale-outline" size={20} color={colors.primary} />
+            <Scales size={20} weight="regular" color={colors.primary} />
             <Text style={[s.cardLabel, { color: colors.primary }]}>{t('tabs.weight')}</Text>
           </View>
           <Text style={s.cardBigValue}>{currentWeight} kg</Text>
@@ -220,19 +220,19 @@ export default function HomeScreen() {
       {/* Today's summary strip */}
       <View style={s.summaryStrip}>
         <View style={s.summaryItem}>
-          <Ionicons name="flame-outline" size={18} color={colors.amber} />
+          <Fire size={18} weight="regular" color={colors.amber} />
           <Text style={s.summaryValue}>{consumed.toLocaleString()}</Text>
           <Text style={s.summaryLabel}>{t('home.consumed')}</Text>
         </View>
         <View style={s.summaryDivider} />
         <View style={s.summaryItem}>
-          <Ionicons name="restaurant-outline" size={18} color={colors.primary} />
+          <ForkKnife size={18} weight="regular" color={colors.primary} />
           <Text style={s.summaryValue}>{remaining.toLocaleString()}</Text>
           <Text style={s.summaryLabel}>{t('home.remaining')}</Text>
         </View>
         <View style={s.summaryDivider} />
         <View style={s.summaryItem}>
-          <Ionicons name="water-outline" size={18} color={colors.skyBlue} />
+          <Drop size={18} weight="regular" color={colors.skyBlue} />
           <Text style={s.summaryValue}>
             {waterTotalMl >= 1000 ? `${(waterTotalMl / 1000).toFixed(1)}L` : `${waterTotalMl}ml`}
           </Text>
@@ -242,7 +242,7 @@ export default function HomeScreen() {
           <>
             <View style={s.summaryDivider} />
             <View style={s.summaryItem}>
-              <Ionicons name="barbell-outline" size={18} color={colors.coral} />
+              <Barbell size={18} weight="regular" color={colors.coral} />
               <Text style={s.summaryValue}>{totalBurned}</Text>
               <Text style={s.summaryLabel}>{t('activity.burned')}</Text>
             </View>
@@ -259,7 +259,7 @@ const s = StyleSheet.create({
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md, backgroundColor: colors.white },
   emptyText: { ...typography.body, color: colors.textSecondary, textAlign: 'center', paddingHorizontal: spacing.xl },
   greetingSection: { marginBottom: spacing.lg, marginTop: spacing.sm },
-  greetingText: { ...typography.heading, color: colors.textPrimary },
+  greetingText: { fontSize: 28, fontWeight: '800' as any, letterSpacing: -0.6, color: colors.textPrimary, lineHeight: 34 },
   dateText: { ...typography.label, color: colors.textSecondary, marginTop: spacing.xs },
   ringContainer: { alignItems: 'center', marginBottom: spacing.sm },
   ringCenter: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.sm },
@@ -270,11 +270,12 @@ const s = StyleSheet.create({
   cardsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.md },
   card: {
     flex: 1,
-    backgroundColor: colors.background,
-    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
     padding: spacing.md,
     alignItems: 'center',
     gap: spacing.sm,
+    ...shadow.sm,
   },
   cardIconRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' },
   cardLabel: { ...typography.label },
@@ -285,10 +286,11 @@ const s = StyleSheet.create({
   goalProgressFill: { height: 6, backgroundColor: colors.primary, borderRadius: 3 },
   summaryStrip: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
-    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
     padding: spacing.md,
     alignItems: 'center',
+    ...shadow.sm,
   },
   summaryItem: { flex: 1, alignItems: 'center', gap: spacing.xs },
   summaryValue: { ...typography.body, color: colors.textPrimary },

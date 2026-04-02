@@ -16,9 +16,9 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Drop, Flag, Clock, CheckCircle, PlusCircle, X, ArrowCounterClockwise } from 'phosphor-react-native';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
 import { useWaterStore } from '../../../stores/waterStore';
 import ProgressRing from '../../../components/common/ProgressRing';
 
@@ -91,19 +91,19 @@ export default function WaterScreen() {
 
         <View style={s.statsRow}>
           <View style={s.stat}>
-            <Ionicons name="water" size={20} color={colors.skyBlue} />
+            <Drop size={20} weight="fill" color={colors.skyBlue} />
             <Text style={s.statValue}>{glasses}</Text>
             <Text style={s.statLabel}>{t('water.glasses')}</Text>
           </View>
           <View style={s.statDivider} />
           <View style={s.stat}>
-            <Ionicons name="flag-outline" size={20} color={colors.primary} />
+            <Flag size={20} weight="regular" color={colors.primary} />
             <Text style={s.statValue}>{goalGlasses}</Text>
             <Text style={s.statLabel}>{t('water.goal_glasses')}</Text>
           </View>
           <View style={s.statDivider} />
           <View style={s.stat}>
-            <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
+            <Clock size={20} weight="regular" color={colors.textSecondary} />
             <Text style={s.statValue}>{remaining >= 1000 ? `${(remaining / 1000).toFixed(1)}L` : `${remaining}ml`}</Text>
             <Text style={s.statLabel}>{t('water.remaining')}</Text>
           </View>
@@ -113,7 +113,7 @@ export default function WaterScreen() {
       {/* Motivational message */}
       {progress >= 1 ? (
         <View style={s.goalMet}>
-          <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+          <CheckCircle size={20} weight="fill" color={colors.primary} />
           <Text style={s.goalMetText}>{t('water.goal_met')}</Text>
         </View>
       ) : null}
@@ -129,7 +129,7 @@ export default function WaterScreen() {
               onPress={() => handleAdd(ml)}
               activeOpacity={0.75}
             >
-              <Ionicons name="water" size={18} color={colors.skyBlue} />
+              <Drop size={18} weight="fill" color={colors.skyBlue} />
               <Text style={s.quickBtnText}>+{ml}ml</Text>
             </TouchableOpacity>
           ))}
@@ -151,12 +151,12 @@ export default function WaterScreen() {
               <Text style={s.customAddText}>{t('water.add')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.customCancel} onPress={() => setShowCustom(false)}>
-              <Ionicons name="close" size={20} color={colors.textSecondary} />
+              <X size={20} weight="bold" color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity style={s.customToggle} onPress={() => setShowCustom(true)}>
-            <Ionicons name="add-circle-outline" size={18} color={colors.textSecondary} />
+            <PlusCircle size={18} weight="regular" color={colors.textSecondary} />
             <Text style={s.customToggleText}>{t('water.custom_amount')}</Text>
           </TouchableOpacity>
         )}
@@ -165,7 +165,7 @@ export default function WaterScreen() {
       {/* Undo last entry */}
       {totalMl > 0 && (
         <TouchableOpacity style={s.undoBtn} onPress={handleUndo} activeOpacity={0.8}>
-          <Ionicons name="arrow-undo-outline" size={16} color={colors.textSecondary} />
+          <ArrowCounterClockwise size={16} weight="regular" color={colors.textSecondary} />
           <Text style={s.undoBtnText}>{t('water.undo_250')}</Text>
         </TouchableOpacity>
       )}
@@ -197,7 +197,7 @@ const s = StyleSheet.create({
     marginBottom: spacing.md,
   },
   goalMetText: { ...typography.body, color: colors.primary },
-  card: { backgroundColor: colors.background, borderRadius: 12, padding: spacing.md, marginBottom: spacing.md },
+  card: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md, ...shadow.sm },
   cardTitle: { ...typography.body, color: colors.textPrimary, marginBottom: spacing.sm },
   quickRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.sm },
   quickBtn: {

@@ -33,7 +33,20 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { XCircle, Check, PencilSimple, Fire, Drop, Scales, ForkKnife, Trophy, TrendDown } from 'phosphor-react-native';
+
+function PhosphorIcon({ name, size, color }: { name: string; size: number; color: string }) {
+  const props = { size, color, weight: 'fill' as const };
+  switch (name) {
+    case 'flame':        return <Fire {...props} />;
+    case 'water':        return <Drop {...props} />;
+    case 'scale':        return <Scales {...props} />;
+    case 'restaurant':   return <ForkKnife {...props} />;
+    case 'trophy':       return <Trophy {...props} />;
+    case 'trending-down':return <TrendDown {...props} />;
+    default:             return <Fire {...props} />;
+  }
+}
 import Constants from 'expo-constants';
 import Svg, { Rect } from 'react-native-svg';
 
@@ -241,7 +254,7 @@ function EditableRow({
             ))}
           </View>
           <TouchableOpacity onPress={handleCancel}>
-            <Ionicons name="close-circle-outline" size={20} color={colors.textSecondary} />
+            <XCircle size={20} weight="regular" color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       );
@@ -261,10 +274,10 @@ function EditableRow({
         />
         <View style={rowStyles.editActions}>
           <TouchableOpacity onPress={handleSave} style={rowStyles.saveBtn}>
-            <Ionicons name="checkmark" size={18} color={colors.textOnAccent} />
+            <Check size={18} weight="bold" color={colors.textOnAccent} />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleCancel}>
-            <Ionicons name="close-circle-outline" size={20} color={colors.textSecondary} />
+            <XCircle size={20} weight="regular" color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -281,7 +294,7 @@ function EditableRow({
     >
       <Text style={rowStyles.label}>{label}</Text>
       <Text style={rowStyles.value}>{value || '—'}</Text>
-      <Ionicons name="create-outline" size={18} color={colors.textSecondary} />
+      <PencilSimple size={18} weight="regular" color={colors.textSecondary} />
     </Pressable>
   );
 }
@@ -835,7 +848,7 @@ export default function ProfileScreen() {
           const streak = streakMap[type];
           return (
             <View key={type} style={styles.streakCard}>
-              <Ionicons name={icon} size={22} color={color} />
+              <PhosphorIcon name={icon} size={22} color={color} />
               <Text style={[styles.streakValue, { color }]}>{streak?.current ?? 0}</Text>
               <Text style={styles.streakDays}>{t('stats.days')}</Text>
               <Text style={styles.streakLabel} numberOfLines={2}>{label}</Text>
@@ -886,11 +899,7 @@ export default function ProfileScreen() {
           return (
             <View key={def.id} style={[styles.badgeCard, !isUnlocked && styles.badgeLocked]}>
               <View style={[styles.badgeIcon, { backgroundColor: isUnlocked ? def.color + '20' : colors.background }]}>
-                <Ionicons
-                  name={def.icon as any}
-                  size={26}
-                  color={isUnlocked ? def.color : colors.border}
-                />
+                <PhosphorIcon name={def.icon} size={26} color={isUnlocked ? def.color : colors.border} />
               </View>
               <Text style={[styles.badgeTitle, !isUnlocked && styles.badgeTextLocked]} numberOfLines={2}>
                 {isUnlocked ? t(def.titleKey) : t('stats.locked')}

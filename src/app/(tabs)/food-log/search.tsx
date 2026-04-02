@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { ArrowLeft, Barcode, MagnifyingGlass, X } from 'phosphor-react-native';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
@@ -162,7 +162,7 @@ export default function FoodSearchScreen() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <ArrowLeft size={24} weight="regular" color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>{t(`food.meal_${mealType ?? 'breakfast'}`)}</Text>
         <TouchableOpacity
@@ -172,13 +172,13 @@ export default function FoodSearchScreen() {
           style={s.scanBtn}
           accessibilityLabel="Scan barcode"
         >
-          <Ionicons name="barcode-outline" size={24} color={colors.textPrimary} />
+          <Barcode size={24} weight="regular" color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
       {/* Search bar */}
       <View style={s.searchContainer}>
-        <Ionicons name="search" size={18} color={colors.textSecondary} />
+        <MagnifyingGlass size={18} weight="regular" color={colors.textSecondary} />
         <TextInput
           style={s.searchInput}
           value={query}
@@ -222,7 +222,7 @@ export default function FoodSearchScreen() {
               <Text style={s.addConfirmText}>{t('food.add')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setSelected(null)} style={s.cancelBtn}>
-              <Ionicons name="close" size={20} color={colors.textSecondary} />
+              <X size={20} weight="bold" color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -267,7 +267,7 @@ export default function FoodSearchScreen() {
         ListEmptyComponent={
           !loading ? (
             <View style={s.emptyState}>
-              <Ionicons name="search-outline" size={40} color={colors.border} />
+              <MagnifyingGlass size={40} weight="regular" color={colors.border} />
               <Text style={s.emptyText}>{t('food.no_results')}</Text>
             </View>
           ) : null
