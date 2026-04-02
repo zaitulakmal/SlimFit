@@ -100,6 +100,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="grocery"
+        options={{
+          title: t('tabs.grocery'),
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'storefront' : 'storefront-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: t('tabs.profile'),
