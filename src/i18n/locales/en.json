@@ -4,6 +4,7 @@
     "food": "Food",
     "weight": "Weight",
     "water": "Water",
+    "activity": "Activity",
     "profile": "Profile"
   },
   "home": {
@@ -161,6 +162,27 @@
     "half_way_desc": "Reached halfway to your weight goal",
     "goal_reached": "Goal Achieved!",
     "goal_reached_desc": "Reached your target weight"
+  },
+  "activity": {
+    "title": "Activity",
+    "burned": "Burned",
+    "minutes": "min",
+    "sessions": "Sessions",
+    "today_log": "Today's Workouts",
+    "pick_activity": "Choose Activity",
+    "all": "All",
+    "cat_cardio": "Cardio",
+    "cat_strength": "Strength",
+    "cat_flexibility": "Flexibility",
+    "cat_sport": "Sport",
+    "log_btn": "Log Workout",
+    "find_mart": "Find Nearby Fresh Mart"
+  },
+  "recipe": {
+    "title": "Healthy Recipes",
+    "search_placeholder": "Search recipes...",
+    "ingredients": "Ingredients",
+    "steps": "Instructions"
   },
   "common": {
     "error_save": "Couldn't save your profile. Please try again.",

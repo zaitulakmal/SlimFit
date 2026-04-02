@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { lookupBarcodeNix } from '../../../services/nutritionix';
+import { lookupBarcodeOFF } from '../../../services/openFoodFacts';
 import { useFoodStore } from '../../../stores/foodStore';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -26,7 +27,9 @@ export default function BarcodeScanScreen() {
     setLoading(true);
     setError('');
 
-    const food = await lookupBarcodeNix(data);
+    // Try Nutritionix first, then Open Food Facts as free fallback
+    let food = await lookupBarcodeNix(data);
+    if (!food) food = await lookupBarcodeOFF(data) as any;
     setLoading(false);
 
     if (food) {
@@ -40,8 +43,8 @@ export default function BarcodeScanScreen() {
         fatG: food.fatG,
         servingQty: food.servingQty,
         servingUnit: food.servingUnit,
-        source: 'nutritionix',
-        nixItemId: food.nixItemId ?? undefined,
+        source: food.source ?? 'nutritionix',
+        nixItemId: (food as any).nixItemId ?? undefined,
         barcode: data,
         dateStr: currentDateStr,
       });
