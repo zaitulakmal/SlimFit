@@ -1,13 +1,15 @@
 /**
- * ActivityCard — selectable card for the activity level step.
- * Per D-04 and UI-SPEC Activity level card layout:
- *   - Default: white bg, #E5E7EB border, border-radius 12px, 56px min-height
- *   - Selected: #4CAF50 border (2px), #E8F5E9 bg tint, checkmark-circle top-right
+ * ActivityCard — Duolingo-style selectable activity card.
  */
 
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { colors, typography } from '../../constants/theme';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { colors, spacing, radius } from '../../constants/theme-new';
 
 interface ActivityCardProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -17,6 +19,8 @@ interface ActivityCardProps {
   onPress: () => void;
 }
 
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
 export default function ActivityCard({
   icon,
   title,
@@ -24,38 +28,41 @@ export default function ActivityCard({
   selected,
   onPress,
 }: ActivityCardProps) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity
-      style={[styles.card, selected && styles.cardSelected]}
+    <AnimatedTouchable
+      style={[styles.card, selected && styles.cardSelected, animatedStyle]}
       onPress={onPress}
-      activeOpacity={0.8}
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 200 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 10, stiffness: 180 }); }}
+      activeOpacity={1}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
     >
-      {/* Left icon */}
-      <Ionicons
-        name={icon}
-        size={28}
-        color={selected ? colors.primary : colors.textSecondary}
-        style={styles.icon}
-      />
+      <View style={[styles.iconWrap, selected && { backgroundColor: colors.primarySubtle }]}>
+        <Ionicons
+          name={icon}
+          size={28}
+          color={selected ? colors.primary : colors.textSecondary}
+        />
+      </View>
 
-      {/* Label group */}
       <View style={styles.labelGroup}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
 
-      {/* Selected checkmark — top-right */}
       {selected && (
-        <Ionicons
-          name="checkmark-circle"
-          size={20}
-          color={colors.primary}
-          style={styles.checkmark}
-        />
+        <View style={styles.checkmark}>
+          <Ionicons name="checkmark-circle" size={24} color={colors.primary} weight="fill" />
+        </View>
       )}
-    </TouchableOpacity>
+    </AnimatedTouchable>
   );
 }
 
@@ -63,39 +70,46 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 56,
-    backgroundColor: colors.white,
-    borderWidth: 1,
+    minHeight: 64,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 8,
-    position: 'relative',
+    borderRadius: radius.xl,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.sm,
   },
   cardSelected: {
-    borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: colors.selectedTint,
+    backgroundColor: colors.primarySubtle,
   },
-  icon: {
-    marginRight: 12,
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.borderLight,
+    marginRight: spacing.md,
   },
   labelGroup: {
     flex: 1,
   },
   title: {
-    ...typography.body,
-    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  titleSelected: {
+    color: colors.primary,
+    fontWeight: '700',
   },
   description: {
-    ...typography.label,
+    fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
   },
   checkmark: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
+    marginLeft: spacing.sm,
   },
 });

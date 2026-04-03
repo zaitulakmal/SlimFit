@@ -27,6 +27,10 @@ function parseOFFProduct(p: any): OFFFood | null {
     p.product_name_ms ||
     p.product_name_en ||
     p.product_name ||
+    p['product_name_fr'] ||
+    p.generic_name_en ||
+    p.generic_name ||
+    p.brands?.split(',')[0]?.trim() ||
     '';
   if (!name.trim()) return null;
 
