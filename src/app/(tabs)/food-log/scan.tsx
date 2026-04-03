@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ActivityIndicator, ScrollView,
+  ActivityIndicator, ScrollView, Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,7 @@ export default function BarcodeScanScreen() {
   const [error, setError] = useState('');
   const [preview, setPreview] = useState<ScannedFood | null>(null);
   const { logFood, currentDateStr } = useFoodStore();
+  const insets = useSafeAreaInsets();
 
   const handleBarcode = async ({ data }: { data: string }) => {
     if (scanned || loading) return;
@@ -51,6 +53,7 @@ export default function BarcodeScanScreen() {
       if (!food) food = await lookupBarcodeOFF(data);
 
       if (food) {
+        setError('');
         setPreview({ ...food, barcode: data });
       } else {
         setError(t('food.barcode_not_found'));
@@ -64,21 +67,25 @@ export default function BarcodeScanScreen() {
 
   const handleConfirm = async () => {
     if (!preview) return;
-    await logFood({
-      mealType: (mealType as MealType) ?? 'snack',
-      foodName: preview.foodName,
-      brandName: preview.brandName ?? undefined,
-      calories: preview.calories,
-      proteinG: preview.proteinG,
-      carbsG: preview.carbsG,
-      fatG: preview.fatG,
-      servingQty: preview.servingQty,
-      servingUnit: preview.servingUnit,
-      source: preview.source,
-      barcode: preview.barcode,
-      dateStr: currentDateStr,
-    });
-    router.back();
+    try {
+      await logFood({
+        mealType: (mealType as MealType) ?? 'snack',
+        foodName: preview.foodName,
+        brandName: preview.brandName ?? undefined,
+        calories: preview.calories,
+        proteinG: preview.proteinG,
+        carbsG: preview.carbsG,
+        fatG: preview.fatG,
+        servingQty: preview.servingQty,
+        servingUnit: preview.servingUnit,
+        source: preview.source,
+        barcode: preview.barcode,
+        dateStr: currentDateStr,
+      });
+      router.back();
+    } catch (e) {
+      Alert.alert('Error', 'Failed to save food. Please try again.');
+    }
   };
 
   const handleRetry = () => {
@@ -124,7 +131,7 @@ export default function BarcodeScanScreen() {
       {/* Overlay */}
       <View style={s.overlay}>
         {/* Top bar */}
-        <View style={s.topBar}>
+        <View style={[s.topBar, { paddingTop: insets.top + 8 }]}>
           <TouchableOpacity style={s.closeBtn} onPress={() => router.back()}>
             <X size={28} weight="bold" color={colors.white} />
           </TouchableOpacity>
@@ -156,7 +163,7 @@ export default function BarcodeScanScreen() {
         )}
 
         {/* Error */}
-        {error && !loading && (
+        {error && !loading && !preview && (
           <View style={s.centered}>
             <View style={s.errorBadge}>
               <Warning size={24} weight="regular" color={colors.white} />
@@ -240,7 +247,7 @@ const s = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center' },
   topBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    width: '100%', paddingTop: spacing.xl, paddingHorizontal: spacing.md,
+    width: '100%', paddingHorizontal: spacing.md,
     paddingBottom: spacing.md, backgroundColor: 'rgba(0,0,0,0.55)',
   },
   closeBtn: { padding: spacing.xs },

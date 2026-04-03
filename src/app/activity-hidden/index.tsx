@@ -5,13 +5,14 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Fire, Clock, CheckCircle, Trash, X, Heart, Barbell, Leaf, Football, Activity } from 'phosphor-react-native';
+import { Fire, Clock, CheckCircle, Trash, X, Heart, Barbell, Leaf, Football, Lightning } from 'phosphor-react-native';
 import React from 'react';
 
-import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
-import { useWorkoutStore } from '../../../stores/workoutStore';
-import { useProfileStore } from '../../../stores/profileStore';
-import { WORKOUT_TYPES, calcCaloriesBurned, type WorkoutType } from '../../../data/workout-types';
+import { colors, spacing, typography, shadow, radius } from '../../constants/theme';
+import { useWorkoutStore } from '../../stores/workoutStore';
+import { useProfileStore } from '../../stores/profileStore';
+import { WORKOUT_TYPES, calcCaloriesBurned, type WorkoutType } from '../../data/workout-types';
+import BottomNav from '../../components/BottomNav';
 
 function WorkoutIcon({ category, size, color }: { category: string; size: number; color: string }) {
   const props = { size, color, weight: 'regular' as const };
@@ -20,7 +21,7 @@ function WorkoutIcon({ category, size, color }: { category: string; size: number
     case 'strength':    return <Barbell {...props} />;
     case 'flexibility': return <Leaf {...props} />;
     case 'sport':       return <Football {...props} />;
-    default:            return <Activity {...props} />;
+    default:            return <Lightning {...props} />;
   }
 }
 
@@ -73,122 +74,118 @@ export default function ActivityScreen() {
   const categories = ['all', 'cardio', 'strength', 'flexibility', 'sport'];
 
   return (
-    <ScrollView style={s.root} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <Text style={s.screenTitle}>{t('activity.title')}</Text>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={s.root} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <Text style={s.screenTitle}>{t('activity.title')}</Text>
 
-      {/* Today summary */}
-      <View style={s.summaryCard}>
-        <View style={s.summaryItem}>
-          <Fire size={22} weight="fill" color={colors.coral} />
-          <Text style={[s.summaryValue, { color: colors.coral }]}>{totalBurned}</Text>
-          <Text style={s.summaryLabel}>{t('activity.burned')}</Text>
-        </View>
-        <View style={s.summaryDivider} />
-        <View style={s.summaryItem}>
-          <Clock size={22} weight="regular" color={colors.primary} />
-          <Text style={s.summaryValue}>
-            {todayWorkouts.reduce((a, w) => a + w.durationMin, 0)}
-          </Text>
-          <Text style={s.summaryLabel}>{t('activity.minutes')}</Text>
-        </View>
-        <View style={s.summaryDivider} />
-        <View style={s.summaryItem}>
-          <CheckCircle size={22} weight="regular" color={colors.skyBlue} />
-          <Text style={s.summaryValue}>{todayWorkouts.length}</Text>
-          <Text style={s.summaryLabel}>{t('activity.sessions')}</Text>
-        </View>
-      </View>
-
-      {/* Today's workouts */}
-      {todayWorkouts.length > 0 && (
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>{t('activity.today_log')}</Text>
-          {todayWorkouts.map((w) => {
-            const def = WORKOUT_TYPES.find((x) => x.id === w.activityType);
-            return (
-              <View key={w.id} style={s.workoutRow}>
-                <WorkoutIcon category={def?.category ?? 'cardio'} size={20} color={colors.primary} />
-                <View style={s.workoutInfo}>
-                  <Text style={s.workoutName}>{def?.name ?? w.activityType}</Text>
-                  <Text style={s.workoutSub}>{w.durationMin} min · {w.caloriesBurned} kcal burned</Text>
-                </View>
-                <TouchableOpacity onPress={() => handleDelete(w.id, def?.name ?? w.activityType)}>
-                  <Trash size={18} weight="regular" color={colors.coral} />
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
-      )}
-
-      {/* Selected type confirmation */}
-      {selectedType && (
-        <View style={s.confirmPanel}>
-          <Text style={s.confirmTitle}>{selectedType.name}</Text>
-          <Text style={s.confirmSub}>
-            {calcCaloriesBurned(selectedType.met, weightKg, parseInt(duration) || 0)} kcal burned
-          </Text>
-          <View style={s.confirmRow}>
-            <View style={s.durationRow}>
-              <TextInput
-                style={s.durationInput}
-                value={duration}
-                onChangeText={setDuration}
-                keyboardType="numeric"
-                selectTextOnFocus
-              />
-              <Text style={s.durationLabel}>{t('activity.minutes')}</Text>
-            </View>
-            <TouchableOpacity style={s.logBtn} onPress={handleLog}>
-              <Text style={s.logBtnText}>{t('activity.log_btn')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setSelectedType(null)} style={s.cancelBtn}>
-              <X size={20} weight="bold" color={colors.textSecondary} />
-            </TouchableOpacity>
+        <View style={s.summaryCard}>
+          <View style={s.summaryItem}>
+            <Fire size={22} weight="fill" color={colors.coral} />
+            <Text style={[s.summaryValue, { color: colors.coral }]}>{totalBurned}</Text>
+            <Text style={s.summaryLabel}>{t('activity.burned')}</Text>
+          </View>
+          <View style={s.summaryDivider} />
+          <View style={s.summaryItem}>
+            <Clock size={22} weight="regular" color={colors.primary} />
+            <Text style={s.summaryValue}>
+              {todayWorkouts.reduce((a, w) => a + w.durationMin, 0)}
+            </Text>
+            <Text style={s.summaryLabel}>{t('activity.minutes')}</Text>
+          </View>
+          <View style={s.summaryDivider} />
+          <View style={s.summaryItem}>
+            <CheckCircle size={22} weight="regular" color={colors.skyBlue} />
+            <Text style={s.summaryValue}>{todayWorkouts.length}</Text>
+            <Text style={s.summaryLabel}>{t('activity.sessions')}</Text>
           </View>
         </View>
-      )}
 
-      {/* Category filter */}
-      <Text style={s.sectionTitle}>{t('activity.pick_activity')}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.catScroll}>
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            style={[s.catChip, filterCat === cat && s.catChipActive]}
-            onPress={() => setFilterCat(cat)}
-          >
-            <Text style={[s.catChipText, filterCat === cat && s.catChipTextActive]}>
-              {cat === 'all' ? t('activity.all') : t(`activity.cat_${cat}`)}
+        {todayWorkouts.length > 0 && (
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>{t('activity.today_log')}</Text>
+            {todayWorkouts.map((w) => {
+              const def = WORKOUT_TYPES.find((x) => x.id === w.activityType);
+              return (
+                <View key={w.id} style={s.workoutRow}>
+                  <WorkoutIcon category={def?.category ?? 'cardio'} size={20} color={colors.primary} />
+                  <View style={s.workoutInfo}>
+                    <Text style={s.workoutName}>{def?.name ?? w.activityType}</Text>
+                    <Text style={s.workoutSub}>{w.durationMin} min · {w.caloriesBurned} kcal burned</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleDelete(w.id, def?.name ?? w.activityType)}>
+                    <Trash size={18} weight="regular" color={colors.coral} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {selectedType && (
+          <View style={s.confirmPanel}>
+            <Text style={s.confirmTitle}>{selectedType.name}</Text>
+            <Text style={s.confirmSub}>
+              {calcCaloriesBurned(selectedType.met, weightKg, parseInt(duration) || 0)} kcal burned
             </Text>
-          </TouchableOpacity>
-        ))}
+            <View style={s.confirmRow}>
+              <View style={s.durationRow}>
+                <TextInput
+                  style={s.durationInput}
+                  value={duration}
+                  onChangeText={setDuration}
+                  keyboardType="numeric"
+                  selectTextOnFocus
+                />
+                <Text style={s.durationLabel}>{t('activity.minutes')}</Text>
+              </View>
+              <TouchableOpacity style={s.logBtn} onPress={handleLog}>
+                <Text style={s.logBtnText}>{t('activity.log_btn')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setSelectedType(null)} style={s.cancelBtn}>
+                <X size={20} weight="bold" color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        <Text style={s.sectionTitle}>{t('activity.pick_activity')}</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.catScroll}>
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              style={[s.catChip, filterCat === cat && s.catChipActive]}
+              onPress={() => setFilterCat(cat)}
+            >
+              <Text style={[s.catChipText, filterCat === cat && s.catChipTextActive]}>
+                {cat === 'all' ? t('activity.all') : t(`activity.cat_${cat}`)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <View style={s.workoutGrid}>
+          {filteredTypes.map((type) => (
+            <TouchableOpacity
+              key={type.id}
+              style={[s.workoutCard, selectedType?.id === type.id && s.workoutCardSelected]}
+              onPress={() => {
+                setSelectedType(type);
+                setDuration('30');
+              }}
+            >
+              <WorkoutIcon category={type.category} size={26} color={selectedType?.id === type.id ? colors.white : colors.primary} />
+              <Text style={[s.workoutCardName, selectedType?.id === type.id && { color: colors.white }]} numberOfLines={2}>
+                {type.name}
+              </Text>
+              <Text style={[s.workoutCardMet, selectedType?.id === type.id && { color: colors.white }]}>
+                MET {type.met}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
-
-      {/* Workout grid */}
-      <View style={s.workoutGrid}>
-        {filteredTypes.map((type) => (
-          <TouchableOpacity
-            key={type.id}
-            style={[s.workoutCard, selectedType?.id === type.id && s.workoutCardSelected]}
-            onPress={() => {
-              setSelectedType(type);
-              setDuration('30');
-            }}
-          >
-            <WorkoutIcon category={type.category} size={26} color={selectedType?.id === type.id ? colors.white : colors.primary} />
-            <Text style={[s.workoutCardName, selectedType?.id === type.id && { color: colors.white }]} numberOfLines={2}>
-              {type.name}
-            </Text>
-            <Text style={[s.workoutCardMet, selectedType?.id === type.id && { color: colors.white }]}>
-              MET {type.met}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-    </ScrollView>
+      <BottomNav />
+    </View>
   );
 }
 

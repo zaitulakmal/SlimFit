@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Barcode, MagnifyingGlass, X } from 'phosphor-react-native';
@@ -84,6 +85,7 @@ function offToItem(f: OFFFood, idx: number): FoodItem {
 export default function FoodSearchScreen() {
   const { t } = useTranslation();
   const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
+  const insets = useSafeAreaInsets();
   const { logFood, currentDateStr } = useFoodStore();
 
   const [query, setQuery] = useState('');
@@ -160,7 +162,7 @@ export default function FoodSearchScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Header */}
-      <View style={s.header}>
+      <View style={[s.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
           <ArrowLeft size={24} weight="regular" color={colors.textPrimary} />
         </TouchableOpacity>
@@ -283,7 +285,6 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
     paddingBottom: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,

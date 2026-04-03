@@ -1,57 +1,52 @@
 /**
- * StepProgress — thin 4px progress bar for the onboarding wizard.
- * Purple fill (#9C27B0) per UI-SPEC onboarding wizard chrome.
- * Animates width using React Native Animated.timing (200ms) per Interaction Contracts.
+ * StepProgress — Duolingo-style animated progress bar.
  */
 
-import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
-import { colors } from '../../constants/theme';
+import { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { colors } from '../../constants/theme-new';
 
 interface StepProgressProps {
   currentStep: number;
   totalSteps: number;
 }
 
-export default function StepProgress({
-  currentStep,
-  totalSteps,
-}: StepProgressProps) {
-  const progress = useRef(
-    new Animated.Value((currentStep - 1) / totalSteps)
-  ).current;
+export default function StepProgress({ currentStep, totalSteps }: StepProgressProps) {
+  const progress = useSharedValue((currentStep - 1) / totalSteps);
 
   useEffect(() => {
-    Animated.timing(progress, {
-      toValue: currentStep / totalSteps,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
+    progress.value = withSpring(currentStep / totalSteps, {
+      damping: 15,
+      stiffness: 120,
+    });
   }, [currentStep, totalSteps, progress]);
 
-  const widthInterpolated = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
-    extrapolate: 'clamp',
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
 
   return (
     <View style={styles.track}>
-      <Animated.View style={[styles.fill, { width: widthInterpolated }]} />
+      <Animated.View style={[styles.fill, animatedStyle]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   track: {
-    height: 4,
-    backgroundColor: colors.border,
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: colors.borderLight,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   fill: {
-    height: 4,
-    backgroundColor: colors.purple,
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 3,
   },
 });

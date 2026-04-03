@@ -9,7 +9,8 @@
     "scheme": "slimtrack",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.anonymous.slimtrack"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +19,13 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.anonymous.slimtrack"
     },
     "web": {
       "output": "static",
@@ -36,9 +43,15 @@
           }
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "SlimTrack needs your location to find nearby grocery stores.",
+          "locationWhenInUsePermission": "SlimTrack needs your location to find nearby grocery stores."
+        }
+      ],
       "expo-sqlite",
       "expo-localization",
-      "expo-barcode-scanner",
       "expo-font",
       "expo-web-browser"
     ],
