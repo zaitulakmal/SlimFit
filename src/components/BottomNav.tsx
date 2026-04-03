@@ -2,12 +2,19 @@ import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { House, ForkKnife, User, CaretLeft } from 'phosphor-react-native';
 import { colors, spacing, radius } from '../constants/theme-new';
+import { pastelColors } from '../constants/pastel-theme';
 
 interface BottomNavProps {
   showBack?: boolean;
+  active?: string;
 }
 
-export default function BottomNav({ showBack = false }: BottomNavProps) {
+export default function BottomNav({ showBack = false, active }: BottomNavProps) {
+  const getActiveColor = (tab: string) => {
+    if (active === tab) return pastelColors.primary;
+    return colors.textSecondary;
+  };
+
   return (
     <View style={styles.container}>
       {showBack && (
@@ -18,16 +25,16 @@ export default function BottomNav({ showBack = false }: BottomNavProps) {
       )}
       <View style={[styles.tabs, !showBack && styles.tabsFull]}>
         <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)')}>
-          <House size={22} weight="regular" color={colors.textSecondary} />
-          <Text style={styles.tabText}>Home</Text>
+          <House size={22} weight={active === 'home' ? 'fill' : 'regular'} color={getActiveColor('home')} />
+          <Text style={[styles.tabText, active === 'home' && { color: pastelColors.primary }]}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/food-log')}>
-          <ForkKnife size={22} weight="regular" color={colors.textSecondary} />
-          <Text style={styles.tabText}>Food</Text>
+          <ForkKnife size={22} weight={active === 'food' ? 'fill' : 'regular'} color={getActiveColor('food')} />
+          <Text style={[styles.tabText, active === 'food' && { color: pastelColors.primary }]}>Food</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/profile')}>
-          <User size={22} weight="fill" color={colors.textSecondary} />
-          <Text style={styles.tabText}>Profile</Text>
+          <User size={22} weight={active === 'profile' ? 'fill' : 'regular'} color={getActiveColor('profile')} />
+          <Text style={[styles.tabText, active === 'profile' && { color: pastelColors.primary }]}>Profile</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Barcode, MagnifyingGlass, X } from 'phosphor-react-native';
+import { ArrowLeft, Barcode, MagnifyingGlass, X, Camera } from 'phosphor-react-native';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
@@ -175,6 +175,15 @@ export default function FoodSearchScreen() {
           accessibilityLabel="Scan barcode"
         >
           <Barcode size={24} weight="regular" color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({ pathname: '/(tabs)/food-log/capture', params: { mealType } })
+          }
+          style={s.scanBtn}
+          accessibilityLabel="Capture food"
+        >
+          <Camera size={24} weight="regular" color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
