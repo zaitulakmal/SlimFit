@@ -25,6 +25,7 @@ import Animated, {
 import React from 'react';
 
 import { colors, spacing, typography, shadow, radius, animation } from '../../constants/theme-new';
+import { pastelColors } from '../../constants/pastel-theme';
 import { RECIPES, searchRecipes, type Recipe } from '../../data/recipes';
 import BottomNav from '../../components/BottomNav';
 

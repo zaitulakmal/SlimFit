@@ -24,6 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { colors, spacing, typography, shadow, radius } from '../../constants/theme-new';
+import { pastelColors } from '../../constants/pastel-theme';
 import BottomNav from '../../components/BottomNav';
 
 interface Place {

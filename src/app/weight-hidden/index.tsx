@@ -30,6 +30,7 @@ import { CheckCircle, ArrowRight, Trash, Scales, TrendDown, TrendUp } from 'phos
 import Svg, { Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
 
 import { colors, spacing, radius, shadow, typography } from '../../constants/theme-new';
+import { pastelColors } from '../../constants/pastel-theme';
 import { useWeightStore } from '../../stores/weightStore';
 import { useProfileStore } from '../../stores/profileStore';
 import { calculateBMI, getBMICategory } from '../../constants/tdee';

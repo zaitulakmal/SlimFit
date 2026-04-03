@@ -50,7 +50,10 @@ function PhosphorIcon({ name, size, color }: { name: string; size: number; color
 import Constants from 'expo-constants';
 import Svg, { Rect } from 'react-native-svg';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { colors as themeColors, spacing, typography } from '../../../constants/theme';
+import { pastelColors } from '../../../constants/pastel-theme';
+
+const colors = pastelColors;
 import {
   getBMICategory,
   type BMICategory,
@@ -69,13 +72,13 @@ import type { NotifType } from '../../../services/notifications';
 function bmiChipColor(category: BMICategory): string {
   switch (category) {
     case 'normal':
-      return colors.primary;
+      return pastelColors.primary;
     case 'overweight':
-      return colors.amber;
+      return pastelColors.amber;
     case 'obese':
-      return colors.coral;
+      return pastelColors.coral;
     default:
-      return colors.skyBlue;
+      return pastelColors.blue;
   }
 }
 

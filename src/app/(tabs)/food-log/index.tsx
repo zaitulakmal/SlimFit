@@ -11,7 +11,7 @@ import {
 import { useFocusEffect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
-import Svg, { Circle as SvgCircle, Path } from 'react-native-svg';
+import Svg, { Circle as SvgCircle, Path, Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import {
   CaretLeft,
   CaretRight,
@@ -23,37 +23,14 @@ import {
   Trash,
 } from 'phosphor-react-native';
 
-import { colors, spacing, typography, shadow, radius } from '../../../constants/theme';
+import { pastelColors, pastelSpacing, pastelRadius, mealColors } from '../../../constants/pastel-theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { useProfileStore } from '../../../stores/profileStore';
 
 const { width: W } = Dimensions.get('window');
+const C = pastelColors;
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
-
-const MEAL_META: Record<string, { color: string; bg: string; emoji: string }> = {
-  breakfast: { color: '#F59E0B', bg: '#FFFBEB', emoji: '🌅' },
-  lunch:     { color: '#10B981', bg: '#ECFDF5', emoji: '☀️' },
-  dinner:    { color: '#B39DDB', bg: '#F3EEFF', emoji: '🌙' },
-  snack:     { color: '#EC4899', bg: '#FDF2F8', emoji: '☕' },
-};
-
-const C = {
-  headerBg:   '#143D27',
-  white:      '#FFFFFF',
-  whiteAlpha: 'rgba(255,255,255,0.70)',
-  whiteFaint: 'rgba(255,255,255,0.12)',
-  primary:    '#B39DDB',
-  amber:      '#F59E0B',
-  coral:      '#EC4899',
-  purple:     '#C5B8E8',
-  blue:       '#0EA5E9',
-  bg:         '#F7F3FF',
-  surface:    '#FFFFFF',
-  text:       '#1E1B4B',
-  textSub:    '#6B7280',
-  border:     '#E9D5FF',
-};
 
 function MealIcon({ meal, size, color }: { meal: string; size: number; color: string }) {
   switch (meal) {
@@ -82,7 +59,46 @@ function offsetDate(dateStr: string, days: number) {
   return d.toISOString().split('T')[0];
 }
 
-// Mini ring for food log header
+function HeaderDecoration() {
+  return (
+    <Svg width={W} height={220} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 220`}>
+      <Defs>
+        <RadialGradient id="foodHeaderGrad" cx="50%" cy="0%" r="100%">
+          <Stop offset="0%" stopColor={C.headerTop} />
+          <Stop offset="100%" stopColor={C.headerBottom} />
+        </RadialGradient>
+      </Defs>
+      <Rect width={W} height={220} fill="url(#foodHeaderGrad)" />
+      
+      {/* Decorative circles */}
+      <SvgCircle cx={W * 0.1} cy={-20} r={60} fill={C.white} opacity={0.15} />
+      <SvgCircle cx={W * 0.9} cy={-30} r={80} fill={C.white} opacity={0.12} />
+      <SvgCircle cx={W * 0.7} cy={200} r={50} fill={C.white} opacity={0.1} />
+      
+      {/* Apple decoration */}
+      <SvgCircle cx={40} cy={180} r={20} fill="#FF8A80" opacity={0.8} />
+      <Rect x={38} y={156} width={4} height={8} rx={2} fill={C.primary} />
+      
+      {/* Grape decoration */}
+      <SvgCircle cx={W - 50} cy={160} r={8} fill="#CE93D8" />
+      <SvgCircle cx={W - 35} cy={155} r={8} fill="#BA68C8" />
+      <SvgCircle cx={W - 50} cy={170} r={8} fill="#CE93D8" />
+      <SvgCircle cx={W - 35} cy={170} r={8} fill="#AB47BC" />
+      
+      {/* Strawberry decoration */}
+      <SvgCircle cx={60} cy={60} r={18} fill="#FF8A80" />
+      <SvgCircle cx={55} cy={52} r={2} fill="#FFF59D" />
+      <SvgCircle cx={65} cy={54} r={2} fill="#FFF59D" />
+      
+      {/* Carrot decoration */}
+      <Path d={`M${W - 80},100 L${W - 60},140 L${W - 100},140 Z`} fill="#FFB74D" />
+      
+      {/* Wavy bottom */}
+      <Path d={`M0,195 Q${W * 0.3},220 ${W * 0.5},205 Q${W * 0.7},190 ${W},210 L${W},220 L0,220 Z`} fill={C.background} />
+    </Svg>
+  );
+}
+
 function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
   const size = 84;
   const strokeWidth = 8;
@@ -92,12 +108,12 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
   const offset = circ * (1 - pct);
   const center = size / 2;
   const isOver = consumed > tdee && tdee > 0;
-  const ringColor = isOver ? C.amber : C.primary;
+  const ringColor = isOver ? C.coral : C.primary;
 
   return (
     <View style={{ width: size, height: size }}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <SvgCircle cx={center} cy={center} r={r} stroke={C.whiteFaint} strokeWidth={strokeWidth} fill="none" />
+        <SvgCircle cx={center} cy={center} r={r} stroke="rgba(255,255,255,0.3)" strokeWidth={strokeWidth} fill="none" />
         <SvgCircle
           cx={center} cy={center} r={r}
           stroke={ringColor} strokeWidth={strokeWidth} fill="none"
@@ -108,25 +124,24 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
         />
       </Svg>
       <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-        <Text style={{ fontSize: 15, fontWeight: '800', color: ringColor }}>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: ringColor }}>
           {Math.round(consumed)}
         </Text>
-        <Text style={{ fontSize: 9, color: C.whiteAlpha, fontWeight: '600' }}>kcal</Text>
+        <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>kcal</Text>
       </View>
     </View>
   );
 }
 
-// Inline macro progress bar
 function InlineMacro({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
   const pct = target > 0 ? Math.min(value / target, 1) * 100 : 0;
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-        <Text style={{ fontSize: 10, fontWeight: '600', color: C.whiteAlpha }}>{label}</Text>
+        <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>{label}</Text>
         <Text style={{ fontSize: 10, fontWeight: '700', color: C.white }}>{Math.round(value)}g</Text>
       </View>
-      <View style={{ height: 5, borderRadius: 3, backgroundColor: C.whiteFaint, overflow: 'hidden' }}>
+      <View style={{ height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.2)', overflow: 'hidden' }}>
         <View style={{ height: 5, borderRadius: 3, backgroundColor: color, width: `${pct}%` }} />
       </View>
     </View>
@@ -143,7 +158,7 @@ export default function FoodLogScreen() {
   );
 
   const totals = getTotals();
-  const tdee = profile?.tdee ?? 0;
+  const tdee = Number(profile?.tdee) || 0;
   const remaining = Math.max(tdee - totals.calories, 0);
   const isOver = totals.calories > tdee && tdee > 0;
 
@@ -165,19 +180,10 @@ export default function FoodLogScreen() {
 
   return (
     <View style={s.root}>
-      {/* ── HEADER ── */}
+      {/* Header */}
       <View style={s.header}>
-        {/* Decorative shapes */}
-        <Svg width={W} height={180} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 180`}>
-          <SvgCircle cx={W - 30} cy={-10} r={90} fill={C.whiteFaint} />
-          <SvgCircle cx={-20} cy={170} r={70} fill={C.whiteFaint} />
-          <Path
-            d={`M0,160 Q${W * 0.3},180 ${W * 0.6},155 Q${W * 0.8},140 ${W},162 L${W},180 L0,180 Z`}
-            fill={C.bg}
-          />
-        </Svg>
+        <HeaderDecoration />
 
-        {/* Date navigation */}
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.dateNav}>
           <TouchableOpacity onPress={() => navigateDate(-1)} style={s.navBtn}>
             <CaretLeft size={22} weight="bold" color={C.white} />
@@ -193,25 +199,24 @@ export default function FoodLogScreen() {
             <CaretRight
               size={22}
               weight="bold"
-              color={currentDateStr >= todayStr() ? C.whiteFaint : C.white}
+              color={currentDateStr >= todayStr() ? 'rgba(255,255,255,0.3)' : C.white}
             />
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Summary row: ring + macros */}
         <Animated.View entering={FadeInDown.delay(60).springify()} style={s.summaryRow}>
           <CalorieRing consumed={totals.calories} tdee={tdee} />
           <View style={s.summaryRight}>
             {tdee > 0 && (
               <View style={s.budgetRow}>
-                <Text style={[s.budgetValue, { color: isOver ? C.amber : C.primary }]}>
+                <Text style={[s.budgetValue, { color: isOver ? C.coral : C.white }]}>
                   {isOver ? `+${Math.round(totals.calories - tdee)}` : remaining}
                 </Text>
                 <Text style={s.budgetLabel}> kcal {isOver ? 'over' : 'left'}</Text>
               </View>
             )}
             <View style={s.macrosCol}>
-              <InlineMacro label="Protein" value={totals.proteinG} target={proteinTarget} color={C.purple} />
+              <InlineMacro label="Protein" value={totals.proteinG} target={proteinTarget} color={C.coral} />
               <InlineMacro label="Carbs"   value={totals.carbsG}   target={carbsTarget}   color={C.blue}   />
               <InlineMacro label="Fat"     value={totals.fatG}     target={fatTarget}     color={C.amber}  />
             </View>
@@ -219,7 +224,7 @@ export default function FoodLogScreen() {
         </Animated.View>
       </View>
 
-      {/* ── MEAL SECTIONS ── */}
+      {/* Meal sections */}
       <ScrollView
         style={s.scroll}
         contentContainerStyle={s.scrollContent}
@@ -227,8 +232,8 @@ export default function FoodLogScreen() {
       >
         {MEAL_TYPES.map((meal, idx) => {
           const mealLogs   = getMealLogs(meal);
-          const mealCals   = mealLogs.reduce((a, l) => a + l.calories, 0);
-          const meta       = MEAL_META[meal];
+          const mealCals   = mealLogs.reduce((a, l) => a + Number(l.calories), 0);
+          const meta       = mealColors[meal];
 
           return (
             <Animated.View
@@ -236,7 +241,6 @@ export default function FoodLogScreen() {
               entering={FadeInUp.delay(idx * 70 + 80).springify()}
               style={s.mealCard}
             >
-              {/* Meal header */}
               <View style={[s.mealHeader, { backgroundColor: meta.bg }]}>
                 <View style={s.mealTitleRow}>
                   <View style={[s.mealIconBg, { backgroundColor: `${meta.color}20` }]}>
@@ -261,7 +265,6 @@ export default function FoodLogScreen() {
                 </TouchableOpacity>
               </View>
 
-              {/* Food rows */}
               {mealLogs.length === 0 ? (
                 <View style={s.emptyMeal}>
                   <Text style={s.emptyText}>{t('food.meal_empty')}</Text>
@@ -276,10 +279,10 @@ export default function FoodLogScreen() {
                           <Text style={s.brandName} numberOfLines={1}>{log.brandName}</Text>
                         )}
                         <View style={s.foodMacroRow}>
-                          <Text style={s.macroPill}>{Math.round(log.calories)} kcal</Text>
-                          <Text style={[s.macroPill, { color: '#CE82FF' }]}>P {Math.round(log.proteinG)}g</Text>
-                          <Text style={[s.macroPill, { color: '#1CB0F6' }]}>C {Math.round(log.carbsG)}g</Text>
-                          <Text style={[s.macroPill, { color: '#FF9600' }]}>F {Math.round(log.fatG)}g</Text>
+                          <Text style={s.macroPill}>{Math.round(Number(log.calories))} kcal</Text>
+                          <Text style={[s.macroPill, { color: C.coral }]}>P {Math.round(Number(log.proteinG))}g</Text>
+                          <Text style={[s.macroPill, { color: C.blue }]}>C {Math.round(Number(log.carbsG))}g</Text>
+                          <Text style={[s.macroPill, { color: C.amber }]}>F {Math.round(Number(log.fatG))}g</Text>
                         </View>
                       </View>
                       <TouchableOpacity
@@ -296,17 +299,17 @@ export default function FoodLogScreen() {
             </Animated.View>
           );
         })}
-        <View style={{ height: 20 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.bg },
+  root: { flex: 1, backgroundColor: C.background },
 
   header: {
-    backgroundColor: C.headerBg,
+    backgroundColor: C.primary,
     paddingTop: 52,
     paddingBottom: 32,
     paddingHorizontal: 20,
@@ -328,7 +331,7 @@ const s = StyleSheet.create({
 
   budgetRow: { flexDirection: 'row', alignItems: 'baseline' },
   budgetValue: { fontSize: 26, fontWeight: '800', letterSpacing: -0.4 },
-  budgetLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.6)' },
+  budgetLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.8)' },
 
   macrosCol: { gap: 8 },
 
@@ -337,7 +340,7 @@ const s = StyleSheet.create({
 
   mealCard: {
     backgroundColor: C.surface,
-    borderRadius: 18,
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -360,7 +363,7 @@ const s = StyleSheet.create({
   addBtn:       { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
 
   emptyMeal: { paddingHorizontal: 16, paddingVertical: 14 },
-  emptyText: { fontSize: 13, color: C.textSub, fontStyle: 'italic' },
+  emptyText: { fontSize: 13, color: C.textSecondary, fontStyle: 'italic' },
 
   foodRow: {
     flexDirection: 'row',
@@ -371,9 +374,9 @@ const s = StyleSheet.create({
   },
   foodRowBorder: { borderTopWidth: 1, borderTopColor: C.border },
   foodInfo:  { flex: 1 },
-  foodName:  { fontSize: 14, fontWeight: '600', color: C.text, marginBottom: 2 },
-  brandName: { fontSize: 12, fontWeight: '500', color: C.textSub, marginBottom: 4 },
+  foodName:  { fontSize: 14, fontWeight: '600', color: C.textPrimary, marginBottom: 2 },
+  brandName: { fontSize: 12, fontWeight: '500', color: C.textSecondary, marginBottom: 4 },
   foodMacroRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  macroPill: { fontSize: 11, fontWeight: '600', color: C.textSub },
+  macroPill: { fontSize: 11, fontWeight: '600', color: C.textSecondary },
   deleteBtn: { padding: 6 },
 });
