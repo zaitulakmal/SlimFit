@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, TextInput, FlatList, StatusBar,
@@ -322,6 +323,7 @@ function CategoryChip({ category: catKey, Icon, active, onPress, label }: {
 
 export default function RecipesScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [cat, setCat]     = useState<Category>('all');
 
@@ -334,7 +336,7 @@ export default function RecipesScreen() {
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       {/* Header */}
-      <Animated.View entering={FadeInDown.springify()} style={s.header}>
+      <Animated.View entering={FadeInDown.springify()} style={[s.header, { paddingTop: insets.top + 16 }]}>
         <Text style={s.headerTitle}>{t('recipe.title')}</Text>
         <Text style={s.headerSub}>{t('recipe.subtitle')}</Text>
       </Animated.View>

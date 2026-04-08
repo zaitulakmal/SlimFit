@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ActivityIndicator, ScrollView, Alert,
+  ActivityIndicator, ScrollView, Alert, TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -12,6 +12,7 @@ import { Camera, X, Warning, Barcode, PlusCircle } from 'phosphor-react-native';
 import { colors, spacing, typography } from '../../../constants/theme';
 import { lookupBarcodeNix } from '../../../services/nutritionix';
 import { lookupBarcodeOFF, type OFFFood } from '../../../services/openFoodFacts';
+import { lookupBarcodeLocal } from '../../../services/localFoods';
 import { useFoodStore } from '../../../stores/foodStore';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -37,8 +38,25 @@ export default function BarcodeScanScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState<ScannedFood | null>(null);
+  const [manualFoodName, setManualFoodName] = useState('');
+  const [manualCalories, setManualCalories] = useState('');
+  const [manualProtein, setManualProtein] = useState('');
+  const [manualCarbs, setManualCarbs] = useState('');
+  const [manualFat, setManualFat] = useState('');
   const { logFood, currentDateStr } = useFoodStore();
   const insets = useSafeAreaInsets();
+
+  const isManualEntry = preview?.source === 'manual';
+  
+  useEffect(() => {
+    if (preview?.source === 'manual') {
+      setManualFoodName(preview.foodName || '');
+      setManualCalories('');
+      setManualProtein('');
+      setManualCarbs('');
+      setManualFat('');
+    }
+  }, [preview]);
 
   const handleBarcode = async ({ data }: { data: string }) => {
     if (scanned || loading) return;
@@ -48,18 +66,60 @@ export default function BarcodeScanScreen() {
     setPreview(null);
 
     try {
-      // Try Nutritionix first (if API key configured), then Open Food Facts
-      let food: any = await lookupBarcodeNix(data);
+      // Try local Malaysian foods first, then Nutritionix, then Open Food Facts
+      let food: any = lookupBarcodeLocal(data);
+      if (!food) food = await lookupBarcodeNix(data);
       if (!food) food = await lookupBarcodeOFF(data);
 
       if (food) {
         setError('');
-        setPreview({ ...food, barcode: data });
+        
+        if (food.calories === 0 && food.proteinG === 0 && food.carbsG === 0 && food.fatG === 0 && food.source !== 'local') {
+          // API found product but no nutrition data - allow manual entry
+          setPreview({
+            foodName: food.foodName || 'Unknown Food',
+            brandName: food.brandName,
+            calories: 0,
+            proteinG: 0,
+            carbsG: 0,
+            fatG: 0,
+            servingQty: 100,
+            servingUnit: 'g',
+            source: 'manual',
+            barcode: data,
+          });
+        } else {
+          setPreview({ ...food, barcode: data });
+        }
       } else {
-        setError(t('food.barcode_not_found'));
+        // Barcode not found - allow manual entry
+        setPreview({
+          foodName: '',
+          brandName: undefined,
+          calories: 0,
+          proteinG: 0,
+          carbsG: 0,
+          fatG: 0,
+          servingQty: 100,
+          servingUnit: 'g',
+          source: 'manual',
+          barcode: data,
+        });
       }
     } catch {
-      setError(t('food.barcode_not_found'));
+      // Error - allow manual entry
+      setPreview({
+        foodName: '',
+        brandName: undefined,
+        calories: 0,
+        proteinG: 0,
+        carbsG: 0,
+        fatG: 0,
+        servingQty: 100,
+        servingUnit: 'g',
+        source: 'manual',
+        barcode: data,
+      });
     } finally {
       setLoading(false);
     }
@@ -67,18 +127,30 @@ export default function BarcodeScanScreen() {
 
   const handleConfirm = async () => {
     if (!preview) return;
+    
+    const finalName = isManualEntry ? manualFoodName : preview.foodName;
+    const finalCalories = isManualEntry ? parseFloat(manualCalories) || 0 : preview.calories;
+    const finalProtein = isManualEntry ? parseFloat(manualProtein) || 0 : preview.proteinG;
+    const finalCarbs = isManualEntry ? parseFloat(manualCarbs) || 0 : preview.carbsG;
+    const finalFat = isManualEntry ? parseFloat(manualFat) || 0 : preview.fatG;
+    
+    if (!finalName.trim()) {
+      Alert.alert('Error', 'Please enter food name');
+      return;
+    }
+    
     try {
       await logFood({
         mealType: (mealType as MealType) ?? 'snack',
-        foodName: preview.foodName,
+        foodName: finalName,
         brandName: preview.brandName ?? undefined,
-        calories: preview.calories,
-        proteinG: preview.proteinG,
-        carbsG: preview.carbsG,
-        fatG: preview.fatG,
+        calories: finalCalories,
+        proteinG: finalProtein,
+        carbsG: finalCarbs,
+        fatG: finalFat,
         servingQty: preview.servingQty,
         servingUnit: preview.servingUnit,
-        source: preview.source,
+        source: 'manual',
         barcode: preview.barcode,
         dateStr: currentDateStr,
       });
@@ -179,33 +251,103 @@ export default function BarcodeScanScreen() {
         {preview && !loading && (
           <View style={s.previewContainer}>
             <ScrollView contentContainerStyle={s.previewCard} showsVerticalScrollIndicator={false}>
-              {preview.brandName ? (
-                <Text style={s.previewBrand}>{preview.brandName}</Text>
-              ) : null}
-              <Text style={s.previewName}>{preview.foodName}</Text>
-              <Text style={s.previewServing}>
-                Per {preview.servingQty}{preview.servingUnit}
-              </Text>
+              {isManualEntry ? (
+                <>
+                  <Text style={s.manualTitle}>Enter Food Details</Text>
+                  <Text style={s.manualBarcode}>Barcode: {preview.barcode}</Text>
+                  
+                  <View style={s.inputGroup}>
+                    <Text style={s.inputLabel}>Food Name</Text>
+                    <TextInput
+                      style={s.input}
+                      value={manualFoodName}
+                      onChangeText={setManualFoodName}
+                      placeholder="Enter food name"
+                      placeholderTextColor={colors.textSecondary}
+                    />
+                  </View>
+                  
+                  <View style={s.inputRow}>
+                    <View style={s.inputHalf}>
+                      <Text style={s.inputLabel}>Calories</Text>
+                      <TextInput
+                        style={s.input}
+                        value={manualCalories}
+                        onChangeText={setManualCalories}
+                        placeholder="0"
+                        keyboardType="numeric"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                    <View style={s.inputHalf}>
+                      <Text style={s.inputLabel}>Protein (g)</Text>
+                      <TextInput
+                        style={s.input}
+                        value={manualProtein}
+                        onChangeText={setManualProtein}
+                        placeholder="0"
+                        keyboardType="numeric"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                  </View>
+                  
+                  <View style={s.inputRow}>
+                    <View style={s.inputHalf}>
+                      <Text style={s.inputLabel}>Carbs (g)</Text>
+                      <TextInput
+                        style={s.input}
+                        value={manualCarbs}
+                        onChangeText={setManualCarbs}
+                        placeholder="0"
+                        keyboardType="numeric"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                    <View style={s.inputHalf}>
+                      <Text style={s.inputLabel}>Fat (g)</Text>
+                      <TextInput
+                        style={s.input}
+                        value={manualFat}
+                        onChangeText={setManualFat}
+                        placeholder="0"
+                        keyboardType="numeric"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                  </View>
+                </>
+              ) : (
+                <>
+                  {preview.brandName ? (
+                    <Text style={s.previewBrand}>{preview.brandName}</Text>
+                  ) : null}
+                  <Text style={s.previewName}>{preview.foodName}</Text>
+                  <Text style={s.previewServing}>
+                    Per {preview.servingQty}{preview.servingUnit}
+                  </Text>
 
-              {/* Macro grid */}
-              <View style={s.macroGrid}>
-                <View style={s.macroBox}>
-                  <Text style={[s.macroValue, { color: colors.amber }]}>{preview.calories}</Text>
-                  <Text style={s.macroLabel}>kcal</Text>
-                </View>
-                <View style={s.macroBox}>
-                  <Text style={s.macroValue}>{preview.proteinG}g</Text>
-                  <Text style={s.macroLabel}>Protein</Text>
-                </View>
-                <View style={s.macroBox}>
-                  <Text style={s.macroValue}>{preview.carbsG}g</Text>
-                  <Text style={s.macroLabel}>Carbs</Text>
-                </View>
-                <View style={s.macroBox}>
-                  <Text style={s.macroValue}>{preview.fatG}g</Text>
-                  <Text style={s.macroLabel}>Fat</Text>
-                </View>
-              </View>
+                  {/* Macro grid */}
+                  <View style={s.macroGrid}>
+                    <View style={s.macroBox}>
+                      <Text style={[s.macroValue, { color: colors.amber }]}>{preview.calories}</Text>
+                      <Text style={s.macroLabel}>kcal</Text>
+                    </View>
+                    <View style={s.macroBox}>
+                      <Text style={s.macroValue}>{preview.proteinG}g</Text>
+                      <Text style={s.macroLabel}>Protein</Text>
+                    </View>
+                    <View style={s.macroBox}>
+                      <Text style={s.macroValue}>{preview.carbsG}g</Text>
+                      <Text style={s.macroLabel}>Carbs</Text>
+                    </View>
+                    <View style={s.macroBox}>
+                      <Text style={s.macroValue}>{preview.fatG}g</Text>
+                      <Text style={s.macroLabel}>Fat</Text>
+                    </View>
+                  </View>
+                </>
+              )}
 
               {/* Action buttons */}
               <View style={s.actionRow}>
@@ -308,4 +450,17 @@ const s = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   confirmBtnText: { ...typography.body, color: colors.textOnAccent },
+  
+  // Manual entry styles
+  manualTitle: { ...typography.heading, color: colors.textPrimary, marginBottom: spacing.xs },
+  manualBarcode: { ...typography.label, color: colors.textSecondary, marginBottom: spacing.md },
+  inputGroup: { marginBottom: spacing.md },
+  inputLabel: { ...typography.label, color: colors.textSecondary, marginBottom: spacing.xs },
+  input: {
+    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    ...typography.body, color: colors.textPrimary,
+  },
+  inputRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm },
+  inputHalf: { flex: 1 },
 });

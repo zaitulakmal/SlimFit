@@ -9,8 +9,11 @@
     "scheme": "slimtrack",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.slimtrack"
+      "icon": "./assets/images/icon.png",
+      "bundleIdentifier": "com.zaitul.slimtrack",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -58,6 +61,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b558b378-82f2-4ee8-99da-85c50636987d"
+      }
     }
   }
 }

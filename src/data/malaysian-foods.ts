@@ -1,6 +1,7 @@
 export interface LocalFood {
   id: string;
   name: string;
+  barcode?: string;
   calories: number;
   proteinG: number;
   carbsG: number;
@@ -94,17 +95,28 @@ export const MALAYSIAN_FOODS: LocalFood[] = [
   { id: 'my-096', name: 'Pizza Hut Personal Pan', calories: 620, proteinG: 28, carbsG: 72, fatG: 24, servingQty: 1, servingUnit: 'pizza', category: 'fast_food' },
   { id: 'my-097', name: 'Ramly Burger', calories: 480, proteinG: 22, carbsG: 42, fatG: 24, servingQty: 1, servingUnit: 'burger', category: 'fast_food' },
   // Packaged
-  { id: 'my-100', name: 'Maggi Mee Goreng', calories: 450, proteinG: 10, carbsG: 62, fatG: 18, servingQty: 1, servingUnit: 'packet', category: 'packaged' },
-  { id: 'my-101', name: 'Maggi Mee Sup', calories: 360, proteinG: 9, carbsG: 56, fatG: 12, servingQty: 1, servingUnit: 'packet', category: 'packaged' },
-  { id: 'my-102', name: 'Gardenia Bread (2 slices)', calories: 180, proteinG: 6, carbsG: 34, fatG: 2, servingQty: 2, servingUnit: 'slices', category: 'packaged' },
-  { id: 'my-103', name: 'Teh Boh Susu (kotak)', calories: 110, proteinG: 3, carbsG: 20, fatG: 2, servingQty: 1, servingUnit: 'box', category: 'packaged' },
-  { id: 'my-104', name: 'Milo Kotak 200ml', calories: 110, proteinG: 4, carbsG: 18, fatG: 2, servingQty: 1, servingUnit: 'box', category: 'packaged' },
+  { id: 'my-100', name: 'Maggi Mee Goreng', calories: 450, proteinG: 10, carbsG: 62, fatG: 18, servingQty: 1, servingUnit: 'packet', category: 'packaged', barcode: '9556001128836' },
+  { id: 'my-101', name: 'Maggi Mee Sup', calories: 360, proteinG: 9, carbsG: 56, fatG: 12, servingQty: 1, servingUnit: 'packet', category: 'packaged', barcode: '9556001128843' },
+  { id: 'my-102', name: 'Gardenia Bread (2 slices)', calories: 180, proteinG: 6, carbsG: 34, fatG: 2, servingQty: 2, servingUnit: 'slices', category: 'packaged', barcode: '9556019000125' },
+  { id: 'my-103', name: 'Teh Boh Susu (kotak)', calories: 110, proteinG: 3, carbsG: 20, fatG: 2, servingQty: 1, servingUnit: 'box', category: 'packaged', barcode: '9556040310315' },
+  { id: 'my-104', name: 'Milo Kotak 200ml', calories: 110, proteinG: 4, carbsG: 18, fatG: 2, servingQty: 1, servingUnit: 'box', category: 'packaged', barcode: '9556001183538' },
   { id: 'my-105', name: 'Munchys Oat Krunch', calories: 130, proteinG: 2, carbsG: 20, fatG: 4, servingQty: 4, servingUnit: 'biscuits', category: 'packaged' },
   { id: 'my-106', name: 'Myojo Mee Goreng', calories: 430, proteinG: 9, carbsG: 60, fatG: 17, servingQty: 1, servingUnit: 'packet', category: 'packaged' },
-  { id: 'my-107', name: 'Nestle Corn Flakes', calories: 160, proteinG: 3, carbsG: 36, fatG: 0.5, servingQty: 40, servingUnit: 'g', category: 'packaged' },
+  { id: 'my-107', name: 'Nestle Corn Flakes', calories: 160, proteinG: 3, carbsG: 36, fatG: 0.5, servingQty: 40, servingUnit: 'g', category: 'packaged', barcode: '9556001014542' },
   { id: 'my-108', name: 'Mamee Monster', calories: 200, proteinG: 4, carbsG: 28, fatG: 8, servingQty: 1, servingUnit: 'packet', category: 'packaged' },
+  { id: 'my-109', name: 'Kit Kat', calories: 218, proteinG: 2.8, carbsG: 28, fatG: 11, servingQty: 1, servingUnit: 'bar', category: 'packaged', barcode: '5000159407236' },
+  { id: 'my-110', name: 'Oreo', calories: 140, proteinG: 1.5, carbsG: 21, fatG: 6, servingQty: 3, servingUnit: 'cookies', category: 'packaged', barcode: '0015000441589' },
+  { id: 'my-111', name: 'Coca Cola', calories: 140, proteinG: 0, carbsG: 39, fatG: 0, servingQty: 330, servingUnit: 'ml', category: 'packaged', barcode: '5449000000996' },
+  { id: 'my-112', name: 'Pepsi', calories: 150, proteinG: 0, carbsG: 41, fatG: 0, servingQty: 330, servingUnit: 'ml', category: 'packaged', barcode: '4060800001234' },
+  { id: 'my-113', name: 'Sprite', calories: 140, proteinG: 0, carbsG: 38, fatG: 0, servingQty: 330, servingUnit: 'ml', category: 'packaged', barcode: '5449000130435' },
+  { id: 'my-114', name: 'F&N Teh Tarik', calories: 130, proteinG: 4, carbsG: 22, fatG: 3, servingQty: 240, servingUnit: 'ml', category: 'packaged', barcode: '9556040310315' },
+  { id: 'my-115', name: 'Nestle Everyday Milk Powder', calories: 60, proteinG: 3, carbsG: 8, fatG: 2, servingQty: 20, servingUnit: 'g', category: 'packaged', barcode: '9556001307576' },
+  { id: 'my-116', name: 'NESCAFE Classic 3-in-1', calories: 70, proteinG: 1, carbsG: 13, fatG: 1.5, servingQty: 1, servingUnit: 'sachet', category: 'packaged', barcode: '9556001140180' },
+  { id: 'my-117', name: 'NESCAFE Coffee Latte', calories: 80, proteinG: 2, carbsG: 14, fatG: 2, servingQty: 240, servingUnit: 'ml', category: 'packaged', barcode: '9556001025272' },
+  { id: 'my-118', name: 'Red Bull', calories: 110, proteinG: 0, carbsG: 28, fatG: 0, servingQty: 250, servingUnit: 'ml', category: 'packaged', barcode: '9556001500283' },
+  { id: 'my-119', name: 'Carlsberg', calories: 150, proteinG: 1.5, carbsG: 12, fatG: 0, servingQty: 330, servingUnit: 'ml', category: 'packaged', barcode: '5000112546410' },
   // More rice dishes
-  { id: 'my-110', name: 'Nasi Paprik', calories: 560, proteinG: 25, carbsG: 72, fatG: 18, servingQty: 1, servingUnit: 'plate', category: 'rice' },
+  { id: 'my-150', name: 'Nasi Paprik', calories: 560, proteinG: 25, carbsG: 72, fatG: 18, servingQty: 1, servingUnit: 'plate', category: 'rice' },
   { id: 'my-111', name: 'Nasi Kerabu', calories: 420, proteinG: 16, carbsG: 65, fatG: 12, servingQty: 1, servingUnit: 'plate', category: 'rice' },
   { id: 'my-112', name: 'Nasi Dagang', calories: 480, proteinG: 18, carbsG: 70, fatG: 16, servingQty: 1, servingUnit: 'plate', category: 'rice' },
   { id: 'my-113', name: 'Nasi Minyak', calories: 400, proteinG: 7, carbsG: 75, fatG: 10, servingQty: 1, servingUnit: 'cup', category: 'rice' },

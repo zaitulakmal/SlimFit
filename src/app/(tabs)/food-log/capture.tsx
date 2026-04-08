@@ -1,16 +1,17 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ActivityIndicator, ScrollView, Alert, Image,
+  ActivityIndicator, ScrollView, Alert, Image, TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Camera, X, Warning, Image as ImageIcon, Sparkle, PlusCircle, ArrowRight } from 'phosphor-react-native';
+import { Camera, X, Warning, Image as ImageIcon, Sparkle, PlusCircle, ArrowRight, Pencil } from 'phosphor-react-native';
 
 import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
+import { MALAYSIAN_FOODS } from '../../../data/malaysian-foods';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -25,28 +26,6 @@ interface FoodFromPhoto {
   imageUri?: string;
 }
 
-// Common foods with nutrition for quick selection
-const COMMON_FOODS = [
-  { name: 'Nasi Lemak', calories: 400, protein: 8, carbs: 45, fat: 18, unit: 'serving' },
-  { name: 'Nasi Goreng', calories: 350, protein: 9, carbs: 50, fat: 12, unit: 'serving' },
-  { name: 'Mee Goreng', calories: 380, protein: 10, carbs: 48, fat: 14, unit: 'serving' },
-  { name: 'Roti Canai', calories: 250, protein: 6, carbs: 35, fat: 10, unit: 'piece' },
-  { name: 'Nasi Putih', calories: 200, protein: 4, carbs: 45, fat: 1, unit: 'cup' },
-  { name: 'Ayam Goreng', calories: 300, protein: 25, carbs: 15, fat: 18, unit: 'piece' },
-  { name: 'Satay', calories: 150, protein: 12, carbs: 8, fat: 8, unit: 'stick' },
-  { name: 'Laksa', calories: 450, protein: 15, carbs: 55, fat: 18, unit: 'bowl' },
-  { name: 'Maggie Goreng', calories: 400, protein: 10, carbs: 52, fat: 16, unit: 'pack' },
-  { name: 'Teh Tarik', calories: 120, protein: 3, carbs: 20, fat: 4, unit: 'cup' },
-  { name: 'Kopi O', calories: 80, protein: 1, carbs: 15, fat: 2, unit: 'cup' },
-  { name: 'Milo', calories: 150, protein: 4, carbs: 25, fat: 4, unit: 'cup' },
-  { name: 'Banana', calories: 105, protein: 1, carbs: 27, fat: 0, unit: 'medium' },
-  { name: 'Apple', calories: 95, protein: 0, carbs: 25, fat: 0, unit: 'medium' },
-  { name: 'Egg', calories: 70, protein: 6, carbs: 0, fat: 5, unit: 'piece' },
-  { name: 'Rice Bowl', calories: 200, protein: 4, carbs: 45, fat: 1, unit: 'bowl' },
-  { name: 'Chicken Rice', calories: 350, protein: 25, carbs: 40, fat: 10, unit: 'serving' },
-  { name: 'Porridge', calories: 150, protein: 5, carbs: 25, fat: 3, unit: 'bowl' },
-];
-
 export default function FoodCaptureScreen() {
   const { t } = useTranslation();
   const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
@@ -54,9 +33,20 @@ export default function FoodCaptureScreen() {
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [capturing, setCapturing] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [foodSearch, setFoodSearch] = useState('');
+  const [manualFoodName, setManualFoodName] = useState('');
+  const [manualCalories, setManualCalories] = useState('');
+  const [manualProtein, setManualProtein] = useState('');
+  const [manualCarbs, setManualCarbs] = useState('');
+  const [manualFat, setManualFat] = useState('');
   const cameraRef = useRef<CameraView>(null);
   const { logFood, currentDateStr } = useFoodStore();
   const insets = useSafeAreaInsets();
+
+  const filteredFoods = foodSearch.trim() 
+    ? MALAYSIAN_FOODS.filter(f => f.name.toLowerCase().includes(foodSearch.toLowerCase())).slice(0, 50)
+    : MALAYSIAN_FOODS.slice(0, 50);
 
   const handleCapture = async () => {
     if (!cameraRef.current || capturing) return;
@@ -80,17 +70,41 @@ export default function FoodCaptureScreen() {
     }
   };
 
-  const handleSelectFood = async (food: typeof COMMON_FOODS[0]) => {
+  const handleSelectFood = async (food: typeof MALAYSIAN_FOODS[0]) => {
     try {
       await logFood({
         mealType: (mealType as MealType) ?? 'snack',
         foodName: food.name,
         calories: food.calories,
-        proteinG: food.protein,
-        carbsG: food.carbs,
-        fatG: food.fat,
+        proteinG: food.proteinG,
+        carbsG: food.carbsG,
+        fatG: food.fatG,
+        servingQty: food.servingQty,
+        servingUnit: food.servingUnit,
+        source: 'local',
+        dateStr: currentDateStr,
+      });
+      router.back();
+    } catch (e) {
+      Alert.alert('Error', 'Failed to save food');
+    }
+  };
+
+  const handleManualEntry = async () => {
+    if (!manualFoodName.trim()) {
+      Alert.alert('Error', 'Please enter food name');
+      return;
+    }
+    try {
+      await logFood({
+        mealType: (mealType as MealType) ?? 'snack',
+        foodName: manualFoodName,
+        calories: parseFloat(manualCalories) || 0,
+        proteinG: parseFloat(manualProtein) || 0,
+        carbsG: parseFloat(manualCarbs) || 0,
+        fatG: parseFloat(manualFat) || 0,
         servingQty: 1,
-        servingUnit: food.unit,
+        servingUnit: 'serving',
         source: 'manual',
         dateStr: currentDateStr,
       });
@@ -208,13 +222,24 @@ export default function FoodCaptureScreen() {
           {/* AI Suggestion header */}
           <View style={s.aiHeader}>
             <Sparkle size={18} weight="fill" color={colors.primary} />
-            <Text style={s.aiTitle}>Common Malaysian Foods</Text>
-            <Text style={s.aiSubtitle}>Select what you ate</Text>
+            <Text style={s.aiTitle}>Malaysian Foods</Text>
+            <Text style={s.aiSubtitle}>Select or search what you ate</Text>
+          </View>
+
+          {/* Search bar */}
+          <View style={s.searchContainer}>
+            <TextInput
+              style={s.searchInput}
+              value={foodSearch}
+              onChangeText={setFoodSearch}
+              placeholder="Search foods..."
+              placeholderTextColor={colors.textSecondary}
+            />
           </View>
 
           {/* Food list */}
           <ScrollView style={s.foodList} contentContainerStyle={s.foodListContent}>
-            {COMMON_FOODS.map((food, index) => (
+            {filteredFoods.map((food, index) => (
               <TouchableOpacity
                 key={index}
                 style={s.foodItem}
@@ -222,12 +247,12 @@ export default function FoodCaptureScreen() {
               >
                 <View style={s.foodInfo}>
                   <Text style={s.foodName}>{food.name}</Text>
-                  <Text style={s.foodServing}>1 {food.unit}</Text>
+                  <Text style={s.foodServing}>{food.servingQty} {food.servingUnit}</Text>
                 </View>
                 <View style={s.foodNutrition}>
                   <Text style={s.foodCalories}>{food.calories} kcal</Text>
                   <Text style={s.foodMacros}>
-                    P: {food.protein}g • C: {food.carbs}g • F: {food.fat}g
+                    P: {food.proteinG}g • C: {food.carbsG}g • F: {food.fatG}g
                   </Text>
                 </View>
                 <ArrowRight size={20} color={colors.textSecondary} weight="bold" />
@@ -235,11 +260,98 @@ export default function FoodCaptureScreen() {
             ))}
           </ScrollView>
 
-          {/* Manual search button */}
-          <TouchableOpacity onPress={handleSearchInstead} style={s.manualBtn}>
-            <Text style={s.manualBtnText}>Search manually</Text>
-            <ArrowRight size={18} color={colors.primary} weight="bold" />
-          </TouchableOpacity>
+          {/* Manual buttons */}
+          <View style={s.manualButtonsRow}>
+            <TouchableOpacity 
+              onPress={() => setShowManualEntry(true)} 
+              style={s.manualBtnHalf}
+            >
+              <Pencil size={18} color={colors.primary} weight="bold" />
+              <Text style={s.manualBtnText}>Enter Manually</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSearchInstead} style={s.manualBtnHalf}>
+              <ArrowRight size={18} color={colors.primary} weight="bold" />
+              <Text style={s.manualBtnText}>Search</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : showManualEntry ? (
+        <View style={s.suggestionsContainer}>
+          <View style={[s.topBar, { paddingTop: insets.top + 8, backgroundColor: colors.white }]}>
+            <TouchableOpacity style={s.closeBtn} onPress={() => setShowManualEntry(false)}>
+              <X size={28} weight="bold" color={colors.textPrimary} />
+            </TouchableOpacity>
+            <Text style={s.suggestionsTitle}>Enter Food Details</Text>
+            <View style={{ width: 44 }} />
+          </View>
+
+          <ScrollView style={s.manualForm} contentContainerStyle={s.manualFormContent}>
+            <View style={s.inputGroup}>
+              <Text style={s.inputLabel}>Food Name</Text>
+              <TextInput
+                style={s.input}
+                value={manualFoodName}
+                onChangeText={setManualFoodName}
+                placeholder="Enter food name"
+                placeholderTextColor={colors.textSecondary}
+              />
+            </View>
+
+            <View style={s.inputRow}>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Calories</Text>
+                <TextInput
+                  style={s.input}
+                  value={manualCalories}
+                  onChangeText={setManualCalories}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  placeholderTextColor={colors.textSecondary}
+                />
+              </View>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Protein (g)</Text>
+                <TextInput
+                  style={s.input}
+                  value={manualProtein}
+                  onChangeText={setManualProtein}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  placeholderTextColor={colors.textSecondary}
+                />
+              </View>
+            </View>
+
+            <View style={s.inputRow}>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Carbs (g)</Text>
+                <TextInput
+                  style={s.input}
+                  value={manualCarbs}
+                  onChangeText={setManualCarbs}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  placeholderTextColor={colors.textSecondary}
+                />
+              </View>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Fat (g)</Text>
+                <TextInput
+                  style={s.input}
+                  value={manualFat}
+                  onChangeText={setManualFat}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  placeholderTextColor={colors.textSecondary}
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity onPress={handleManualEntry} style={s.confirmBtn}>
+              <PlusCircle size={20} weight="fill" color={colors.white} />
+              <Text style={s.confirmBtnText}>Add Food</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       ) : null}
     </View>
@@ -331,4 +443,33 @@ const s = StyleSheet.create({
     padding: spacing.lg, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border,
   },
   manualBtnText: { ...typography.body, fontWeight: '600', color: colors.primary },
+  
+  // New styles for manual entry and buttons row
+  manualButtonsRow: { flexDirection: 'row', gap: spacing.sm, padding: spacing.md, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border },
+  manualBtnHalf: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs,
+    padding: spacing.md, backgroundColor: colors.background, borderRadius: 12, borderWidth: 1, borderColor: colors.border,
+  },
+  manualForm: { flex: 1, backgroundColor: colors.background },
+  manualFormContent: { padding: spacing.lg, gap: spacing.md },
+  inputGroup: { marginBottom: spacing.sm },
+  inputLabel: { ...typography.label, color: colors.textSecondary, marginBottom: spacing.xs },
+  input: {
+    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    ...typography.body, color: colors.textPrimary, backgroundColor: colors.white,
+  },
+  inputRow: { flexDirection: 'row', gap: spacing.sm },
+  inputHalf: { flex: 1 },
+  confirmBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
+    backgroundColor: colors.primary, borderRadius: 12, paddingVertical: spacing.md, marginTop: spacing.md,
+  },
+  confirmBtnText: { ...typography.body, fontWeight: '600', color: colors.textOnAccent },
+  searchContainer: { padding: spacing.md, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
+  searchInput: {
+    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    ...typography.body, color: colors.textPrimary, backgroundColor: colors.background,
+  },
 });
