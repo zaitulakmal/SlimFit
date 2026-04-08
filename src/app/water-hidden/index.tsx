@@ -45,8 +45,8 @@ function HeaderDecoration() {
   );
 }
 
-function WaterGlass({ progress }: { progress: number }) {
-  const GW = 260, GH = 300;
+function WaterBottleLarge({ progress }: { progress: number }) {
+  const GW = 200, GH = 320;
   const fillAnim = useSharedValue(0);
 
   useEffect(() => {
@@ -56,51 +56,63 @@ function WaterGlass({ progress }: { progress: number }) {
     });
   }, [progress]);
 
-  const maxFill = 230;
+  // Bottle shape: cap(top) → neck → shoulder → body → base
+  // Body: x=60..140, y=90..290
+  const bodyX = 60, bodyW = 80, bodyY = 90, bodyH = 200;
+  const maxFill = bodyH - 4;
+
   const fillProps = useAnimatedProps(() => ({
-    y: 28 + (maxFill - fillAnim.value * maxFill),
+    y: bodyY + 2 + (maxFill - fillAnim.value * maxFill),
     height: fillAnim.value * maxFill,
   }));
 
   const isGoalMet = progress >= 1;
   const fillColor = isGoalMet ? C.primary : C.blue;
 
+  // Bottle outline path
+  const bottlePath = `
+    M 90,10 L 110,10
+    L 110,20 Q 118,22 120,32
+    L 120,50 Q 140,62 140,90
+    L 140,282 Q 140,292 130,292
+    L 70,292 Q 60,292 60,282
+    L 60,90 Q 60,62 80,50
+    L 80,32 Q 82,22 90,20 Z
+  `;
+  const clipPath = `
+    M 80,50 Q 60,62 60,90
+    L 60,282 Q 60,292 70,292
+    L 130,292 Q 140,292 140,282
+    L 140,90 Q 140,62 120,50 Z
+  `;
+
   return (
     <Svg width={GW} height={GH} viewBox={`0 0 ${GW} ${GH}`}>
       <Defs>
-        <ClipPath id="glassClip2">
-          <Path d="M32,26 L228,26 L210,274 Q210,284 198,284 L102,284 Q90,284 90,274 Z" />
+        <ClipPath id="bottleClipLarge">
+          <Path d={clipPath} />
         </ClipPath>
       </Defs>
 
-      {/* Glass body background */}
-      <Path
-        d="M32,26 L228,26 L210,274 Q210,284 198,284 L102,284 Q90,284 90,274 Z"
-        fill={`${fillColor}15`}
-        stroke={fillColor}
-        strokeWidth={3}
-      />
+      {/* Bottle body background */}
+      <Path d={bottlePath} fill={`${fillColor}15`} stroke={fillColor} strokeWidth={3} strokeLinejoin="round" />
 
       {/* Water fill */}
-      <G clipPath="url(#glassClip2)">
+      <G clipPath="url(#bottleClipLarge)">
         <AnimatedRect
-          x={32} width={196}
+          x={60} width={80}
           fill={fillColor}
-          opacity={0.7}
+          opacity={0.75}
           animatedProps={fillProps}
         />
         {/* Shine */}
-        <Rect x={50} y={40} width={12} height={140} rx={6} fill="rgba(255,255,255,0.4)" />
-        <Rect x={70} y={40} width={6} height={100} rx={3} fill="rgba(255,255,255,0.2)" />
+        <Rect x={68} y={95} width={10} height={160} rx={5} fill="rgba(255,255,255,0.4)" />
+        <Rect x={82} y={95} width={5} height={110} rx={3} fill="rgba(255,255,255,0.2)" />
       </G>
 
-      {/* Rim highlight */}
-      <Path
-        d="M32,26 L228,26"
-        stroke="rgba(255,255,255,0.9)"
-        strokeWidth={4}
-        strokeLinecap="round"
-      />
+      {/* Cap */}
+      <Rect x={88} y={6} width={24} height={16} rx={5} fill={fillColor} />
+      <Rect x={92} y={2} width={16} height={8} rx={3} fill={fillColor} opacity={0.7} />
     </Svg>
   );
 }
@@ -143,7 +155,7 @@ export default function WaterScreen() {
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Main glass */}
         <View style={s.glassContainer}>
-          <WaterGlass progress={progress} />
+          <WaterBottleLarge progress={progress} />
           
           {isGoalMet && (
             <Animated.View entering={FadeInDown} style={s.completeBadge}>

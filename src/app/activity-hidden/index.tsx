@@ -148,7 +148,7 @@ export default function ActivityScreen() {
 
   return (
     <View style={s.root}>
-      <ScrollView style={s.scrollView} contentContainerStyle={[s.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.scrollView} contentContainerStyle={[s.content, { paddingTop: insets.top + 20, paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={s.screenTitle}>Activity</Text>
 
         {/* Summary card */}

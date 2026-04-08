@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { ForkKnife, House, IdentificationBadgeIcon } from 'phosphor-react-native';
+import { ForkKnife, House, UserCircle } from 'phosphor-react-native';
 import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
@@ -54,7 +54,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.profile'),
           tabBarIcon: ({ focused, color, size }) => (
-            <IdentificationBadgeIcon size={size} weight={focused ? 'fill' : 'regular'} color={color} />
+            <UserCircle size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />

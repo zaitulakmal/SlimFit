@@ -160,7 +160,7 @@ function GenderCard({ value, labelKey, selected, onPress }: {
   }));
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[animatedStyle, genderStyles.cardWrapper]}>
       <TouchableOpacity
         style={[genderStyles.card, selected && genderStyles.cardSelected]}
         onPress={onPress}
@@ -187,17 +187,20 @@ function GenderCard({ value, labelKey, selected, onPress }: {
 }
 
 const genderStyles = StyleSheet.create({
+  cardWrapper: {
+    width: '100%',
+  },
   card: {
-    flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.xl,
     backgroundColor: colors.surface,
     borderWidth: 2,
     borderColor: colors.border,
-    borderRadius: radius.xxl,
+    borderRadius: radius.xl,
     position: 'relative',
-    minHeight: 140,
+    minHeight: 120,
   },
   cardSelected: {
     borderColor: colors.primary,
@@ -581,7 +584,7 @@ const styles = StyleSheet.create({
   },
   inputError: { borderColor: colors.danger },
   errorText: { fontSize: 14, fontWeight: '500', color: colors.danger, marginTop: spacing.xs },
-  genderRow: { flexDirection: 'row', gap: spacing.md },
+  genderRow: { flexDirection: 'column', gap: spacing.md, width: '100%' },
   footer: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xl, paddingTop: spacing.md, backgroundColor: colors.background },
   skipButton: { alignItems: 'center', paddingVertical: spacing.sm, marginBottom: spacing.md },
   skipText: { fontSize: 15, fontWeight: '600', color: colors.textSecondary },

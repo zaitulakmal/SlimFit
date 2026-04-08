@@ -101,6 +101,15 @@ const tables = [
     notes TEXT,
     logged_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS fasting_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    date_str TEXT NOT NULL,
+    start_hour INTEGER NOT NULL,
+    start_minute INTEGER NOT NULL,
+    duration_hours INTEGER NOT NULL DEFAULT 16,
+    is_active INTEGER NOT NULL DEFAULT 0,
+    completed_at TEXT
+  )`,
 ];
 
 for (const sql of tables) {

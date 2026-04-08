@@ -1,42 +1,34 @@
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
-import { House, ForkKnife, User, CaretLeft } from 'phosphor-react-native';
-import { colors, spacing, radius } from '../constants/theme-new';
-import { pastelColors } from '../constants/pastel-theme';
+import { House, ForkKnife, UserCircle } from 'phosphor-react-native';
+
+const ACTIVE   = '#B39DDB';
+const INACTIVE = '#C4B5FD';
 
 interface BottomNavProps {
-  showBack?: boolean;
-  active?: string;
+  active?: 'home' | 'food' | 'profile';
 }
 
-export default function BottomNav({ showBack = false, active }: BottomNavProps) {
-  const getActiveColor = (tab: string) => {
-    if (active === tab) return pastelColors.primary;
-    return colors.textSecondary;
-  };
+export default function BottomNav({ active }: BottomNavProps) {
+  const color  = (tab: string): string => active === tab ? ACTIVE : INACTIVE;
+  const weight = (tab: string): 'fill' | 'regular' => active === tab ? 'fill' : 'regular';
 
   return (
     <View style={styles.container}>
-      {showBack && (
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <CaretLeft size={24} color={colors.text} weight="bold" />
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
-      )}
-      <View style={[styles.tabs, !showBack && styles.tabsFull]}>
-        <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)')}>
-          <House size={22} weight={active === 'home' ? 'fill' : 'regular'} color={getActiveColor('home')} />
-          <Text style={[styles.tabText, active === 'home' && { color: pastelColors.primary }]}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/food-log')}>
-          <ForkKnife size={22} weight={active === 'food' ? 'fill' : 'regular'} color={getActiveColor('food')} />
-          <Text style={[styles.tabText, active === 'food' && { color: pastelColors.primary }]}>Food</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/profile')}>
-          <User size={22} weight={active === 'profile' ? 'fill' : 'regular'} color={getActiveColor('profile')} />
-          <Text style={[styles.tabText, active === 'profile' && { color: pastelColors.primary }]}>Profile</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)')}>
+        <House size={24} weight={weight('home')} color={color('home')} />
+        <Text style={[styles.label, { color: color('home') }]}>Home</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/food-log')}>
+        <ForkKnife size={24} weight={weight('food')} color={color('food')} />
+        <Text style={[styles.label, { color: color('food') }]}>Food</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.tab} onPress={() => router.push('/(tabs)/profile')}>
+        <UserCircle size={24} weight={weight('profile')} color={color('profile')} />
+        <Text style={[styles.label, { color: color('profile') }]}>Profile</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -44,43 +36,25 @@ export default function BottomNav({ showBack = false, active }: BottomNavProps) 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.borderLight,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-  },
-  backBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingRight: spacing.md,
-    borderRightWidth: 1,
-    borderRightColor: colors.borderLight,
-    marginRight: spacing.md,
-  },
-  backText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: 4,
-  },
-  tabs: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  tabsFull: {
-    flex: 1,
+    backgroundColor: '#FFFFFF',
+    height: 72,
+    paddingTop: 8,
+    paddingBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 16,
   },
   tab: {
+    flex: 1,
     alignItems: 'center',
-    padding: spacing.xs,
+    justifyContent: 'center',
   },
-  tabText: {
-    fontSize: 10,
-    color: colors.textSecondary,
+  label: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.2,
     marginTop: 2,
   },
 });

@@ -25,7 +25,7 @@ import Animated, {
   interpolate,
   Easing,
 } from 'react-native-reanimated';
-import Svg, { Circle as SvgCircle, Defs, RadialGradient, Stop, Rect, Path, ClipPath, G, Ellipse, Line } from 'react-native-svg';
+import Svg, { Circle as SvgCircle, Defs, RadialGradient, Stop, Rect, Path, ClipPath, G, Ellipse, Line, LinearGradient } from 'react-native-svg';
 import {
   UserCircle,
   Drop,
@@ -35,6 +35,7 @@ import {
   Barbell,
   BookOpenText,
   MapPin,
+  Clock,
   ArrowRight,
   Lightning,
 } from 'phosphor-react-native';
@@ -45,8 +46,11 @@ import { useWaterStore } from '../../stores/waterStore';
 import { useFoodStore } from '../../stores/foodStore';
 import { useStatsStore } from '../../stores/statsStore';
 import { useWorkoutStore } from '../../stores/workoutStore';
+import { useFastingStore } from '../../stores/fastingStore';
 
-const { width: W } = Dimensions.get('window');
+const { width: W, height: H } = Dimensions.get('window');
+const RF = (size: number) => Math.round(size * (W / 390));
+const RFV = (size: number) => Math.round(size * (H / 780));
 
 // ── Pastel color palette ─────────────────────────────────────────────────────────
 const C = {
@@ -231,23 +235,142 @@ function WaterBottle({ progress }: { progress: number }) {
   );
 }
 
+// ── Fasting Clock Component ─────────────────────────────────────────────────────
+const FASTING_SCHEDULES = [
+  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#FF8A80' },
+  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#FFB74D' },
+  { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FF7043' },
+];
+
+function AnimatedFastingClock({ 
+  schedule, 
+  currentHour,
+  isFasting,
+  startHour = 20,
+}: { 
+  schedule: typeof FASTING_SCHEDULES[0];
+  currentHour: number;
+  isFasting: boolean;
+  startHour?: number;
+}) {
+  const size = RF(90);
+  const SW = 9;                         // stroke width for arcs
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - SW / 2 - 2;     // ring fits fully inside SVG
+
+  const eatingStart = startHour;
+  const eatingEnd = (startHour + schedule.eatHours) % 24;
+
+  const hourToAngle = (hour: number) => (hour / 24) * 360 - 90;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  const currentAngle = hourToAngle(currentHour);
+
+  const arcPath = (startDeg: number, endDeg: number, isLarge: boolean) => {
+    const s = { x: cx + r * Math.cos(toRad(startDeg)), y: cy + r * Math.sin(toRad(startDeg)) };
+    const e = { x: cx + r * Math.cos(toRad(endDeg)), y: cy + r * Math.sin(toRad(endDeg)) };
+    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${isLarge ? 1 : 0} 1 ${e.x} ${e.y}`;
+  };
+
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size}>
+        <Defs>
+          <LinearGradient id="fastingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor="#FF8A80" />
+            <Stop offset="100%" stopColor="#FF7043" />
+          </LinearGradient>
+          <LinearGradient id="eatingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor="#81C784" />
+            <Stop offset="100%" stopColor="#66BB6A" />
+          </LinearGradient>
+        </Defs>
+
+        {/* Track ring */}
+        <SvgCircle cx={cx} cy={cy} r={r} fill="#F5FBF8" stroke="#E8F4F0" strokeWidth={SW} />
+
+        {/* Fasting arc (red) — longer window */}
+        <Path
+          d={arcPath(hourToAngle(eatingEnd), hourToAngle(eatingStart), schedule.fastingHours > 12)}
+          stroke="url(#fastingGrad)"
+          strokeWidth={SW}
+          fill="none"
+          strokeLinecap="round"
+        />
+
+        {/* Eating arc (green) — shorter window */}
+        <Path
+          d={arcPath(hourToAngle(eatingStart), hourToAngle(eatingEnd), schedule.eatHours > 12)}
+          stroke="url(#eatingGrad)"
+          strokeWidth={SW}
+          fill="none"
+          strokeLinecap="round"
+        />
+
+        {/* Current time dot — sits on the ring */}
+        <SvgCircle
+          cx={cx + r * Math.cos(toRad(currentAngle))}
+          cy={cy + r * Math.sin(toRad(currentAngle))}
+          r={5}
+          fill={isFasting ? '#FF8A80' : '#81C784'}
+        />
+        <SvgCircle
+          cx={cx + r * Math.cos(toRad(currentAngle))}
+          cy={cy + r * Math.sin(toRad(currentAngle))}
+          r={2.5}
+          fill="white"
+        />
+
+        {/* Center circle */}
+        <SvgCircle cx={cx} cy={cy} r={r - SW / 2 - 4} fill="white" />
+
+        {/* Clock hands */}
+        {(() => {
+          const innerR = r - SW / 2 - 4;
+          const hourAngle = toRad(((currentHour % 12) / 12) * 360 - 90);
+          const minAngle  = toRad(((currentHour % 1) * 360) - 90);
+          const handColor = isFasting ? '#FF8A80' : '#56AB91';
+          return (
+            <G>
+              <Path
+                d={`M ${cx} ${cy} L ${cx + innerR * 0.5 * Math.cos(hourAngle)} ${cy + innerR * 0.5 * Math.sin(hourAngle)}`}
+                stroke={handColor} strokeWidth={2.5} strokeLinecap="round"
+              />
+              <Path
+                d={`M ${cx} ${cy} L ${cx + innerR * 0.75 * Math.cos(minAngle)} ${cy + innerR * 0.75 * Math.sin(minAngle)}`}
+                stroke={handColor} strokeWidth={1.5} strokeLinecap="round"
+              />
+              <SvgCircle cx={cx} cy={cy} r={2} fill={handColor} />
+            </G>
+          );
+        })()}
+      </Svg>
+
+      <View style={{ flexDirection: 'row', marginTop: RF(6), gap: RF(10) }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#81C784' }} />
+          <Text style={{ fontSize: RF(9), color: '#6B8E7A' }}>{schedule.eatHours}h eat</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF8A80' }} />
+          <Text style={{ fontSize: RF(9), color: '#6B8E7A' }}>{schedule.fastingHours}h fast</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 // ── Decorative food illustrations ───────────────────────────────────────────────
 function HeaderDecoration() {
   const screenWidth = Dimensions.get('window').width;
   const WR = screenWidth;
+  const svgH = RFV(420);
   
   return (
-    <Svg width={W} height={420} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 420`}>
-      <Defs>
-        <RadialGradient id="pastelGrad" cx="50%" cy="0%" r="100%">
-          <Stop offset="0%" stopColor={C.headerTop} />
-          <Stop offset="50%" stopColor={C.headerMid} />
-          <Stop offset="100%" stopColor={C.headerBottom} />
-        </RadialGradient>
-      </Defs>
-      
-      {/* Gradient background */}
-      <Rect width={W} height={420} fill="url(#pastelGrad)" />
+    <Svg width={W} height={svgH} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 420`}>
+      {/* Solid green background */}
+      <Rect width={W} height={420} fill={C.headerTop} />
       
       {/* Floating decorative circles */}
       <SvgCircle cx={W * 0.1} cy={-30} r={70} fill={C.whiteAlpha30} />
@@ -318,11 +441,6 @@ function HeaderDecoration() {
       <SvgCircle cx={W * 0.3} cy={320} r={3} fill={C.white} opacity={0.4} />
       <SvgCircle cx={W * 0.8} cy={350} r={2} fill={C.white} opacity={0.35} />
       
-      {/* Wavy bottom */}
-      <Path
-        d={`M0,388 Q${W * 0.2},420 ${W * 0.4},400 Q${W * 0.6},380 ${W},410 L${W},420 L0,420 Z`}
-        fill={C.bg}
-      />
     </Svg>
   );
 }
@@ -352,7 +470,7 @@ function MacroBar({
         <Text style={mb.macroLabel}>{label}</Text>
         <Text style={mb.macroValue}>{Math.round(value)}g</Text>
       </View>
-      <View style={[mb.track, { backgroundColor: `${color}20` }]}>
+      <View style={[mb.track, { backgroundColor: `${color}40` }]}>
         <Animated.View style={[mb.fill, { backgroundColor: color }, barStyle]} />
       </View>
     </View>
@@ -362,10 +480,10 @@ function MacroBar({
 const mb = StyleSheet.create({
   macroItem:    { flex: 1 },
   macroLabelRow:{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  macroLabel:   { fontSize: 11, fontWeight: '600', color: C.whiteAlpha80, letterSpacing: 0.3 },
-  macroValue:   { fontSize: 11, fontWeight: '700', color: C.white },
-  track:        { height: 8, borderRadius: 4, overflow: 'hidden' },
-  fill:         { height: 8, borderRadius: 4 },
+  macroLabel:   { fontSize: 11, fontWeight: '600', color: 'rgba(45,74,62,0.75)', letterSpacing: 0.3 },
+  macroValue:   { fontSize: 11, fontWeight: '700', color: '#2D4A3E' },
+  track:        { height: 10, borderRadius: 5, overflow: 'hidden' },
+  fill:         { height: 10, borderRadius: 5 },
 });
 
 // ── Quick-access card ─────────────────────────────────────────────────────────
@@ -541,6 +659,8 @@ export default function HomeScreen() {
   const dayLogs    = useFoodStore((s) => s.dayLogs);
   const streakMap  = useStatsStore((s) => s.streakMap);
   const totalBurned = useWorkoutStore((s) => s.totalBurned);
+  const fastingToday = useFastingStore((s) => s.today);
+  const fastingProgress = useFastingStore((s) => s.getProgress());
   const isProfileLoaded = useProfileStore((s) => s.isLoaded);
   const isFoodLoaded = useFoodStore((s) => s.isLoaded);
 
@@ -563,6 +683,7 @@ export default function HomeScreen() {
       useFoodStore.getState().loadDayLogs();
       useStatsStore.getState().loadStats();
       useWorkoutStore.getState().loadToday();
+      useFastingStore.getState().loadToday();
 
       setCalorieProgress(0);
       setWaterProgress(0);
@@ -636,9 +757,9 @@ export default function HomeScreen() {
 
         {/* Greeting row */}
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.greetRow}>
-          <View>
-            <Text style={s.greetText}>{t(greetingKey(), { name })}</Text>
-            <Text style={s.dateText}>
+          <View style={{ flex: 1, flexShrink: 1, marginRight: RF(10) }}>
+            <Text style={s.greetText} numberOfLines={2}>{t(greetingKey(), { name })}</Text>
+            <Text style={s.dateText} numberOfLines={1}>
               {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
             </Text>
           </View>
@@ -709,7 +830,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Water + Weight cards */}
+        {/* Water + Fasting cards */}
         <View style={s.miniCardsRow}>
           <MiniCard
             icon={<Drop size={16} weight="fill" color="#7EC8E3" />}
@@ -726,23 +847,29 @@ export default function HomeScreen() {
           </MiniCard>
 
           <MiniCard
-            icon={<Scales size={16} weight="regular" color="#56AB91" />}
-            label="Weight"
-            labelColor="#379D76"
-            bgColor={C.cardMint}
-            onPress={() => router.push('/weight-hidden')}
+            icon={<Clock size={16} weight="fill" color="#FF8A80" />}
+            label="Fasting"
+            labelColor="#FF8A80"
+            bgColor="#FFF0F0"
+            onPress={() => router.push('/fasting-hidden')}
             index={1}
           >
-            <Text style={[s.bigValue, { color: C.text }]}>{currentWeight} kg</Text>
-            <View style={s.goalTrack}>
-              <View style={[s.goalFill, { width: `${goalProgress * 100}%` as any }]} />
-            </View>
-            <Text style={s.miniSub}>Goal: {targetWeight} kg</Text>
+            <AnimatedFastingClock 
+              schedule={FASTING_SCHEDULES.find(s => s.fastingHours === fastingToday?.durationHours) || FASTING_SCHEDULES[0]}
+              currentHour={new Date().getHours() + new Date().getMinutes() / 60}
+              isFasting={fastingToday?.isActive || false}
+              startHour={fastingToday?.startHour || 20}
+            />
+            <Text style={[s.miniSub, { color: '#FF8A80', marginTop: RF(4) }]}>
+              {fastingToday?.isActive 
+                ? `🔥 Burning Fat - ${fastingToday.durationHours}h Fast` 
+                : 'Select Schedule'}
+            </Text>
           </MiniCard>
         </View>
 
         {/* Explore section */}
-        <Animated.View entering={FadeInUp.delay(200).springify()} style={s.sectionLabel}>
+        <Animated.View entering={FadeInUp.delay(200).springify()} style={[s.sectionLabel, { marginTop: RFV(12) }]}>
           <Text style={s.sectionTitle}>Explore</Text>
         </Animated.View>
 
@@ -764,16 +891,6 @@ export default function HomeScreen() {
           onPress={() => router.push('/activity-hidden')}
           index={1}
         />
-        <ExploreCard
-          title="Nearby"
-          subtitle="Find healthy food spots near you"
-          icon={<MapPin size={26} weight="fill" color="#7EC8E3" />}
-          iconBg="#E8F4F8"
-          accentColor="#7EC8E3"
-          onPress={() => router.push('/grocery-hidden')}
-          index={2}
-        />
-        
         <View style={{ height: 100 }} />
       </View>
     </ScrollView>
@@ -787,80 +904,81 @@ const s = StyleSheet.create({
 
   // Header
   header: {
-    paddingTop: 64,
-    paddingBottom: 40,
-    paddingHorizontal: 20,
+    paddingTop: RFV(60),
+    paddingBottom: RFV(32),
+    paddingHorizontal: RF(20),
     alignItems: 'center',
     overflow: 'hidden',
-    minHeight: 440,
+    minHeight: RFV(420),
+    backgroundColor: C.headerTop,
   },
   greetRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 24,
+    marginBottom: RFV(20),
     zIndex: 1,
   },
   greetText: {
-    fontSize: 26,
+    fontSize: RF(22),
     fontWeight: '800',
     color: C.white,
     letterSpacing: -0.4,
-    lineHeight: 32,
+    lineHeight: RF(28),
   },
   dateText: {
-    fontSize: 13,
+    fontSize: RF(12),
     fontWeight: '500',
     color: C.whiteAlpha80,
-    marginTop: 4,
+    marginTop: RFV(4),
   },
   streakPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: RF(12),
+    paddingVertical: RF(6),
     borderRadius: 999,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
   },
-  streakNum: { fontSize: 16, fontWeight: '800', color: C.white },
+  streakNum: { fontSize: RF(14), fontWeight: '800', color: C.white },
 
-  ringWrap:   { marginBottom: 28, zIndex: 1, alignItems: 'center', justifyContent: 'center' },
-  ringCenter: { position: 'absolute', alignItems: 'center', justifyContent: 'center', paddingTop: 30 },
-  ringMain:   { fontSize: 36, fontWeight: '800', letterSpacing: -0.6, lineHeight: 42 },
-  ringSub:    { fontSize: 13, fontWeight: '600', color: C.white, marginTop: 4 },
-  ringBudget: { fontSize: 12, fontWeight: '500', color: C.white, marginTop: 2 },
+  ringWrap:   { marginBottom: RFV(20), zIndex: 1, alignItems: 'center', justifyContent: 'center' },
+  ringCenter: { position: 'absolute', alignItems: 'center', justifyContent: 'center', paddingTop: RFV(24) },
+  ringMain:   { fontSize: RF(30), fontWeight: '800', letterSpacing: -0.6, lineHeight: RF(36) },
+  ringSub:    { fontSize: RF(11), fontWeight: '600', color: C.white, marginTop: RFV(4) },
+  ringBudget: { fontSize: RF(10), fontWeight: '500', color: C.white, marginTop: RFV(2) },
 
   macroRow: {
     flexDirection: 'row',
     width: '100%',
     gap: 0,
     backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 18,
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    borderRadius: RF(16),
+    paddingHorizontal: RF(14),
+    paddingVertical: RF(12),
     zIndex: 1,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
   },
-  macroDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 14 },
+  macroDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: RF(12) },
 
   // Body
-  body: { paddingHorizontal: 18, paddingTop: 24 },
+  body: { paddingHorizontal: 18, paddingTop: 32 },
 
-  sectionLabel: { marginBottom: 14, marginTop: 6 },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.2 },
+  sectionLabel: { marginBottom: RFV(12), marginTop: RFV(4) },
+  sectionTitle: { fontSize: RF(16), fontWeight: '800', color: C.text, letterSpacing: -0.2 },
 
-  chipsRow:    { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  miniCardsRow:{ flexDirection: 'row', gap: 12, marginBottom: 24 },
+  chipsRow:    { flexDirection: 'row', gap: RF(8), marginBottom: RFV(14) },
+  miniCardsRow:{ flexDirection: 'row', gap: RF(10), marginBottom: RFV(20) },
 
-  miniSub:  { fontSize: 11, fontWeight: '600', color: C.textSub, textAlign: 'center' },
-  bigValue: { fontSize: 24, fontWeight: '800', letterSpacing: -0.3 },
-  goalTrack:{ width: '100%', height: 8, backgroundColor: C.border, borderRadius: 4, overflow: 'hidden' },
-  goalFill: { height: 8, backgroundColor: C.primary, borderRadius: 4 },
+  miniSub:  { fontSize: RF(10), fontWeight: '600', color: C.textSub, textAlign: 'center' },
+  bigValue: { fontSize: RF(20), fontWeight: '800', letterSpacing: -0.3 },
+  goalTrack:{ width: '100%', height: RFV(6), backgroundColor: C.border, borderRadius: 4, overflow: 'hidden' },
+  goalFill: { height: RFV(6), backgroundColor: C.primary, borderRadius: 4 },
 
   // Empty state
   emptyState: {
@@ -868,7 +986,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: C.bg,
-    gap: 16,
+    gap: RFV(14),
   },
-  emptyText: { fontSize: 16, color: C.textSub, textAlign: 'center', paddingHorizontal: 32 },
+  emptyText: { fontSize: RF(14), color: C.textSub, textAlign: 'center', paddingHorizontal: RF(28) },
 });

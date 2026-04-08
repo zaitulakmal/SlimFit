@@ -149,3 +149,18 @@ export const workouts = sqliteTable('workouts', {
 });
 export type Workout = typeof workouts.$inferSelect;
 export type NewWorkout = typeof workouts.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Fasting logs
+// ---------------------------------------------------------------------------
+export const fastingLogs = sqliteTable('fasting_logs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull(),
+  startHour: integer('start_hour').notNull(),
+  startMinute: integer('start_minute').notNull(),
+  durationHours: integer('duration_hours').notNull().default(16),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
+  completedAt: text('completed_at'),
+});
+export type FastingLog = typeof fastingLogs.$inferSelect;
+export type NewFastingLog = typeof fastingLogs.$inferInsert;
