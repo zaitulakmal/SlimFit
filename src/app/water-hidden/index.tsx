@@ -13,12 +13,12 @@ import Animated, {
 import Svg, { Path, Rect, ClipPath, Defs, G, Circle as SvgCircle, Stop, RadialGradient } from 'react-native-svg';
 import { Minus, Plus, Drop, CheckCircle, X } from 'phosphor-react-native';
 
-import { pastelColors } from '../../constants/pastel-theme';
+import { colors } from '../../constants/theme-new';
 import { useWaterStore } from '../../stores/waterStore';
 import BottomNav from '../../components/BottomNav';
 
 const { width: W } = Dimensions.get('window');
-const C = pastelColors;
+const C = colors;
 
 const STEP_ML = 250;
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
@@ -28,16 +28,16 @@ function HeaderDecoration() {
     <Svg width={W} height={200} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 200`}>
       <Defs>
         <RadialGradient id="waterHeaderGrad" cx="50%" cy="0%" r="100%">
-          <Stop offset="0%" stopColor={C.headerTop} />
-          <Stop offset="100%" stopColor={C.headerBottom} />
+          <Stop offset="0%" stopColor="#4CAF50" />
+          <Stop offset="100%" stopColor="#1B5E20" />
         </RadialGradient>
       </Defs>
       <Rect width={W} height={200} fill="url(#waterHeaderGrad)" />
       
       {/* Water drops decoration */}
-      <SvgCircle cx={W * 0.15} cy={50} r={20} fill={C.white} opacity={0.2} />
-      <SvgCircle cx={W * 0.8} cy={30} r={15} fill={C.white} opacity={0.15} />
-      <SvgCircle cx={W * 0.5} cy={180} r={30} fill={C.white} opacity={0.1} />
+      <SvgCircle cx={W * 0.15} cy={50} r={20} fill="#FFFFFF" opacity={0.2} />
+      <SvgCircle cx={W * 0.8} cy={30} r={15} fill="#FFFFFF" opacity={0.15} />
+      <SvgCircle cx={W * 0.5} cy={180} r={30} fill="#FFFFFF" opacity={0.1} />
       
       {/* Wavy bottom */}
       <Path d={`M0,175 Q${W * 0.3},200 ${W * 0.5},185 Q${W * 0.7},170 ${W},190 L${W},200 L0,200 Z`} fill={C.background} />
@@ -67,7 +67,7 @@ function WaterBottleLarge({ progress }: { progress: number }) {
   }));
 
   const isGoalMet = progress >= 1;
-  const fillColor = isGoalMet ? C.primary : C.blue;
+  const fillColor = isGoalMet ? '#4CAF50' : '#42A5F5';
 
   // Bottle outline path
   const bottlePath = `

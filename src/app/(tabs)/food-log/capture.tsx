@@ -13,6 +13,9 @@ import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { MALAYSIAN_FOODS } from '../../../data/malaysian-foods';
 
+const RAW_FOOD_CATEGORIES = ['raw', 'dairy', 'fruit'];
+const rawFoods = MALAYSIAN_FOODS.filter(f => RAW_FOOD_CATEGORIES.includes(f.category));
+
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 interface FoodFromPhoto {
@@ -35,6 +38,7 @@ export default function FoodCaptureScreen() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [foodSearch, setFoodSearch] = useState('');
+  const [showRawOnly, setShowRawOnly] = useState(false);
   const [manualFoodName, setManualFoodName] = useState('');
   const [manualCalories, setManualCalories] = useState('');
   const [manualProtein, setManualProtein] = useState('');
@@ -44,9 +48,10 @@ export default function FoodCaptureScreen() {
   const { logFood, currentDateStr } = useFoodStore();
   const insets = useSafeAreaInsets();
 
-  const filteredFoods = foodSearch.trim() 
-    ? MALAYSIAN_FOODS.filter(f => f.name.toLowerCase().includes(foodSearch.toLowerCase())).slice(0, 50)
-    : MALAYSIAN_FOODS.slice(0, 50);
+  const sourceList = showRawOnly ? rawFoods : MALAYSIAN_FOODS;
+  const filteredFoods = foodSearch.trim()
+    ? sourceList.filter(f => f.name.toLowerCase().includes(foodSearch.toLowerCase())).slice(0, 50)
+    : sourceList.slice(0, 50);
 
   const handleCapture = async () => {
     if (!cameraRef.current || capturing) return;
@@ -222,8 +227,26 @@ export default function FoodCaptureScreen() {
           {/* AI Suggestion header */}
           <View style={s.aiHeader}>
             <Sparkle size={18} weight="fill" color={colors.primary} />
-            <Text style={s.aiTitle}>Malaysian Foods</Text>
-            <Text style={s.aiSubtitle}>Select or search what you ate</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.aiTitle}>Senarai Makanan</Text>
+              <Text style={s.aiSubtitle}>Pilih atau cari makanan yang kau makan</Text>
+            </View>
+          </View>
+
+          {/* Category toggle */}
+          <View style={s.categoryToggle}>
+            <TouchableOpacity
+              style={[s.categoryBtn, !showRawOnly && s.categoryBtnActive]}
+              onPress={() => setShowRawOnly(false)}
+            >
+              <Text style={[s.categoryBtnText, !showRawOnly && s.categoryBtnTextActive]}>Semua</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[s.categoryBtn, showRawOnly && s.categoryBtnActive]}
+              onPress={() => setShowRawOnly(true)}
+            >
+              <Text style={[s.categoryBtnText, showRawOnly && s.categoryBtnTextActive]}>Bahan Mentah</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Search bar */}
@@ -466,6 +489,21 @@ const s = StyleSheet.create({
     backgroundColor: colors.primary, borderRadius: 12, paddingVertical: spacing.md, marginTop: spacing.md,
   },
   confirmBtnText: { ...typography.body, fontWeight: '600', color: colors.textOnAccent },
+  categoryToggle: {
+    flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm, backgroundColor: colors.white,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  categoryBtn: {
+    paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
+    borderRadius: 20, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  categoryBtnActive: {
+    backgroundColor: colors.primary, borderColor: colors.primary,
+  },
+  categoryBtnText: { ...typography.label, color: colors.textSecondary, fontWeight: '500' },
+  categoryBtnTextActive: { color: colors.white },
   searchContainer: { padding: spacing.md, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
   searchInput: {
     borderWidth: 1, borderColor: colors.border, borderRadius: 8,

@@ -44,7 +44,7 @@ export default function ActivityCard({
       accessibilityRole="radio"
       accessibilityState={{ selected }}
     >
-      <View style={[styles.iconWrap, selected && { backgroundColor: colors.primarySubtle }]}>
+      <View style={[styles.iconWrap, selected && { backgroundColor: colors.accentLight }]}>
         <Ionicons
           name={icon}
           size={28}
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderColor: colors.primary,
-    backgroundColor: colors.primarySubtle,
+    backgroundColor: colors.accentLight,
   },
   iconWrap: {
     width: 52,

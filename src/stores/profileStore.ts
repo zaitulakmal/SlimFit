@@ -16,13 +16,27 @@
 import { create } from 'zustand';
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
-import { userProfile } from '../db/schema';
+import {
+  userProfile,
+  weightLogs,
+  waterLogs,
+  foodLogs,
+  mealPresets,
+  nixCache,
+  streaks,
+  badges,
+  notificationSettings,
+  workouts,
+  fastingLogs,
+} from '../db/schema';
 import {
   calculateTDEE,
   calculateBMI,
   roundTDEE,
+  calculateCalorieTarget,
   type Gender,
   type ActivityLevel,
+  type GoalType,
 } from '../constants/tdee';
 import i18n from '../i18n';
 
@@ -38,9 +52,11 @@ export interface ProfileData {
   heightCm: number;
   weightKg: number;
   activityLevel: ActivityLevel;
+  goalType: GoalType;
   targetWeightKg: number;
   deadline: string | null;
   tdee: number | null;
+  calorieTarget: number | null;
   bmi: number | null;
   language: string;
   onboardingCompleted: boolean;
@@ -48,7 +64,7 @@ export interface ProfileData {
 
 export type ProfileInput = Omit<
   ProfileData,
-  'id' | 'tdee' | 'bmi' | 'onboardingCompleted'
+  'id' | 'tdee' | 'calorieTarget' | 'bmi' | 'onboardingCompleted'
 >;
 
 interface ProfileStore {
@@ -58,6 +74,7 @@ interface ProfileStore {
   saveProfile: (data: ProfileInput) => Promise<void>;
   updateProfile: (data: Partial<ProfileInput>) => Promise<void>;
   setLanguage: (lang: string) => Promise<void>;
+  resetProfile: () => Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
@@ -84,7 +101,11 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           activityLevel: row.activityLevel,
           targetWeightKg: row.targetWeightKg,
           deadline: row.deadline ?? null,
+          goalType: (row.goalType as GoalType) ?? 'lose_weight',
           tdee: row.tdee,
+          calorieTarget: row.tdee
+            ? calculateCalorieTarget(row.tdee, (row.goalType as GoalType) ?? 'lose_weight', row.weightKg, row.targetWeightKg, row.deadline)
+            : null,
           bmi: row.bmi,
           language: row.language,
           onboardingCompleted: row.onboardingCompleted,
@@ -113,6 +134,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       data.activityLevel
     );
     const tdee = roundTDEE(tdeeRaw);
+    const calorieTarget = calculateCalorieTarget(tdee, data.goalType, data.weightKg, data.targetWeightKg, data.deadline);
     const bmi = parseFloat(
       calculateBMI(data.weightKg, data.heightCm).toFixed(1)
     );
@@ -128,6 +150,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           heightCm: data.heightCm,
           weightKg: data.weightKg,
           activityLevel: data.activityLevel,
+          goalType: data.goalType,
           targetWeightKg: data.targetWeightKg,
           deadline: data.deadline,
           tdee,
@@ -144,6 +167,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           id: result[0].id,
           ...data,
           tdee,
+          calorieTarget,
           bmi,
           onboardingCompleted: true,
         },
@@ -171,6 +195,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       merged.activityLevel
     );
     const tdee = roundTDEE(tdeeRaw);
+    const calorieTarget = calculateCalorieTarget(tdee, merged.goalType, merged.weightKg, merged.targetWeightKg, merged.deadline);
     const bmi = parseFloat(
       calculateBMI(merged.weightKg, merged.heightCm).toFixed(1)
     );
@@ -186,7 +211,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         })
         .where(eq(userProfile.id, current.id));
 
-      set({ profile: { ...merged, tdee, bmi } });
+      set({ profile: { ...merged, tdee, calorieTarget, bmi } });
     } catch (err) {
       console.error('[profileStore] updateProfile error:', err);
       throw err;
@@ -197,6 +222,22 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
    * Switch app language and persist preference.
    * i18n.changeLanguage() is synchronous — all t() subscribers re-render (D-10).
    */
+  /** Delete all user data from every table and reset store state. */
+  resetProfile: async () => {
+    await db.delete(foodLogs);
+    await db.delete(waterLogs);
+    await db.delete(weightLogs);
+    await db.delete(workouts);
+    await db.delete(fastingLogs);
+    await db.delete(streaks);
+    await db.delete(badges);
+    await db.delete(mealPresets);
+    await db.delete(nixCache);
+    await db.delete(notificationSettings);
+    await db.delete(userProfile);
+    set({ profile: null, isLoaded: true });
+  },
+
   setLanguage: async (lang: string) => {
     i18n.changeLanguage(lang);
     const current = get().profile;

@@ -26,6 +26,8 @@ import {
 import { pastelColors, pastelSpacing, pastelRadius, mealColors } from '../../../constants/pastel-theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { useProfileStore } from '../../../stores/profileStore';
+import { calculateCalorieTarget } from '../../../constants/tdee';
+import type { GoalType } from '../../../constants/tdee';
 
 const { width: W } = Dimensions.get('window');
 const C = pastelColors;
@@ -63,38 +65,23 @@ function HeaderDecoration() {
   return (
     <Svg width={W} height={220} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 220`}>
       <Defs>
-        <RadialGradient id="foodHeaderGrad" cx="50%" cy="0%" r="100%">
-          <Stop offset="0%" stopColor={C.headerTop} />
-          <Stop offset="100%" stopColor={C.headerBottom} />
+        <RadialGradient id="foodHeaderGrad" cx="60%" cy="0%" r="120%">
+          <Stop offset="0%" stopColor="#E9D5FF" />
+          <Stop offset="55%" stopColor="#DDD6FE" />
+          <Stop offset="100%" stopColor="#C4B5FD" />
         </RadialGradient>
       </Defs>
+      {/* Purple lavender — matches Figma Meals screen */}
       <Rect width={W} height={220} fill="url(#foodHeaderGrad)" />
-      
-      {/* Decorative circles */}
-      <SvgCircle cx={W * 0.1} cy={-20} r={60} fill={C.white} opacity={0.15} />
-      <SvgCircle cx={W * 0.9} cy={-30} r={80} fill={C.white} opacity={0.12} />
-      <SvgCircle cx={W * 0.7} cy={200} r={50} fill={C.white} opacity={0.1} />
-      
-      {/* Apple decoration */}
-      <SvgCircle cx={40} cy={180} r={20} fill="#FF8A80" opacity={0.8} />
-      <Rect x={38} y={156} width={4} height={8} rx={2} fill={C.primary} />
-      
-      {/* Grape decoration */}
-      <SvgCircle cx={W - 50} cy={160} r={8} fill="#CE93D8" />
-      <SvgCircle cx={W - 35} cy={155} r={8} fill="#BA68C8" />
-      <SvgCircle cx={W - 50} cy={170} r={8} fill="#CE93D8" />
-      <SvgCircle cx={W - 35} cy={170} r={8} fill="#AB47BC" />
-      
-      {/* Strawberry decoration */}
-      <SvgCircle cx={60} cy={60} r={18} fill="#FF8A80" />
-      <SvgCircle cx={55} cy={52} r={2} fill="#FFF59D" />
-      <SvgCircle cx={65} cy={54} r={2} fill="#FFF59D" />
-      
-      {/* Carrot decoration */}
-      <Path d={`M${W - 80},100 L${W - 60},140 L${W - 100},140 Z`} fill="#FFB74D" />
-      
-      {/* Wavy bottom */}
-      <Path d={`M0,195 Q${W * 0.3},220 ${W * 0.5},205 Q${W * 0.7},190 ${W},210 L${W},220 L0,220 Z`} fill={C.background} />
+
+      <SvgCircle cx={W * 0.88} cy={-20} r={90} fill="#8B5CF6" opacity={0.10} />
+      <SvgCircle cx={W * 0.08} cy={220} r={70} fill="#A78BFA" opacity={0.10} />
+      <SvgCircle cx={W - 28} cy={100} r={6}  fill="#8B5CF6" opacity={0.4} />
+      <SvgCircle cx={W - 16} cy={118} r={4}  fill="#A78BFA" opacity={0.35} />
+      <SvgCircle cx={30}     cy={140} r={7}  fill="#8B5CF6" opacity={0.3} />
+
+      {/* Wavy bottom into cream bg */}
+      <Path d={`M0,195 Q${W * 0.25},215 ${W * 0.5},202 Q${W * 0.75},188 ${W},208 L${W},220 L0,220 Z`} fill={C.background} />
     </Svg>
   );
 }
@@ -108,12 +95,12 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
   const offset = circ * (1 - pct);
   const center = size / 2;
   const isOver = consumed > tdee && tdee > 0;
-  const ringColor = isOver ? C.coral : C.primary;
+  const ringColor = isOver ? '#C41E3A' : '#8B5CF6';
 
   return (
     <View style={{ width: size, height: size }}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <SvgCircle cx={center} cy={center} r={r} stroke="rgba(255,255,255,0.3)" strokeWidth={strokeWidth} fill="none" />
+        <SvgCircle cx={center} cy={center} r={r} stroke="rgba(109,40,217,0.2)" strokeWidth={strokeWidth} fill="none" />
         <SvgCircle
           cx={center} cy={center} r={r}
           stroke={ringColor} strokeWidth={strokeWidth} fill="none"
@@ -127,7 +114,7 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
         <Text style={{ fontSize: 16, fontWeight: '800', color: ringColor }}>
           {Math.round(consumed)}
         </Text>
-        <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>kcal</Text>
+        <Text style={{ fontSize: 9, color: 'rgba(76,29,149,0.7)', fontWeight: '600' }}>kcal</Text>
       </View>
     </View>
   );
@@ -138,10 +125,10 @@ function InlineMacro({ label, value, target, color }: { label: string; value: nu
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-        <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>{label}</Text>
-        <Text style={{ fontSize: 10, fontWeight: '700', color: C.white }}>{Math.round(value)}g</Text>
+        <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(76,29,149,0.65)' }}>{label}</Text>
+        <Text style={{ fontSize: 10, fontWeight: '700', color: '#4C1D95' }}>{Math.round(value)}g</Text>
       </View>
-      <View style={{ height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.2)', overflow: 'hidden' }}>
+      <View style={{ height: 5, borderRadius: 3, backgroundColor: 'rgba(109,40,217,0.15)', overflow: 'hidden' }}>
         <View style={{ height: 5, borderRadius: 3, backgroundColor: color, width: `${pct}%` }} />
       </View>
     </View>
@@ -158,7 +145,16 @@ export default function FoodLogScreen() {
   );
 
   const totals = getTotals();
-  const tdee = Number(profile?.tdee) || 0;
+  const rawTdee = Number(profile?.tdee) || 0;
+  const tdee = rawTdee > 0
+    ? calculateCalorieTarget(
+        rawTdee,
+        (profile?.goalType as GoalType) ?? 'lose_weight',
+        profile?.weightKg ?? 0,
+        profile?.targetWeightKg ?? profile?.weightKg ?? 0,
+        profile?.deadline
+      )
+    : 0;
   const remaining = Math.max(tdee - totals.calories, 0);
   const isOver = totals.calories > tdee && tdee > 0;
 
@@ -186,7 +182,7 @@ export default function FoodLogScreen() {
 
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.dateNav}>
           <TouchableOpacity onPress={() => navigateDate(-1)} style={s.navBtn}>
-            <CaretLeft size={22} weight="bold" color={C.white} />
+            <CaretLeft size={22} weight="bold" color="#4C1D95" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => loadDayLogs(todayStr())} style={s.datePill}>
             <Text style={s.dateText}>{formatDate(currentDateStr)}</Text>
@@ -199,7 +195,7 @@ export default function FoodLogScreen() {
             <CaretRight
               size={22}
               weight="bold"
-              color={currentDateStr >= todayStr() ? 'rgba(255,255,255,0.3)' : C.white}
+              color={currentDateStr >= todayStr() ? 'rgba(76,29,149,0.3)' : '#4C1D95'}
             />
           </TouchableOpacity>
         </Animated.View>
@@ -209,7 +205,7 @@ export default function FoodLogScreen() {
           <View style={s.summaryRight}>
             {tdee > 0 && (
               <View style={s.budgetRow}>
-                <Text style={[s.budgetValue, { color: isOver ? C.coral : C.white }]}>
+                <Text style={[s.budgetValue, { color: isOver ? '#C41E3A' : '#4C1D95' }]}>
                   {isOver ? `+${Math.round(totals.calories - tdee)}` : remaining}
                 </Text>
                 <Text style={s.budgetLabel}> kcal {isOver ? 'over' : 'left'}</Text>
@@ -309,9 +305,9 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.background },
 
   header: {
-    backgroundColor: C.primary,
+    backgroundColor: '#E9D5FF',
     paddingTop: 52,
-    paddingBottom: 32,
+    paddingBottom: 36,
     paddingHorizontal: 20,
     overflow: 'hidden',
   },
@@ -324,43 +320,43 @@ const s = StyleSheet.create({
   },
   navBtn:   { padding: 6 },
   datePill: { flex: 1, alignItems: 'center' },
-  dateText: { fontSize: 17, fontWeight: '700', color: C.white, letterSpacing: -0.2 },
+  dateText: { fontSize: 17, fontWeight: '700', color: '#4C1D95', letterSpacing: -0.2 },
 
   summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   summaryRight: { flex: 1, gap: 10 },
 
   budgetRow: { flexDirection: 'row', alignItems: 'baseline' },
   budgetValue: { fontSize: 26, fontWeight: '800', letterSpacing: -0.4 },
-  budgetLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.8)' },
+  budgetLabel: { fontSize: 13, fontWeight: '600', color: '#6D28D9' },
 
   macrosCol: { gap: 8 },
 
   scroll:       { flex: 1 },
-  scrollContent:{ padding: 16, gap: 12 },
+  scrollContent:{ padding: 16, gap: 14 },
 
   mealCard: {
     backgroundColor: C.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
+    shadowColor: '#6D28D9',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 3,
   },
   mealHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   mealTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  mealIconBg:   { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  mealIconBg:   { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   mealTitle:    { fontSize: 15, fontWeight: '700' },
-  calPill:      { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99 },
+  calPill:      { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 },
   calPillText:  { fontSize: 11, fontWeight: '700' },
-  addBtn:       { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  addBtn:       { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 
   emptyMeal: { paddingHorizontal: 16, paddingVertical: 14 },
   emptyText: { fontSize: 13, color: C.textSecondary, fontStyle: 'italic' },
@@ -368,7 +364,7 @@ const s = StyleSheet.create({
   foodRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 10,
   },

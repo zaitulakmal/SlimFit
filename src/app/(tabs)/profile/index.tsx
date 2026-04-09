@@ -31,7 +31,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { XCircle, Check, PencilSimple, Fire, Drop, Scales, ForkKnife, Trophy, TrendDown } from 'phosphor-react-native';
 
@@ -48,7 +48,7 @@ function PhosphorIcon({ name, size, color }: { name: string; size: number; color
   }
 }
 import Constants from 'expo-constants';
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { Rect, Circle as SvgCircle, Defs, LinearGradient, Stop, Ellipse, Path } from 'react-native-svg';
 
 import { colors as themeColors, spacing, typography } from '../../../constants/theme';
 import { pastelColors } from '../../../constants/pastel-theme';
@@ -56,9 +56,11 @@ import { pastelColors } from '../../../constants/pastel-theme';
 const colors = pastelColors;
 import {
   getBMICategory,
+  calculateCalorieTarget,
   type BMICategory,
   type ActivityLevel,
   type Gender,
+  type GoalType,
 } from '../../../constants/tdee';
 import { useProfileStore } from '../../../stores/profileStore';
 import { useNotificationStore } from '../../../stores/notificationStore';
@@ -277,7 +279,7 @@ function EditableRow({
         />
         <View style={rowStyles.editActions}>
           <TouchableOpacity onPress={handleSave} style={rowStyles.saveBtn}>
-            <Check size={18} weight="bold" color={colors.textOnAccent} />
+            <Check size={18} weight="bold" color="#4A4A4A" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleCancel}>
             <XCircle size={20} weight="regular" color={colors.textSecondary} />
@@ -339,7 +341,7 @@ const rowStyles = StyleSheet.create({
     gap: spacing.xs,
   },
   saveBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FB923C',
     borderRadius: 6,
     padding: spacing.xs,
   },
@@ -551,8 +553,8 @@ const tpStyles = StyleSheet.create({
   actions: { flexDirection: 'row', gap: spacing.sm },
   cancelBtn: { flex: 1, padding: spacing.sm, alignItems: 'center' },
   cancelText: { ...typography.body, color: colors.textSecondary },
-  saveBtn: { flex: 1, backgroundColor: colors.primary, borderRadius: 10, padding: spacing.sm, alignItems: 'center' },
-  saveText: { ...typography.body, color: colors.textOnAccent },
+  saveBtn: { flex: 1, backgroundColor: '#FB923C', borderRadius: 10, padding: spacing.sm, alignItems: 'center' },
+  saveText: { ...typography.body, color: '#431407', fontWeight: '700' },
 });
 
 // ---------------------------------------------------------------------------
@@ -561,7 +563,8 @@ const tpStyles = StyleSheet.create({
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { profile, updateProfile, setLanguage } = useProfileStore();
+  const { profile, updateProfile, setLanguage, resetProfile } = useProfileStore();
+  const router = useRouter();
   const [editing, setEditing] = useState<FieldKey | null>(null);
 
   const { settings: notifSettings, loadSettings, toggleNotification, updateTime } =
@@ -576,35 +579,9 @@ export default function ProfileScreen() {
     }, [])
   );
 
-  if (!profile) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>{t('home.empty_state')}</Text>
-      </View>
-    );
-  }
-
-  const bmiCategory = profile.bmi ? getBMICategory(profile.bmi) : 'normal';
-  const chipColor = bmiChipColor(bmiCategory);
-
-  const initials = profile.name
-    ? profile.name.trim().charAt(0).toUpperCase()
-    : '?';
-
-  const activityLabels: Record<ActivityLevel, string> = {
-    sedentary: t('onboarding.activity_sedentary'),
-    lightly_active: t('onboarding.activity_light'),
-    moderately_active: t('onboarding.activity_moderate'),
-    very_active: t('onboarding.activity_very'),
-  };
-
-  const genderLabels: Record<Gender, string> = {
-    male: t('onboarding.gender_male'),
-    female: t('onboarding.gender_female'),
-  };
-
   // ---------------------------------------------------------------------------
   // Field save handler — validates and calls updateProfile
+  // MUST be before any early return to satisfy Rules of Hooks
   // ---------------------------------------------------------------------------
 
   const handleFieldSave = useCallback(
@@ -673,6 +650,34 @@ export default function ProfileScreen() {
     [updateProfile, t]
   );
 
+  // Early return AFTER all hooks
+  if (!profile) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{t('home.empty_state')}</Text>
+      </View>
+    );
+  }
+
+  const bmiCategory = profile.bmi ? getBMICategory(profile.bmi) : 'normal';
+  const chipColor = bmiChipColor(bmiCategory);
+
+  const initials = profile.name
+    ? profile.name.trim().charAt(0).toUpperCase()
+    : '?';
+
+  const activityLabels: Record<ActivityLevel, string> = {
+    sedentary: t('onboarding.activity_sedentary'),
+    lightly_active: t('onboarding.activity_light'),
+    moderately_active: t('onboarding.activity_moderate'),
+    very_active: t('onboarding.activity_very'),
+  };
+
+  const genderLabels: Record<Gender, string> = {
+    male: t('onboarding.gender_male'),
+    female: t('onboarding.gender_female'),
+  };
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -685,8 +690,37 @@ export default function ProfileScreen() {
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
-      {/* Section 1: Avatar area */}
-      <View style={styles.avatarSection}>
+      {/* Section 1: Avatar area with graphics */}
+      <View style={[styles.avatarSection, { minHeight: 200 }]}>
+        <Svg width={420} height={200} style={StyleSheet.absoluteFill} viewBox="0 0 420 200">
+          <Defs>
+            <LinearGradient id="profileHeaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor="#FFEDD5" />
+              <Stop offset="50%" stopColor="#FED7AA" />
+              <Stop offset="100%" stopColor="#FDBA74" />
+            </LinearGradient>
+          </Defs>
+          <Rect width={420} height={200} fill="url(#profileHeaderGrad)" />
+
+          {/* Soft glow blobs */}
+          <SvgCircle cx={380} cy={-20} r={100} fill="#FB923C" opacity={0.12} />
+          <SvgCircle cx={-30} cy={200} r={110} fill="#FDBA74" opacity={0.18} />
+          <SvgCircle cx={60} cy={-10} r={50} fill="#FED7AA" opacity={0.25} />
+
+          {/* Peach fruit */}
+          <Ellipse cx={370} cy={155} rx={28} ry={26} fill="#FB923C" opacity={0.75} />
+          <Ellipse cx={370} cy={155} rx={20} ry={18} fill="#FDBA74" />
+          <Path d="M370,129 Q375,119 382,123" stroke="#92400E" strokeWidth={2} fill="none" />
+
+          {/* Strawberry */}
+          <Ellipse cx={50} cy={160} rx={18} ry={20} fill="#F97316" opacity={0.7} />
+          <SvgCircle cx={50} cy={143} r={8} fill="#84CC16" opacity={0.8} />
+
+          {/* Mango slice */}
+          <Ellipse cx={85} cy={45} rx={22} ry={18} fill="#FBBF24" opacity={0.65} />
+          <Ellipse cx={85} cy={45} rx={14} ry={11} fill="#FDE68A" />
+        </Svg>
+
         <View style={styles.avatarCircle}>
           <Text style={styles.avatarInitials}>{initials}</Text>
         </View>
@@ -709,12 +743,12 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>{t('profile.stats_bmi')}</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>~{profile.tdee?.toLocaleString()}</Text>
+          <Text style={styles.statValue}>~{(profile.calorieTarget ?? profile.tdee)?.toLocaleString()}</Text>
           <Text style={styles.statLabel}>{t('profile.stats_tdee')}</Text>
         </View>
       </View>
 
-      {/* Section 3: Profile Details */}
+      {/* Section: Profile Details */}
       <Text style={styles.sectionHeader}>{t('profile.section_details')}</Text>
       <View style={styles.sectionCard}>
         <EditableRow
@@ -865,7 +899,7 @@ export default function ProfileScreen() {
       <View style={styles.sectionCard}>
         <View style={styles.weeklyChart}>
           {weeklyCalories.map((entry) => {
-            const tdee = profile.tdee ?? 0;
+            const tdee = profile.calorieTarget ?? profile.tdee ?? 0;
             const maxCal = Math.max(...weeklyCalories.map((d) => d.calories), tdee, 500);
             const barH = Math.max((entry.calories / maxCal) * 80, entry.calories > 0 ? 4 : 0);
             const isOver = tdee > 0 && entry.calories > tdee;
@@ -887,9 +921,9 @@ export default function ProfileScreen() {
             );
           })}
         </View>
-        {profile.tdee ? (
+        {(profile.calorieTarget ?? profile.tdee) ? (
           <Text style={styles.tdeeRefLine}>
-            Budget: ~{profile.tdee.toLocaleString()} kcal/day
+            Budget: ~{(profile.calorieTarget ?? profile.tdee)?.toLocaleString()} kcal/day
           </Text>
         ) : null}
       </View>
@@ -924,6 +958,35 @@ export default function ProfileScreen() {
         ) : null}
         <Text style={styles.aboutPrivacy}>{t('profile.about_privacy')}</Text>
       </View>
+
+      {/* Reset account */}
+      <TouchableOpacity
+        style={styles.resetButton}
+        onPress={() => {
+          Alert.alert(
+            t('profile.reset_title'),
+            t('profile.reset_confirm'),
+            [
+              { text: t('common.cancel'), style: 'cancel' },
+              {
+                text: t('profile.reset_action'),
+                style: 'destructive',
+                onPress: async () => {
+                  try {
+                    await resetProfile();
+                    router.replace('/onboarding');
+                  } catch (e) {
+                    console.error('[reset]', e);
+                    Alert.alert('Error', t('profile.reset_error'));
+                  }
+                },
+              },
+            ]
+          );
+        }}
+      >
+        <Text style={styles.resetButtonText}>{t('profile.reset_title')}</Text>
+      </TouchableOpacity>
     </ScrollView>
 
     {/* Time picker modal */}
@@ -949,7 +1012,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: '#FFF7ED',
   },
   content: {
     padding: spacing.md,
@@ -969,24 +1032,39 @@ const styles = StyleSheet.create({
   // Avatar
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xl,
+    marginHorizontal: -spacing.md,
+    marginTop: -spacing.md,
+    marginBottom: spacing.lg,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    paddingHorizontal: spacing.md,
+    overflow: 'hidden',
   },
   avatarCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#FB923C',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.6)',
+    shadowColor: '#C2410C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
   },
   avatarInitials: {
     ...typography.display,
-    color: colors.textOnAccent,
+    color: '#431407',
   },
   userName: {
     ...typography.heading,
-    color: colors.textPrimary,
+    color: '#431407',
     marginBottom: spacing.sm,
   },
   bmiChip: {
@@ -996,7 +1074,8 @@ const styles = StyleSheet.create({
   },
   bmiChipText: {
     ...typography.label,
-    color: colors.textOnAccent,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   // Stats row
   statsRow: {
@@ -1006,10 +1085,27 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.background,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: spacing.md,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    shadowColor: '#FB923C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  streakCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: spacing.md,
+    alignItems: 'center',
+    gap: 2,
+    borderWidth: 1,
+    borderColor: '#FED7AA',
   },
   statValue: {
     ...typography.heading,
@@ -1023,18 +1119,26 @@ const styles = StyleSheet.create({
   },
   // Section
   sectionHeader: {
-    ...typography.heading,
-    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#7A7A7A',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
     marginBottom: spacing.sm,
     marginTop: spacing.md,
   },
   sectionCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#FED7AA',
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
+    shadowColor: '#FB923C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 2,
   },
   // Settings row
   settingsRow: {
@@ -1062,19 +1166,26 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
   },
+  resetButton: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    marginBottom: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.coral,
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    ...typography.body,
+    color: colors.coral,
+    fontWeight: '700',
+  },
   // Streaks
   streakRow: {
     flexDirection: 'row',
     gap: spacing.sm,
     marginBottom: spacing.md,
-  },
-  streakCard: {
-    flex: 1,
-    backgroundColor: colors.background,
-    borderRadius: 12,
-    padding: spacing.md,
-    alignItems: 'center',
-    gap: 2,
   },
   streakValue: {
     fontSize: 24,
@@ -1108,16 +1219,16 @@ const styles = StyleSheet.create({
   badgeCard: {
     width: '47%',
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#FED7AA',
     padding: spacing.md,
     alignItems: 'center',
     gap: spacing.xs,
   },
   badgeLocked: {
-    backgroundColor: colors.background,
-    borderColor: colors.border,
+    backgroundColor: '#FFF7ED',
+    borderColor: '#FED7AA',
   },
   badgeIcon: {
     width: 52,
@@ -1130,4 +1241,49 @@ const styles = StyleSheet.create({
   badgeTitle: { ...typography.body, color: colors.textPrimary, textAlign: 'center' },
   badgeTextLocked: { color: colors.textSecondary },
   badgeDesc: { ...typography.label, color: colors.textSecondary, textAlign: 'center' },
+});
+
+const goalSectionStyles = StyleSheet.create({
+  goalRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  goalCard: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+    gap: spacing.xs,
+  },
+  goalCardActive: {
+    borderColor: '#FB923C',
+    backgroundColor: '#FFEDD5',
+  },
+  goalIcon: { fontSize: 22 },
+  goalLabel: {
+    ...typography.label,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  goalLabelActive: { color: '#431407', fontWeight: '700' },
+  targetBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+  },
+  targetLabel: { ...typography.body, fontWeight: '600', color: colors.textPrimary },
+  targetSub: { ...typography.label, color: colors.textSecondary, marginTop: 2 },
+  targetValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#C2410C',
+  },
 });

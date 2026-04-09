@@ -1,65 +1,78 @@
-// Pastel theme for SlimTrack - fresh, healthy, colorful design
+// Figma: "Modernize Weight Loss Tracker UI"
+// Palette 1 (Dashboard): Ruby #C41E3A · Papyrus #E8DCC4 · Citron #F0C808
 
 export const pastelColors = {
-  // Primary - soft mint green
-  primary: '#56AB91',
-  primaryLight: '#A8E6CF',
-  primaryDark: '#379D76',
-  
-  // Pastel accents
-  amber: '#FFD93D',
-  coral: '#FF8A80',
-  pink: '#FFB5E8',
-  blue: '#7EC8E3',
-  purple: '#B5A8D8',
-  orange: '#FFB74D',
-  yellow: '#FFF59D',
-  skyBlue: '#7EC8E3',
-  
-  // Neutrals
+  // Primary — Ruby red
+  primary: '#C41E3A',
+  primaryLight: '#E53558',
+  primaryDark: '#A01830',
+
+  // Accent — Sunny Citron yellow
+  amber: '#F0C808',
+  amberDark: '#D4AF07',
+  amberLight: '#FFF9E6',
+
+  // Greens (vegetables/success)
+  green: '#10B981',
+  greenLight: '#D1FAE5',
+  greenDark: '#059669',
+
+  // Supporting palette
+  coral: '#C41E3A',
+  pink: '#FFEDD5',
+  blue: '#BFDBFE',
+  purple: '#DDD6FE',
+  orange: '#FB923C',
+  yellow: '#F0C808',
+  skyBlue: '#93C5FD',
+
+  // Neutrals — warm cream
   white: '#FFFFFF',
-  background: '#F5FBF8',  // very light mint
+  background: '#F5EFE7',     // warm cream page bg
   surface: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#D4EDE3',
-  borderLight: '#E8F4F0',
-  
+  border: '#EDE8DF',
+  borderLight: '#F5F0E8',
+
   // Text
-  textPrimary: '#2D4A3E',
-  textSecondary: '#6B8E7A',
-  textTertiary: '#A5C4B4',
+  textPrimary: '#3D2B1F',    // warm dark brown
+  textSecondary: '#7A6A5A',
+  textTertiary: '#A89880',
   textOnAccent: '#FFFFFF',
-  textPlaceholder: '#A5C4B4',
-  text: '#2D4A3E',
-  
-  // Card backgrounds - pastel
-  cardMint: '#E8F8F0',
-  cardYellow: '#FFF9E6',
-  cardPink: '#FFEAF0',
-  cardBlue: '#E8F4F8',
-  cardPurple: '#F0EBF8',
-  cardOrange: '#FFF2E6',
-  cardCoral: '#FFE8E8',
-  
+  textOnDark: '#FFFFFF',
+  textOnAmber: '#3D2B1F',    // dark text on yellow buttons
+  textPlaceholder: '#B0A090',
+  text: '#3D2B1F',
+
+  // Card tints matching Figma stat cards
+  cardMint: '#D1FAE5',       // green (meals)
+  cardYellow: '#FFF9E6',     // yellow (calories)
+  cardPink: '#FFE4E6',       // pink/red (weight)
+  cardBlue: '#DBEAFE',       // blue (water)
+  cardPurple: '#EDE9FE',     // purple
+  cardOrange: '#FFEDD5',     // orange (burned)
+  cardCoral: '#FFE4E6',
+  cardCream: '#F5EFE7',
+
   // Status
-  success: '#81C784',
-  warning: '#FFD93D',
-  danger: '#FF8A80',
-  error: '#FF8A80',
-  secondary: '#A8E6CF',
-  selectedTint: '#E8F8F0',
-  
-  // Header gradient
-  headerTop: '#A8E6CF',
-  headerMid: '#88D8B0',
-  headerBottom: '#56AB91',
-  
+  success: '#10B981',
+  warning: '#F0C808',
+  danger: '#C41E3A',
+  error: '#C41E3A',
+  secondary: '#E8DCC4',
+  selectedTint: '#FFF9E6',
+
+  // Header backgrounds per screen (matching Figma)
+  headerTop: '#E8DCC4',      // Dashboard: papyrus beige
+  headerMid: '#F5EFE7',      // warm cream mid
+  headerBottom: '#FFF9E6',   // light citron bottom
+
   // Overlay
   overlay: 'rgba(0,0,0,0.5)',
-  overlayLight: 'rgba(0,0,0,0.3)',
-  
+  overlayLight: 'rgba(0,0,0,0.25)',
+
   // Shadows
-  shadow: '#000000',
+  shadow: '#C41E3A',
 } as const;
 
 export const pastelSpacing = {
@@ -77,29 +90,31 @@ export const pastelRadius = {
   md: 12,
   lg: 16,
   xl: 20,
+  '2xl': 24,
+  '3xl': 32,
   full: 999,
 } as const;
 
 export const pastelTypography = {
   heading: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800' as const,
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
     color: pastelColors.textPrimary,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700' as const,
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
     color: pastelColors.textPrimary,
   },
   body: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500' as const,
     color: pastelColors.textPrimary,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600' as const,
     color: pastelColors.textSecondary,
   },
@@ -117,32 +132,32 @@ export const pastelTypography = {
 
 export const pastelShadow = {
   sm: {
-    shadowColor: pastelColors.shadow,
+    shadowColor: '#3D2B1F',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
     elevation: 2,
   },
   md: {
-    shadowColor: pastelColors.shadow,
+    shadowColor: '#3D2B1F',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
     elevation: 4,
   },
   lg: {
-    shadowColor: pastelColors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowColor: '#3D2B1F',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 24,
+    elevation: 8,
   },
 } as const;
 
-// Meal type colors
+// Meal type colors — matching Figma tint cards
 export const mealColors = {
-  breakfast: { color: '#FFB74D', bg: '#FFF2E6', icon: '🌅' },
-  lunch:     { color: '#56AB91', bg: '#E8F8F0', icon: '☀️' },
-  dinner:    { color: '#B5A8D8', bg: '#F0EBF8', icon: '🌙' },
-  snack:     { color: '#FF8A80', bg: '#FFEAF0', icon: '☕' },
+  breakfast: { color: '#F59E0B', bg: '#FFF9E6', icon: '🌅' },
+  lunch:     { color: '#10B981', bg: '#D1FAE5', icon: '☀️' },
+  dinner:    { color: '#8B5CF6', bg: '#EDE9FE', icon: '🌙' },
+  snack:     { color: '#FB923C', bg: '#FFEDD5', icon: '☕' },
 } as const;

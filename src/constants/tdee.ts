@@ -65,6 +65,78 @@ export function roundTDEE(tdee: number): number {
   return Math.round(tdee / 50) * 50;
 }
 
+export type GoalType = 'lose_weight' | 'maintain' | 'get_fit';
+
+/**
+ * Goal-adjusted daily calorie target.
+ *
+ * lose_weight → TDEE − 500 kcal/day (or deadline-based deficit)
+ * maintain    → TDEE
+ * get_fit     → TDEE + 200 kcal/day (lean body recomposition)
+ *
+ * Caps: max deficit 1 000 kcal, never below 1 200 kcal/day.
+ * If deadline is provided for lose_weight, calculates precise deficit.
+ */
+export function calculateCalorieTarget(
+  tdee: number,
+  goalType: GoalType,
+  currentWeightKg: number,
+  targetWeightKg: number,
+  deadline?: string | null
+): number {
+  if (goalType === 'maintain') return Math.round(tdee);
+  if (goalType === 'get_fit') return Math.round(tdee + 200);
+
+  // lose_weight
+  let deficit = 500;
+  if (deadline) {
+    const end = new Date(deadline);
+    if (!isNaN(end.getTime())) {
+      const today = new Date();
+      const daysRemaining = Math.max(
+        Math.ceil((end.getTime() - today.getTime()) / 86_400_000),
+        7
+      );
+      const weightToLose = Math.max(currentWeightKg - targetWeightKg, 0);
+      deficit = Math.min(1000, (weightToLose * 7700) / daysRemaining);
+    }
+  }
+
+  return Math.round(Math.max(1200, tdee - deficit));
+}
+
+/**
+ * Recommend a goal type based on BMI category.
+ *
+ * underweight → get_fit  (need to gain mass / build muscle)
+ * normal      → maintain (already in healthy range)
+ * overweight  → lose_weight
+ * obese       → lose_weight
+ */
+export function suggestGoal(bmiCategory: BMICategory): GoalType {
+  if (bmiCategory === 'underweight') return 'get_fit';
+  if (bmiCategory === 'normal') return 'maintain';
+  return 'lose_weight';
+}
+
+/**
+ * Return calorie targets for all three goals given a TDEE.
+ * Useful for displaying all options side-by-side so the user
+ * can make an informed choice.
+ */
+export function getGoalCalorieOptions(
+  tdee: number,
+  weightKg: number,
+  targetWeightKg: number,
+  deadline?: string | null
+): Record<GoalType, number> {
+  return {
+    lose_weight: calculateCalorieTarget(tdee, 'lose_weight', weightKg, targetWeightKg, deadline),
+    maintain: calculateCalorieTarget(tdee, 'maintain', weightKg, targetWeightKg, deadline),
+    get_fit: calculateCalorieTarget(tdee, 'get_fit', weightKg, targetWeightKg, deadline),
+  };
+}
+
 /**
  * Body Mass Index = weight (kg) / height (m)^2.
  */

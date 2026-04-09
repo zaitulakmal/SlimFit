@@ -45,27 +45,28 @@ import { CaretLeft, Clock, Fire, Play, Stop as StopIcon, CheckCircle } from 'pho
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { pastelColors } from '../../constants/pastel-theme';
+import { colors } from '../../constants/theme-new';
 import { useFastingStore } from '../../stores/fastingStore';
 
 const { width: W, height: H } = Dimensions.get('window');
 const RF = (n: number) => Math.round(n * (W / 390));
 const RFV = (n: number) => Math.round(n * (H / 780));
 
-const C = pastelColors;
+const C = colors;
 
 const PLANS = [
-  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#FF8A80', desc: 'Most popular beginner plan' },
-  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#FFB74D', desc: 'Deeper fat burn' },
-  { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FF7043', desc: 'Advanced — warrior diet' },
+  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#A6171C', desc: 'Most popular' },
+  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#F1C045', desc: 'Deeper burn' },
+  { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FF9800', desc: 'Warrior diet' },
 ];
 
 // ── fat-burn stages by fasting hour ─────────────────────────────────────────
 function getFatBurnStage(elapsedHours: number) {
-  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#A8E6CF' };
-  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#FFD93D' };
-  if (elapsedHours < 12) return { label: 'Ketosis Starting',   pct: 0.50, color: '#FFB74D' };
-  if (elapsedHours < 16) return { label: 'Fat Burning',         pct: 0.75, color: '#FF8A80' };
-  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#FF5252' };
+  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#A6171C' };
+  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#F1C045' };
+  if (elapsedHours < 12) return { label: 'Ketosis Starting',   pct: 0.50, color: '#FF9800' };
+  if (elapsedHours < 16) return { label: 'Fat Burning',         pct: 0.75, color: '#4CAF50' };
+  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#A6171C' };
 }
 
 // ── Circular fasting clock ───────────────────────────────────────────────────
