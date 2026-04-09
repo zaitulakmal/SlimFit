@@ -38,6 +38,7 @@ import {
   Clock,
   ArrowRight,
   Lightning,
+  PlusCircle,
 } from 'phosphor-react-native';
 
 import { useProfileStore } from '../../stores/profileStore';
@@ -52,51 +53,55 @@ const { width: W, height: H } = Dimensions.get('window');
 const RF = (size: number) => Math.round(size * (W / 390));
 const RFV = (size: number) => Math.round(size * (H / 780));
 
-// ── Pastel color palette ─────────────────────────────────────────────────────────
+// ── Figma: "Modernize Weight Loss Tracker UI" ─────────────────────────────────────
+// Dashboard palette: Ruby #C41E3A · Papyrus #E8DCC4 · Citron #F0C808
 const C = {
-  // Pastel green gradient (fresh, healthy)
-  headerTop:     '#A8E6CF',    // mint green
-  headerMid:     '#88D8B0',    // soft green
-  headerBottom: '#56AB91',    // deeper green
-  
-  // Pastel accent colors
-  primary:      '#56AB91',    // soft green
-  secondary:    '#A8E6CF',    // mint
-  amber:        '#FFD93D',    // pastel yellow
-  coral:        '#FF8A80',   // pastel red
-  pink:         '#FFB5E8',    // pastel pink
-  blue:         '#7EC8E3',    // pastel blue
-  purple:       '#B5A8D8',    // pastel purple
-  orange:       '#FFB74D',    // pastel orange
-  
+  // Header — papyrus cream (Figma Dashboard)
+  headerTop:    '#E8DCC4',
+  headerMid:    '#F5EFE7',
+  headerBottom: '#FFF9E6',
+
+  // Core brand
+  primary:      '#C41E3A',   // Ruby red
+  secondary:    '#E8DCC4',   // Papyrus beige
+  amber:        '#F0C808',   // Sunny Citron
+  amberDark:    '#D4AF07',
+  coral:        '#C41E3A',
+  pink:         '#FFE4E6',
+  blue:         '#BFDBFE',
+  purple:       '#DDD6FE',
+  orange:       '#FB923C',
+  green:        '#10B981',
+
   // Neutrals
   white:         '#FFFFFF',
   whiteAlpha80:  'rgba(255,255,255,0.80)',
   whiteAlpha70:  'rgba(255,255,255,0.70)',
+  whiteAlpha60:  'rgba(255,255,255,0.60)',
   whiteAlpha50:  'rgba(255,255,255,0.50)',
   whiteAlpha30:  'rgba(255,255,255,0.30)',
   whiteAlpha15:  'rgba(255,255,255,0.15)',
-  
+
   surface:       '#FFFFFF',
-  bg:            '#F5FBF8',   // very light mint
-  text:          '#2D4A3E',   // dark green-brown
-  textSub:       '#6B8E7A',   // muted green
-  textLight:     '#A5C4B4',   // light green
-  
-  // Pastel card backgrounds
-  cardMint:      '#E8F8F0',
-  cardYellow:   '#FFF9E6',
-  cardPink:     '#FFEAF0',
-  cardBlue:     '#E8F4F8',
-  cardPurple:   '#F0EBF8',
-  cardOrange:   '#FFF2E6',
-  
-  // Status colors
-  proteinColor:  '#FF8A80',   // coral
-  carbsColor:    '#7EC8E3',   // blue
-  fatColor:      '#FFD93D',   // yellow
-  
-  border:        '#D4EDE3',
+  bg:            '#F5EFE7',  // warm cream page background
+  text:          '#3D2B1F',  // warm dark brown
+  textSub:       '#7A6A5A',  // muted warm brown
+  textLight:     '#A89880',  // light warm brown
+
+  // Figma stat card tints
+  cardMint:      '#D1FAE5',  // green — meals
+  cardYellow:    '#FFF9E6',  // citron — calories
+  cardPink:      '#FFE4E6',  // ruby — weight
+  cardBlue:      '#DBEAFE',  // blue — water
+  cardPurple:    '#EDE9FE',
+  cardOrange:    '#FFEDD5',  // orange — burned
+
+  // Macro track colors
+  proteinColor:  '#C41E3A',  // ruby
+  carbsColor:    '#F0C808',  // citron
+  fatColor:      '#FB923C',  // orange
+
+  border:        '#EDE8DF',
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────────
@@ -141,21 +146,27 @@ function AnimatedCalorieRing({
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size}>
-        {/* Background ring */}
+        <Defs>
+          <LinearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <Stop offset="0%" stopColor="#C41E3A" />
+            <Stop offset="100%" stopColor="#F0C808" />
+          </LinearGradient>
+        </Defs>
+        {/* Background ring track */}
         <SvgCircle
           cx={size/2}
           cy={size/2}
           r={r}
-          stroke={C.whiteAlpha30}
+          stroke="#E8DCC4"
           strokeWidth={strokeWidth}
           fill="none"
         />
-        {/* Progress ring */}
+        {/* Progress ring — red→yellow gradient */}
         <AnimatedCircle
           cx={size/2}
           cy={size/2}
           r={r}
-          stroke={color}
+          stroke="url(#ringGrad)"
           strokeWidth={strokeWidth}
           fill="none"
           strokeLinecap="round"
@@ -369,78 +380,50 @@ function HeaderDecoration() {
   
   return (
     <Svg width={W} height={svgH} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 420`}>
-      {/* Solid green background */}
-      <Rect width={W} height={420} fill={C.headerTop} />
-      
-      {/* Floating decorative circles */}
-      <SvgCircle cx={W * 0.1} cy={-30} r={70} fill={C.whiteAlpha30} />
-      <SvgCircle cx={W * 0.85} cy={-50} r={90} fill={C.whiteAlpha30} />
-      <SvgCircle cx={W * 0.6} cy={400} r={80} fill={C.whiteAlpha30} />
-      <SvgCircle cx={W * 0.15} cy={380} r={50} fill={C.whiteAlpha30} />
-      
-      {/* ── APPLE (top-left) ── */}
-      <Ellipse cx={50} cy={90} rx={28} ry={30} fill="#FF8A80" opacity={0.9} />
-      <Ellipse cx={50} cy={90} rx={20} ry={22} fill="#FFCDD2" />
-      <Rect x={48} y={56} width={4} height={10} rx={2} fill="#56AB91" />
-      <Path d="M48,56 Q55,48 60,55" fill="#81C784" />
-      
-      {/* ── BANANA (top-right) ── */}
-      <Path d={`M${WR - 70},80 Q${WR - 50},70 ${WR - 30},90 Q${WR - 10},110 ${WR + 10},90`} stroke="#FFEB3B" strokeWidth={14} fill="none" strokeLinecap="round" />
-      <Path d={`M${WR - 70},80 Q${WR - 50},70 ${WR - 30},90 Q${WR - 10},110 ${WR + 10},90`} stroke="#FDD835" strokeWidth={6} fill="none" strokeLinecap="round" />
-      
-      {/* ── GRAPE (mid-left) ── */}
-      <SvgCircle cx={25} cy={170} r={10} fill="#CE93D8" />
-      <SvgCircle cx={40} cy={165} r={10} fill="#BA68C8" />
-      <SvgCircle cx={55} cy={170} r={10} fill="#CE93D8" />
-      <SvgCircle cx={32} cy={185} r={10} fill="#AB47BC" />
-      <SvgCircle cx={47} cy={185} r={10} fill="#CE93D8" />
-      <SvgCircle cx={40} cy={198} r={10} fill="#BA68C8" />
-      {/* Stem */}
-      <Rect x={38} y={152} width={4} height={10} rx={2} fill="#56AB91" />
-      
-      {/* ── STRAWBERRY (mid-right) ── */}
-      <Path d={`M${WR - 45},165 Q${WR - 45},145 ${WR - 25},145 Q${WR - 5},145 ${WR - 5},165 Q${WR - 5},190 ${WR - 25},190 Q${WR - 45},190 ${WR - 45},165 Z`} fill="#FF8A80" />
-      <SvgCircle cx={WR - 30} cy={153} r={2.5} fill="#FFF59D" />
-      <SvgCircle cx={WR - 22} cy={157} r={2.5} fill="#FFF59D" />
-      <SvgCircle cx={WR - 38} cy={157} r={2.5} fill="#FFF59D" />
-      {/* Leaf */}
-      <Path d={`M${WR - 30},145 Q${WR - 30},133 ${WR - 22},137`} stroke="#81C784" strokeWidth={2.5} fill="none" />
-      <Path d={`M${WR - 38},143 Q${WR - 38},131 ${WR - 30},135`} stroke="#81C784" strokeWidth={2.5} fill="none" />
-      
-      {/* ── CARROT (bottom-left) ── */}
-      <Path d={`M35,280 L55,340 L15,340 Z`} fill="#FFB74D" />
-      {/* Carrot lines */}
-      <Line x1={28} y1={295} x2={42} y2={295} stroke="#FF9800" strokeWidth={1.5} />
-      <Line x1={25} y1={310} x2={45} y2={310} stroke="#FF9800" strokeWidth={1.5} />
-      <Line x1={22} y1={325} x2={48} y2={325} stroke="#FF9800" strokeWidth={1.5} />
-      {/* Leaves */}
-      <Path d="M35,280 Q25,265 30,272" stroke="#81C784" strokeWidth={3} fill="none" />
-      <Path d="M35,280 Q35,265 40,270" stroke="#66BB6A" strokeWidth={3} fill="none" />
-      <Path d="M35,280 Q45,265 50,272" stroke="#81C784" strokeWidth={3} fill="none" />
-      
-      {/* ── BROCOLI (bottom-right) ── */}
-      <Rect x={WR - 35} y={300} width={8} height={28} rx={4} fill="#56AB91" />
-      <SvgCircle cx={WR - 31} cy={285} r={18} fill="#81C784" />
-      <SvgCircle cx={WR - 48} cy={292} r={14} fill="#A5D6A7" />
-      <SvgCircle cx={WR - 14} cy={292} r={14} fill="#A5D6A7" />
-      <SvgCircle cx={WR - 31} cy={275} r={12} fill="#C8E6C9" />
-      
-      {/* ── LEMON (floating) ── */}
-      <Ellipse cx={W * 0.75} cy={220} rx={28} ry={20} fill="#FFF59D" opacity={0.9} />
-      <Ellipse cx={W * 0.75} cy={220} rx={20} ry={14} fill="#FFFDE7" />
-      <SvgCircle cx={W * 0.72} cy={214} r={4} fill="rgba(255,255,255,0.5)" />
-      
-      {/* ── PEACH (floating) ── */}
-      <Ellipse cx={W * 0.25} cy={260} rx={24} ry={20} fill="#FFAB91" />
-      <Ellipse cx={W * 0.25} cy={260} rx={18} ry={14} fill="#FFCCBC" />
-      <SvgCircle cx={W * 0.22} cy={254} r={3} fill="rgba(255,255,255,0.5)" />
-      
-      {/* Sparkles */}
-      <SvgCircle cx={W * 0.4} cy={60} r={4} fill={C.white} opacity={0.6} />
-      <SvgCircle cx={W * 0.7} cy={100} r={3} fill={C.white} opacity={0.5} />
-      <SvgCircle cx={W * 0.3} cy={320} r={3} fill={C.white} opacity={0.4} />
-      <SvgCircle cx={W * 0.8} cy={350} r={2} fill={C.white} opacity={0.35} />
-      
+      <Defs>
+        <LinearGradient id="creamHeaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#E8DCC4" />
+          <Stop offset="55%" stopColor="#F5EFE7" />
+          <Stop offset="100%" stopColor="#FFF9E6" />
+        </LinearGradient>
+      </Defs>
+
+      {/* Cream/papyrus gradient background */}
+      <Rect width={W} height={420} fill="url(#creamHeaderGrad)" />
+
+      {/* Ruby glow — top left */}
+      <SvgCircle cx={W * 0.05} cy={60}  r={110} fill="#C41E3A" opacity={0.06} />
+      {/* Citron glow — top right */}
+      <SvgCircle cx={W * 0.92} cy={30}  r={120} fill="#F0C808" opacity={0.12} />
+      {/* Papyrus bottom circle */}
+      <SvgCircle cx={W * 0.5}  cy={430} r={100} fill="#E8DCC4" opacity={0.5} />
+
+      {/* ── Apple — top left */}
+      <Ellipse cx={44} cy={88} rx={26} ry={28} fill="#C41E3A" opacity={0.85} />
+      <Ellipse cx={44} cy={88} rx={18} ry={20} fill="#E84060" opacity={0.5} />
+      <Rect x={42} y={57} width={4} height={10} rx={2} fill="#10B981" />
+      <Path d="M42,57 Q50,49 55,56" fill="#10B981" opacity={0.8} />
+
+      {/* ── Lemon — top right */}
+      <Ellipse cx={WR - 44} cy={72} rx={26} ry={20} fill="#F0C808" opacity={0.9} />
+      <Ellipse cx={WR - 44} cy={72} rx={18} ry={14} fill="#FFF176" opacity={0.8} />
+      <SvgCircle cx={WR - 52} cy={66} r={4} fill="rgba(255,255,255,0.6)" />
+
+      {/* ── Orange — mid right */}
+      <SvgCircle cx={WR - 30} cy={200} r={30} fill="#FB923C" opacity={0.75} />
+      <SvgCircle cx={WR - 30} cy={200} r={22} fill="#FDBA74" opacity={0.6} />
+      <SvgCircle cx={WR - 38} cy={192} r={5}  fill="rgba(255,255,255,0.5)" />
+
+      {/* ── Green herb dots — mid left */}
+      <SvgCircle cx={28} cy={220} r={10} fill="#10B981" opacity={0.7} />
+      <SvgCircle cx={44} cy={212} r={8}  fill="#34D399" opacity={0.6} />
+      <SvgCircle cx={20} cy={236} r={7}  fill="#10B981" opacity={0.5} />
+
+      {/* Decorative dots */}
+      <SvgCircle cx={W * 0.4} cy={50}  r={4} fill="#C41E3A" opacity={0.25} />
+      <SvgCircle cx={W * 0.6} cy={80}  r={3} fill="#F0C808" opacity={0.35} />
+      <SvgCircle cx={W * 0.3} cy={340} r={3} fill="#E8DCC4" opacity={0.6} />
+      <SvgCircle cx={W * 0.75} cy={360} r={4} fill="#C41E3A" opacity={0.15} />
     </Svg>
   );
 }
@@ -480,10 +463,10 @@ function MacroBar({
 const mb = StyleSheet.create({
   macroItem:    { flex: 1 },
   macroLabelRow:{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  macroLabel:   { fontSize: 11, fontWeight: '600', color: 'rgba(45,74,62,0.75)', letterSpacing: 0.3 },
-  macroValue:   { fontSize: 11, fontWeight: '700', color: '#2D4A3E' },
-  track:        { height: 10, borderRadius: 5, overflow: 'hidden' },
-  fill:         { height: 10, borderRadius: 5 },
+  macroLabel:   { fontSize: 11, fontWeight: '600', color: 'rgba(61,43,31,0.65)', letterSpacing: 0.3 },
+  macroValue:   { fontSize: 11, fontWeight: '700', color: '#3D2B1F' },
+  track:        { height: 8, borderRadius: 4, overflow: 'hidden' },
+  fill:         { height: 8, borderRadius: 4 },
 });
 
 // ── Quick-access card ─────────────────────────────────────────────────────────
@@ -531,29 +514,29 @@ const ec = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: C.surface,
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
     padding: 16,
     marginBottom: 12,
     gap: 14,
-    shadowColor: '#000',
+    shadowColor: '#3D2B1F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowRadius: 14,
     elevation: 4,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: '#EDE8DF',
   },
   iconWrap: {
     width: 52,
     height: 52,
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   textWrap: { flex: 1 },
-  title:    { fontSize: 16, fontWeight: '700', color: C.text, marginBottom: 3 },
-  sub:      { fontSize: 13, fontWeight: '500', color: C.textSub },
+  title:    { fontSize: 16, fontWeight: '700', color: '#3D2B1F', marginBottom: 3 },
+  sub:      { fontSize: 13, fontWeight: '500', color: '#7A6A5A' },
   arrow: {
     width: 36,
     height: 36,
@@ -582,19 +565,19 @@ function StatChip({
 const sc = StyleSheet.create({
   chip: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 16,
     alignItems: 'center',
     gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowColor: '#3D2B1F',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
     elevation: 3,
   },
-  iconBg: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.7)' },
+  iconBg: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.8)' },
   value:  { fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },
-  label:  { fontSize: 11, fontWeight: '600', color: C.textSub, textAlign: 'center' },
+  label:  { fontSize: 11, fontWeight: '600', color: '#7A6A5A', textAlign: 'center' },
 });
 
 // ── Mini water/weight cards ───────────────────────────────────────────────────
@@ -634,17 +617,17 @@ function MiniCard({
 const mcard = StyleSheet.create({
   card: {
     flex: 1,
-    borderRadius: 22,
+    borderRadius: 26,
     padding: 16,
     alignItems: 'center',
     gap: 10,
-    shadowColor: '#000',
+    shadowColor: '#3D2B1F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowRadius: 14,
     elevation: 4,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: 'rgba(255,255,255,0.6)',
   },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
   label:    { fontSize: 13, fontWeight: '700' },
@@ -690,9 +673,9 @@ export default function HomeScreen() {
 
       const id = setTimeout(() => {
         const p    = useProfileStore.getState().profile;
-        const tdee = Number(p?.tdee) || 0;
+        const budget = Number(p?.calorieTarget ?? p?.tdee) || 0;
         const cal  = Number(useFoodStore.getState().getTotals().calories);
-        setCalorieProgress(tdee > 0 ? Math.min(cal / tdee, 1) : 0);
+        setCalorieProgress(budget > 0 ? Math.min(cal / budget, 1) : 0);
         const w    = useWaterStore.getState().today;
         const goal = Number(w?.goalMl) || 2000;
         const tot  = Number(w?.totalMl) || 0;
@@ -719,11 +702,11 @@ export default function HomeScreen() {
     );
   }
 
-  const tdee      = Number(profile.tdee) || 0;
+  const tdee      = Number(profile.calorieTarget ?? profile.tdee) || 0;
   const consumed  = Math.round(Number(foodTotals.calories));
   const remaining = Math.max(tdee - consumed, 0);
   const overBudget = consumed > tdee;
-  const ringColor  = overBudget ? C.coral : C.primary;
+  const ringColor  = overBudget ? C.coral : C.amber;
 
   const waterTotalMl = Number(waterToday?.totalMl) || 0;
   const waterGoalMl  = Number(waterToday?.goalMl) || 2000;
@@ -765,7 +748,7 @@ export default function HomeScreen() {
           </View>
           {foodStreak >= 2 && (
             <View style={s.streakPill}>
-              <Fire size={16} color="#FF8A80" weight="fill" />
+              <Fire size={16} color="#A6171C" weight="fill" />
               <Text style={s.streakNum}>{foodStreak}</Text>
             </View>
           )}
@@ -775,7 +758,7 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInDown.delay(80).springify()} style={s.ringWrap}>
           <AnimatedCalorieRing progress={calorieProgress} size={210} color={ringColor} />
           <View style={s.ringCenter}>
-            <Text style={[s.ringMain, { color: '#FFFFFF' }]}>
+            <Text style={[s.ringMain, { color: C.primary }]}>
               {Number(remaining).toLocaleString()}
             </Text>
             <Text style={s.ringSub}>kcal remaining</Text>
@@ -803,28 +786,28 @@ export default function HomeScreen() {
 
         <View style={s.chipsRow}>
           <StatChip
-            icon={<Fire size={22} weight="fill" color="#FF8A80" />}
+            icon={<Fire size={22} weight="fill" color="#A6171C" />}
             value={Number(consumed).toLocaleString()}
             label="Consumed"
-            color="#E57373"
-            bgColor={C.cardPink}
+            color="#A6171C"
+            bgColor="#FFEBEE"
             index={0}
           />
           <StatChip
-            icon={<Drop size={22} weight="fill" color="#7EC8E3" />}
+            icon={<Drop size={22} weight="fill" color="#4CAF50" />}
             value={waterDisplay(waterTotalMl)}
             label="Water"
-            color="#4FA3C7"
-            bgColor={C.cardBlue}
+            color="#4CAF50"
+            bgColor="#E8F5E9"
             index={1}
           />
           {totalBurned > 0 && (
             <StatChip
-              icon={<Lightning size={22} weight="fill" color="#FFD93D" />}
+              icon={<Lightning size={22} weight="fill" color="#F1C045" />}
               value={Number(totalBurned).toLocaleString()}
               label="Burned"
-              color="#F9A825"
-              bgColor={C.cardYellow}
+              color="#F1C045"
+              bgColor="#FFF8E1"
               index={2}
             />
           )}
@@ -833,10 +816,10 @@ export default function HomeScreen() {
         {/* Water + Fasting cards */}
         <View style={s.miniCardsRow}>
           <MiniCard
-            icon={<Drop size={16} weight="fill" color="#7EC8E3" />}
+            icon={<Drop size={16} weight="fill" color="#4CAF50" />}
             label="Water"
-            labelColor="#4FA3C7"
-            bgColor={C.cardBlue}
+            labelColor="#4CAF50"
+            bgColor="#E8F5E9"
             onPress={() => router.push('/water-hidden')}
             index={0}
           >
@@ -847,10 +830,10 @@ export default function HomeScreen() {
           </MiniCard>
 
           <MiniCard
-            icon={<Clock size={16} weight="fill" color="#FF8A80" />}
+            icon={<Clock size={16} weight="fill" color="#A6171C" />}
             label="Fasting"
-            labelColor="#FF8A80"
-            bgColor="#FFF0F0"
+            labelColor="#A6171C"
+            bgColor="#FFEBEE"
             onPress={() => router.push('/fasting-hidden')}
             index={1}
           >
@@ -860,12 +843,35 @@ export default function HomeScreen() {
               isFasting={fastingToday?.isActive || false}
               startHour={fastingToday?.startHour || 20}
             />
-            <Text style={[s.miniSub, { color: '#FF8A80', marginTop: RF(4) }]}>
+            <Text style={[s.miniSub, { color: '#A6171C', marginTop: RF(4) }]}>
               {fastingToday?.isActive 
-                ? `🔥 Burning Fat - ${fastingToday.durationHours}h Fast` 
+                ? `${fastingToday.durationHours}h Fast` 
                 : 'Select Schedule'}
             </Text>
           </MiniCard>
+        </View>
+
+        {/* Quick Actions — matching Figma */}
+        <Animated.View entering={FadeInUp.delay(180).springify()} style={s.sectionLabel}>
+          <Text style={s.sectionTitle}>Quick Actions</Text>
+        </Animated.View>
+        <View style={s.quickActionsRow}>
+          <TouchableOpacity
+            style={[s.quickBtn, { backgroundColor: '#F0C808' }]}
+            onPress={() => router.push('/(tabs)/food-log')}
+            activeOpacity={0.85}
+          >
+            <PlusCircle size={20} weight="fill" color="#3D2B1F" />
+            <Text style={[s.quickBtnText, { color: '#3D2B1F' }]}>Add Meal</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.quickBtn, { backgroundColor: '#C41E3A' }]}
+            onPress={() => router.push('/water-hidden')}
+            activeOpacity={0.85}
+          >
+            <PlusCircle size={20} weight="fill" color="#FFFFFF" />
+            <Text style={[s.quickBtnText, { color: '#FFFFFF' }]}>Log Water</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Explore section */}
@@ -875,19 +881,19 @@ export default function HomeScreen() {
 
         <ExploreCard
           title="Recipes"
-          subtitle="Browse healthy Malaysian meals"
-          icon={<BookOpenText size={26} weight="fill" color="#FFB74D" />}
-          iconBg="#FFF2E6"
-          accentColor="#FFB74D"
+          subtitle="Browse healthy meals"
+          icon={<BookOpenText size={26} weight="fill" color="#F1C045" />}
+          iconBg="#FFF8E1"
+          accentColor="#F1C045"
           onPress={() => router.push('/recipes-hidden')}
           index={0}
         />
         <ExploreCard
           title="Activity"
-          subtitle="Log workouts & calories burned"
-          icon={<Barbell size={26} weight="fill" color="#FFB5E8" />}
-          iconBg="#FFEAF0"
-          accentColor="#FFB5E8"
+          subtitle="Log workouts"
+          icon={<Barbell size={26} weight="fill" color="#4CAF50" />}
+          iconBg="#E8F5E9"
+          accentColor="#4CAF50"
           onPress={() => router.push('/activity-hidden')}
           index={1}
         />
@@ -902,7 +908,7 @@ const s = StyleSheet.create({
   root:    { flex: 1, backgroundColor: C.bg },
   content: { paddingBottom: 40 },
 
-  // Header
+  // Header — cream/papyrus (Figma Dashboard)
   header: {
     paddingTop: RFV(60),
     paddingBottom: RFV(32),
@@ -910,7 +916,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
     minHeight: RFV(420),
-    backgroundColor: C.headerTop,
+    backgroundColor: '#E8DCC4',
   },
   greetRow: {
     flexDirection: 'row',
@@ -923,62 +929,80 @@ const s = StyleSheet.create({
   greetText: {
     fontSize: RF(22),
     fontWeight: '800',
-    color: C.white,
+    color: '#3D2B1F',
     letterSpacing: -0.4,
     lineHeight: RF(28),
   },
   dateText: {
     fontSize: RF(12),
     fontWeight: '500',
-    color: C.whiteAlpha80,
+    color: '#7A6A5A',
     marginTop: RFV(4),
   },
   streakPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(196,30,58,0.10)',
     paddingHorizontal: RF(12),
     paddingVertical: RF(6),
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: 'rgba(196,30,58,0.20)',
   },
-  streakNum: { fontSize: RF(14), fontWeight: '800', color: C.white },
+  streakNum: { fontSize: RF(14), fontWeight: '800', color: '#C41E3A' },
 
   ringWrap:   { marginBottom: RFV(20), zIndex: 1, alignItems: 'center', justifyContent: 'center' },
   ringCenter: { position: 'absolute', alignItems: 'center', justifyContent: 'center', paddingTop: RFV(24) },
   ringMain:   { fontSize: RF(30), fontWeight: '800', letterSpacing: -0.6, lineHeight: RF(36) },
-  ringSub:    { fontSize: RF(11), fontWeight: '600', color: C.white, marginTop: RFV(4) },
-  ringBudget: { fontSize: RF(10), fontWeight: '500', color: C.white, marginTop: RFV(2) },
+  ringSub:    { fontSize: RF(11), fontWeight: '600', color: '#7A6A5A', marginTop: RFV(4) },
+  ringBudget: { fontSize: RF(10), fontWeight: '500', color: '#A89880', marginTop: RFV(2) },
 
   macroRow: {
     flexDirection: 'row',
     width: '100%',
     gap: 0,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: RF(16),
+    backgroundColor: 'rgba(255,255,255,0.65)',
+    borderRadius: RF(20),
     paddingHorizontal: RF(14),
-    paddingVertical: RF(12),
+    paddingVertical: RF(14),
     zIndex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.5)',
   },
-  macroDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: RF(12) },
+  macroDivider: { width: 1, backgroundColor: 'rgba(61,43,31,0.12)', marginHorizontal: RF(12) },
 
   // Body
   body: { paddingHorizontal: 18, paddingTop: 32 },
 
   sectionLabel: { marginBottom: RFV(12), marginTop: RFV(4) },
-  sectionTitle: { fontSize: RF(16), fontWeight: '800', color: C.text, letterSpacing: -0.2 },
+  sectionTitle: { fontSize: RF(17), fontWeight: '700', color: '#3D2B1F', letterSpacing: -0.2 },
 
-  chipsRow:    { flexDirection: 'row', gap: RF(8), marginBottom: RFV(14) },
-  miniCardsRow:{ flexDirection: 'row', gap: RF(10), marginBottom: RFV(20) },
+  chipsRow:    { flexDirection: 'row', gap: RF(10), marginBottom: RFV(16) },
+  miniCardsRow:{ flexDirection: 'row', gap: RF(12), marginBottom: RFV(20) },
 
-  miniSub:  { fontSize: RF(10), fontWeight: '600', color: C.textSub, textAlign: 'center' },
+  miniSub:  { fontSize: RF(10), fontWeight: '600', color: '#7A6A5A', textAlign: 'center' },
   bigValue: { fontSize: RF(20), fontWeight: '800', letterSpacing: -0.3 },
-  goalTrack:{ width: '100%', height: RFV(6), backgroundColor: C.border, borderRadius: 4, overflow: 'hidden' },
-  goalFill: { height: RFV(6), backgroundColor: C.primary, borderRadius: 4 },
+  goalTrack:{ width: '100%', height: RFV(6), backgroundColor: '#EDE8DF', borderRadius: 4, overflow: 'hidden' },
+  goalFill: { height: RFV(6), backgroundColor: '#C41E3A', borderRadius: 4 },
+
+  // Quick Actions
+  quickActionsRow: { flexDirection: 'row', gap: RF(12), marginBottom: RFV(20) },
+  quickBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: RFV(54),
+    borderRadius: 20,
+    shadowColor: '#3D2B1F',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  quickBtnText: { fontSize: RF(15), fontWeight: '700' },
 
   // Empty state
   emptyState: {

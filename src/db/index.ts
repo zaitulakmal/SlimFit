@@ -120,4 +120,16 @@ for (const sql of tables) {
   }
 }
 
+// Migrations for existing installs
+const migrations = [
+  `ALTER TABLE user_profile ADD COLUMN goal_type TEXT DEFAULT 'lose_weight'`,
+];
+for (const sql of migrations) {
+  try {
+    client.execSync(sql);
+  } catch {
+    // Column already exists — safe to ignore
+  }
+}
+
 export const db = drizzle(client, { schema });

@@ -9,13 +9,16 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Barcode, MagnifyingGlass, X, Camera } from 'phosphor-react-native';
+import { ArrowLeft, Barcode, MagnifyingGlass, X, Camera, Plus, PlusCircle } from 'phosphor-react-native';
 
-import { colors, spacing, typography } from '../../../constants/theme';
+import { pastelColors as colors, pastelSpacing as spacing, pastelTypography as typography } from '../../../constants/pastel-theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { searchLocalFoods, type LocalFood } from '../../../data/malaysian-foods';
 import { searchFoodsNix, type NixFood } from '../../../services/nutritionix';
@@ -97,6 +100,13 @@ export default function FoodSearchScreen() {
   const [qty, setQty] = useState('1');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualName, setManualName] = useState('');
+  const [manualCalories, setManualCalories] = useState('');
+  const [manualProtein, setManualProtein] = useState('');
+  const [manualCarbs, setManualCarbs] = useState('');
+  const [manualFat, setManualFat] = useState('');
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim()) {
@@ -152,6 +162,28 @@ export default function FoodSearchScreen() {
     router.back();
   };
 
+  const handleManualAdd = async () => {
+    if (!manualName.trim()) {
+      Alert.alert('Error', 'Sila masukkan nama makanan');
+      return;
+    }
+    if (!mealType) return;
+    await logFood({
+      mealType,
+      foodName: manualName.trim(),
+      calories: parseFloat(manualCalories) || 0,
+      proteinG: parseFloat(manualProtein) || 0,
+      carbsG: parseFloat(manualCarbs) || 0,
+      fatG: parseFloat(manualFat) || 0,
+      servingQty: 1,
+      servingUnit: 'serving',
+      source: 'manual',
+      dateStr: currentDateStr,
+    });
+    setShowManualModal(false);
+    router.back();
+  };
+
   const scaledCalories = selected
     ? Math.round(selected.calories * ((parseFloat(qty) || 1) / selected.servingQty))
     : 0;
@@ -184,6 +216,13 @@ export default function FoodSearchScreen() {
           accessibilityLabel="Capture food"
         >
           <Camera size={24} weight="regular" color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setShowManualModal(true)}
+          style={s.scanBtn}
+          accessibilityLabel="Add manually"
+        >
+          <Plus size={24} weight="bold" color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -280,10 +319,65 @@ export default function FoodSearchScreen() {
             <View style={s.emptyState}>
               <MagnifyingGlass size={40} weight="regular" color={colors.border} />
               <Text style={s.emptyText}>{t('food.no_results')}</Text>
+              <TouchableOpacity style={s.manualEntryBtn} onPress={() => setShowManualModal(true)}>
+                <Plus size={18} weight="bold" color={colors.white} />
+                <Text style={s.manualEntryBtnText}>Tambah Sendiri</Text>
+              </TouchableOpacity>
             </View>
           ) : null
         }
+        ListFooterComponent={<View style={{ height: 40 }} />}
       />
+
+      {/* Manual Entry Modal */}
+      <Modal visible={showManualModal} animationType="slide" presentationStyle="pageSheet">
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <View style={[s.modalHeader, { paddingTop: insets.top + 12 }]}>
+            <TouchableOpacity onPress={() => setShowManualModal(false)} style={s.backBtn}>
+              <X size={24} weight="bold" color={colors.textPrimary} />
+            </TouchableOpacity>
+            <Text style={s.headerTitle}>Tambah Makanan</Text>
+            <View style={{ width: 40 }} />
+          </View>
+          <ScrollView style={s.modalBody} contentContainerStyle={s.modalContent} keyboardShouldPersistTaps="handled">
+            <View style={s.inputGroup}>
+              <Text style={s.inputLabel}>Nama Makanan *</Text>
+              <TextInput
+                style={s.input}
+                value={manualName}
+                onChangeText={setManualName}
+                placeholder="cth: Nasi putih, Dada ayam..."
+                placeholderTextColor={colors.textSecondary}
+                autoFocus
+              />
+            </View>
+            <View style={s.inputRow}>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Kalori (kcal)</Text>
+                <TextInput style={s.input} value={manualCalories} onChangeText={setManualCalories} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
+              </View>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Protein (g)</Text>
+                <TextInput style={s.input} value={manualProtein} onChangeText={setManualProtein} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
+              </View>
+            </View>
+            <View style={s.inputRow}>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Karbohidrat (g)</Text>
+                <TextInput style={s.input} value={manualCarbs} onChangeText={setManualCarbs} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
+              </View>
+              <View style={s.inputHalf}>
+                <Text style={s.inputLabel}>Lemak (g)</Text>
+                <TextInput style={s.input} value={manualFat} onChangeText={setManualFat} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
+              </View>
+            </View>
+            <TouchableOpacity style={s.addManualBtn} onPress={handleManualAdd}>
+              <PlusCircle size={20} weight="fill" color={colors.white} />
+              <Text style={s.addManualBtnText}>Tambah ke Log</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -363,12 +457,12 @@ const s = StyleSheet.create({
   },
   addConfirmBtn: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#F1C045',
     borderRadius: 10,
     paddingVertical: spacing.sm,
     alignItems: 'center',
   },
-  addConfirmText: { ...typography.body, color: colors.textOnAccent },
+  addConfirmText: { ...typography.body, color: '#4A4A4A', fontWeight: '700' },
   cancelBtn: { padding: spacing.xs },
   listHeader: {
     ...typography.label,
@@ -402,4 +496,32 @@ const s = StyleSheet.create({
     gap: spacing.md,
   },
   emptyText: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },
+  manualEntryBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: '#F1C045', paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md, borderRadius: 12, marginTop: spacing.sm,
+  },
+  manualEntryBtnText: { ...typography.body, fontWeight: '700', color: '#4A4A4A' },
+  modalHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.md, paddingBottom: spacing.sm,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+    backgroundColor: colors.white,
+  },
+  modalBody: { flex: 1, backgroundColor: colors.background },
+  modalContent: { padding: spacing.lg, gap: spacing.md },
+  inputGroup: { marginBottom: spacing.sm },
+  inputLabel: { ...typography.label, color: colors.textSecondary, marginBottom: spacing.xs },
+  input: {
+    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    ...typography.body, color: colors.textPrimary, backgroundColor: colors.white,
+  },
+  inputRow: { flexDirection: 'row', gap: spacing.sm },
+  inputHalf: { flex: 1 },
+  addManualBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
+    backgroundColor: '#F1C045', borderRadius: 12, paddingVertical: spacing.md, marginTop: spacing.md,
+  },
+  addManualBtnText: { ...typography.body, fontWeight: '700', color: '#4A4A4A' },
 });

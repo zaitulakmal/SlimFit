@@ -5,11 +5,11 @@
     "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon.jpeg",
     "scheme": "slimtrack",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/icon.png",
+      "icon": "./assets/images/icon.jpeg",
       "bundleIdentifier": "com.zaitul.slimtrack",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false

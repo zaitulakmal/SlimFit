@@ -10,6 +10,7 @@ export const userProfile = sqliteTable('user_profile', {
   activityLevel: text('activity_level', {
     enum: ['sedentary', 'lightly_active', 'moderately_active', 'very_active'],
   }).notNull(),
+  goalType: text('goal_type', { enum: ['lose_weight', 'maintain', 'get_fit'] }).default('lose_weight'),
   targetWeightKg: real('target_weight_kg').notNull(),
   deadline: text('deadline'),
   tdee: integer('tdee'),
