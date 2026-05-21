@@ -13,6 +13,13 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -100,6 +107,12 @@ export default function FoodSearchScreen() {
   const [qty, setQty] = useState('1');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const addScale = useSharedValue(1);
+
+  const addBtnStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: addScale.value }],
+  }));
+
   const [showManualModal, setShowManualModal] = useState(false);
   const [manualName, setManualName] = useState('');
   const [manualCalories, setManualCalories] = useState('');
@@ -141,8 +154,17 @@ export default function FoodSearchScreen() {
     setQty(String(item.servingQty));
   };
 
+  const handleDismissSheet = () => {
+    setSelected(null);
+  };
+
   const handleAdd = async () => {
     if (!selected || !mealType) return;
+    addScale.value = withSequence(
+      withSpring(0.92, { damping: 12, stiffness: 300 }),
+      withSpring(1.06, { damping: 10, stiffness: 250 }),
+      withTiming(1, { duration: 150 }),
+    );
     const qtyNum = parseFloat(qty) || 1;
     const ratio = qtyNum / selected.servingQty;
     await logFood({
@@ -193,96 +215,63 @@ export default function FoodSearchScreen() {
       style={s.root}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Header */}
-      <View style={[s.header, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
-          <ArrowLeft size={24} weight="regular" color={colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>{t(`food.meal_${mealType ?? 'breakfast'}`)}</Text>
-        <TouchableOpacity
-          onPress={() =>
-            router.push({ pathname: '/(tabs)/food-log/scan', params: { mealType } })
-          }
-          style={s.scanBtn}
-          accessibilityLabel="Scan barcode"
-        >
-          <Barcode size={24} weight="regular" color={colors.textPrimary} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            router.push({ pathname: '/(tabs)/food-log/capture', params: { mealType } })
-          }
-          style={s.scanBtn}
-          accessibilityLabel="Capture food"
-        >
-          <Camera size={24} weight="regular" color={colors.textPrimary} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setShowManualModal(true)}
-          style={s.scanBtn}
-          accessibilityLabel="Add manually"
-        >
-          <Plus size={24} weight="bold" color={colors.textPrimary} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Search bar */}
-      <View style={s.searchContainer}>
-        <MagnifyingGlass size={18} weight="regular" color={colors.textSecondary} />
-        <TextInput
-          style={s.searchInput}
-          value={query}
-          onChangeText={setQuery}
-          placeholder={t('food.search_placeholder')}
-          placeholderTextColor={colors.textSecondary}
-          autoFocus
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-        />
-        {loading && <ActivityIndicator size="small" color={colors.primary} />}
-      </View>
-
-      {/* Selected item confirm panel */}
-      {selected && (
-        <View style={s.confirmPanel}>
-          <View style={s.confirmInfo}>
-            <Text style={s.confirmName} numberOfLines={1}>
-              {selected.foodName}
-            </Text>
-            <Text style={s.confirmMacros}>
-              {scaledCalories} kcal · P {Math.round(selected.proteinG * ((parseFloat(qty) || 1) / selected.servingQty))}g
-              · C {Math.round(selected.carbsG * ((parseFloat(qty) || 1) / selected.servingQty))}g
-              · F {Math.round(selected.fatG * ((parseFloat(qty) || 1) / selected.servingQty))}g
-            </Text>
-          </View>
-          <View style={s.confirmActions}>
-            <View style={s.qtyRow}>
-              <TextInput
-                style={s.qtyInput}
-                value={qty}
-                onChangeText={setQty}
-                keyboardType="numeric"
-                selectTextOnFocus
-              />
-              <Text style={s.qtyUnit} numberOfLines={1}>
-                {selected.servingUnit}
-              </Text>
-            </View>
-            <TouchableOpacity style={s.addConfirmBtn} onPress={handleAdd}>
-              <Text style={s.addConfirmText}>{t('food.add')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setSelected(null)} style={s.cancelBtn}>
-              <X size={20} weight="bold" color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
+      {/* Navy header + search section */}
+      <View style={[s.navySection, { paddingTop: insets.top + 12 }]}>
+        {/* Icon row */}
+        <View style={s.header}>
+          <TouchableOpacity onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
+            <ArrowLeft size={24} weight="regular" color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={s.headerTitle}>{t(`food.meal_${mealType ?? 'breakfast'}`)}</Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({ pathname: '/(tabs)/food-log/scan', params: { mealType } })
+            }
+            style={s.scanBtn}
+            accessibilityLabel="Scan barcode"
+          >
+            <Barcode size={24} weight="regular" color="rgba(255,255,255,0.85)" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({ pathname: '/(tabs)/food-log/capture', params: { mealType } })
+            }
+            style={s.scanBtn}
+            accessibilityLabel="Capture food"
+          >
+            <Camera size={24} weight="regular" color="rgba(255,255,255,0.85)" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowManualModal(true)}
+            style={s.scanBtn}
+            accessibilityLabel="Add manually"
+          >
+            <Plus size={24} weight="bold" color="rgba(255,255,255,0.85)" />
+          </TouchableOpacity>
         </View>
-      )}
+
+        {/* Search bar — inside navy section */}
+        <View style={s.searchContainer}>
+          <MagnifyingGlass size={18} weight="regular" color="rgba(255,255,255,0.6)" />
+          <TextInput
+            style={s.searchInput}
+            value={query}
+            onChangeText={setQuery}
+            placeholder={t('food.search_placeholder')}
+            placeholderTextColor="rgba(255,255,255,0.45)"
+            autoFocus
+            returnKeyType="search"
+          />
+          {loading && <ActivityIndicator size="small" color="#F0C808" />}
+        </View>
+      </View>
 
       {/* Results list */}
       <FlatList
         data={results}
         keyExtractor={(item) => item.id}
         keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: selected ? 320 : 40 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[s.resultRow, selected?.id === item.id && s.resultRowSelected]}
@@ -321,12 +310,12 @@ export default function FoodSearchScreen() {
               <Text style={s.emptyText}>{t('food.no_results')}</Text>
               <TouchableOpacity style={s.manualEntryBtn} onPress={() => setShowManualModal(true)}>
                 <Plus size={18} weight="bold" color={colors.white} />
-                <Text style={s.manualEntryBtnText}>Tambah Sendiri</Text>
+                <Text style={s.manualEntryBtnText}>Add Manually</Text>
               </TouchableOpacity>
             </View>
           ) : null
         }
-        ListFooterComponent={<View style={{ height: 40 }} />}
+        ListFooterComponent={null}
       />
 
       {/* Manual Entry Modal */}
@@ -336,24 +325,24 @@ export default function FoodSearchScreen() {
             <TouchableOpacity onPress={() => setShowManualModal(false)} style={s.backBtn}>
               <X size={24} weight="bold" color={colors.textPrimary} />
             </TouchableOpacity>
-            <Text style={s.headerTitle}>Tambah Makanan</Text>
+            <Text style={s.headerTitle}>Add Food</Text>
             <View style={{ width: 40 }} />
           </View>
           <ScrollView style={s.modalBody} contentContainerStyle={s.modalContent} keyboardShouldPersistTaps="handled">
             <View style={s.inputGroup}>
-              <Text style={s.inputLabel}>Nama Makanan *</Text>
+              <Text style={s.inputLabel}>Food Name *</Text>
               <TextInput
                 style={s.input}
                 value={manualName}
                 onChangeText={setManualName}
-                placeholder="cth: Nasi putih, Dada ayam..."
+                placeholder="e.g. Chicken breast, Rice..."
                 placeholderTextColor={colors.textSecondary}
                 autoFocus
               />
             </View>
             <View style={s.inputRow}>
               <View style={s.inputHalf}>
-                <Text style={s.inputLabel}>Kalori (kcal)</Text>
+                <Text style={s.inputLabel}>Calories (kcal)</Text>
                 <TextInput style={s.input} value={manualCalories} onChangeText={setManualCalories} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
               </View>
               <View style={s.inputHalf}>
@@ -363,19 +352,95 @@ export default function FoodSearchScreen() {
             </View>
             <View style={s.inputRow}>
               <View style={s.inputHalf}>
-                <Text style={s.inputLabel}>Karbohidrat (g)</Text>
+                <Text style={s.inputLabel}>Carbs (g)</Text>
                 <TextInput style={s.input} value={manualCarbs} onChangeText={setManualCarbs} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
               </View>
               <View style={s.inputHalf}>
-                <Text style={s.inputLabel}>Lemak (g)</Text>
+                <Text style={s.inputLabel}>Fat (g)</Text>
                 <TextInput style={s.input} value={manualFat} onChangeText={setManualFat} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
               </View>
             </View>
             <TouchableOpacity style={s.addManualBtn} onPress={handleManualAdd}>
               <PlusCircle size={20} weight="fill" color={colors.white} />
-              <Text style={s.addManualBtnText}>Tambah ke Log</Text>
+              <Text style={s.addManualBtnText}>Add to Log</Text>
             </TouchableOpacity>
           </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Bottom sheet as transparent Modal — guaranteed above everything */}
+      <Modal
+        visible={!!selected}
+        transparent
+        animationType="slide"
+        onRequestClose={handleDismissSheet}
+        statusBarTranslucent
+      >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+        <View style={s.sheetOverlay}>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            onPress={handleDismissSheet}
+            activeOpacity={1}
+          />
+          <View style={s.bottomSheet}>
+            <View style={s.sheetHandle} />
+
+            {/* Header: name + close */}
+            <View style={s.sheetTopRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={s.sheetTitle} numberOfLines={2}>{selected?.foodName}</Text>
+                {selected?.brandName ? (
+                  <Text style={s.sheetBrand}>{selected.brandName}</Text>
+                ) : null}
+              </View>
+              <TouchableOpacity onPress={handleDismissSheet} style={s.sheetClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+                <X size={22} weight="bold" color="rgba(26,43,92,0.7)" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Nutrition grid */}
+            <View style={s.nutritionGrid}>
+              {[
+                { label: 'Calories', value: String(scaledCalories), unit: 'kcal' },
+                { label: 'Protein',  value: String(Math.round((selected?.proteinG ?? 0) * ((parseFloat(qty)||1) / (selected?.servingQty ?? 1)))), unit: 'g' },
+                { label: 'Carbs',    value: String(Math.round((selected?.carbsG   ?? 0) * ((parseFloat(qty)||1) / (selected?.servingQty ?? 1)))), unit: 'g' },
+                { label: 'Fat',      value: String(Math.round((selected?.fatG     ?? 0) * ((parseFloat(qty)||1) / (selected?.servingQty ?? 1)))), unit: 'g' },
+              ].map((item) => (
+                <View key={item.label} style={s.nutritionItem}>
+                  <Text style={s.nutritionValue}>{item.value}<Text style={s.nutritionUnit}>{item.unit}</Text></Text>
+                  <Text style={s.nutritionLabel}>{item.label}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Serving size row */}
+            <View style={s.servingRow}>
+              <Text style={s.servingLabel}>Serving size</Text>
+              <View style={s.qtyRow}>
+                <TextInput
+                  style={s.qtyInput}
+                  value={qty}
+                  onChangeText={setQty}
+                  keyboardType="numeric"
+                  selectTextOnFocus
+                />
+                <Text style={s.qtyUnit} numberOfLines={1}>{selected?.servingUnit}</Text>
+              </View>
+            </View>
+
+            {/* Add button — full width, always visible */}
+            <Animated.View style={addBtnStyle}>
+              <TouchableOpacity style={s.addConfirmBtn} onPress={handleAdd} activeOpacity={0.85}>
+                <PlusCircle size={20} weight="fill" color="#FFFFFF" />
+                <Text style={s.addConfirmText}>Add to Log</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </View>
         </KeyboardAvoidingView>
       </Modal>
     </KeyboardAvoidingView>
@@ -383,112 +448,161 @@ export default function FoodSearchScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.white },
+  root: { flex: 1, backgroundColor: colors.background },
+  navySection: {
+    backgroundColor: '#1A2B5C',
+    paddingBottom: 16,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     gap: spacing.sm,
   },
   backBtn: { padding: spacing.xs },
-  headerTitle: { ...typography.heading, color: colors.textPrimary, flex: 1 },
+  headerTitle: { ...typography.heading, color: '#FFFFFF', flex: 1 },
   scanBtn: { padding: spacing.xs },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: spacing.md,
+    marginHorizontal: spacing.md,
+    marginTop: 4,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.background,
-    borderRadius: 12,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(255,255,255,0.18)',
     gap: spacing.sm,
   },
   searchInput: {
     flex: 1,
     ...typography.body,
-    color: colors.textPrimary,
+    color: '#FFFFFF',
     padding: 0,
   },
-  confirmPanel: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-    padding: spacing.md,
-    backgroundColor: colors.selectedTint,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    gap: spacing.sm,
+  // Amber bottom sheet (inside transparent Modal)
+  sheetOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
-  confirmInfo: { gap: 2 },
-  confirmName: { ...typography.body, color: colors.textPrimary },
-  confirmMacros: { ...typography.label, color: colors.textSecondary },
-  confirmActions: {
+  bottomSheet: {
+    backgroundColor: '#F0C808',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 24,
+    paddingBottom: 44,
+    shadowColor: '#1A2B5C',
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  sheetHandle: {
+    width: 40, height: 4,
+    backgroundColor: 'rgba(26,43,92,0.2)',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  sheetTopRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 16 },
+  sheetTitle: { fontSize: 22, fontWeight: '900', color: '#1A2B5C', letterSpacing: -0.5 },
+  sheetBrand: { fontSize: 12, fontWeight: '500', color: 'rgba(26,43,92,0.6)', marginTop: 2 },
+  sheetClose: { padding: 4, marginTop: 2 },
+  nutritionGrid: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  nutritionItem: {
+    flex: 1, alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    borderRadius: 16, padding: 12,
+  },
+  nutritionValue: { fontSize: 18, fontWeight: '900', color: '#1A2B5C' },
+  nutritionUnit: { fontSize: 11, fontWeight: '600' },
+  nutritionLabel: { fontSize: 10, fontWeight: '600', color: 'rgba(26,43,92,0.65)', marginTop: 2 },
+  servingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'space-between',
+    marginBottom: 14,
   },
+  servingLabel: { fontSize: 13, fontWeight: '700', color: 'rgba(26,43,92,0.7)' },
+  sheetActions: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    backgroundColor: colors.white,
-    gap: spacing.xs,
+    borderWidth: 1.5,
+    borderColor: 'rgba(26,43,92,0.25)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    gap: 6,
   },
   qtyInput: {
     ...typography.body,
-    color: colors.textPrimary,
+    color: '#1A2B5C',
     minWidth: 36,
     textAlign: 'center',
     padding: 0,
+    fontWeight: '800',
+    fontSize: 16,
   },
   qtyUnit: {
     ...typography.label,
-    color: colors.textSecondary,
+    color: 'rgba(26,43,92,0.65)',
     maxWidth: 80,
+    fontWeight: '600',
   },
   addConfirmBtn: {
-    flex: 1,
-    backgroundColor: '#F1C045',
-    borderRadius: 10,
-    paddingVertical: spacing.sm,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1A2B5C',
+    borderRadius: 18,
+    paddingVertical: 16,
+    width: '100%',
   },
-  addConfirmText: { ...typography.body, color: '#4A4A4A', fontWeight: '700' },
-  cancelBtn: { padding: spacing.xs },
+  addConfirmText: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.2 },
   listHeader: {
     ...typography.label,
     color: colors.textSecondary,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
+    paddingTop: spacing.md,
     paddingBottom: spacing.sm,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    fontSize: 11,
   },
   resultRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginHorizontal: spacing.md,
+    marginVertical: 4,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingVertical: 12,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    shadowColor: '#1A2B5C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
     gap: spacing.sm,
   },
   resultRowSelected: {
-    backgroundColor: colors.selectedTint,
+    borderWidth: 2,
+    borderColor: '#F0C808',
+    backgroundColor: '#FFFBF0',
   },
   resultInfo: { flex: 1 },
-  resultName: { ...typography.body, color: colors.textPrimary },
+  resultName: { fontSize: 15, fontWeight: '700', color: '#1A2B5C' },
   resultBrand: { ...typography.label, color: colors.textSecondary },
-  resultSub: { ...typography.label, color: colors.textSecondary, marginTop: 2 },
+  resultSub: { fontSize: 12, fontWeight: '500', color: colors.textSecondary, marginTop: 2 },
   macroPills: { gap: 2, alignItems: 'flex-end' },
-  macroPill: { ...typography.label, color: colors.textSecondary },
+  macroPill: { fontSize: 11, fontWeight: '600', color: '#9AA3C0' },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',

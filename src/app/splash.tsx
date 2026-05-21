@@ -11,6 +11,7 @@ import Svg, {
   Defs, LinearGradient, Stop, G,
 } from 'react-native-svg';
 import { useProfileStore } from '../stores/profileStore';
+import { useAuthStore } from '../stores/authStore';
 
 const { width: W } = Dimensions.get('window');
 
@@ -140,6 +141,7 @@ function FloatingLeaf({ x, y, size, delay, color }: {
 // ─── Main splash ─────────────────────────────────────────────────────────────
 export default function SplashScreen() {
   const profile = useProfileStore((s) => s.profile);
+  const user = useAuthStore((s) => s.user);
 
   const bowlScale   = useSharedValue(0);
   const bowlY       = useSharedValue(60);
@@ -151,7 +153,9 @@ export default function SplashScreen() {
   const bgScale     = useSharedValue(1.05);
 
   const navigate = () => {
-    if (!profile?.onboardingCompleted) {
+    if (!user) {
+      router.replace('/auth/login');
+    } else if (!profile?.onboardingCompleted) {
       router.replace('/onboarding');
     } else {
       router.replace('/(tabs)');

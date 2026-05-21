@@ -2,6 +2,11 @@
 // Palette 1 (Dashboard): Ruby #C41E3A · Papyrus #E8DCC4 · Citron #F0C808
 
 export const pastelColors = {
+  // Navy — dark header / accent
+  navy: '#1A2B5C',
+  navyLight: '#243470',
+  navyDark: '#0F1A3C',
+
   // Primary — Ruby red
   primary: '#C41E3A',
   primaryLight: '#E53558',

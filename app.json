@@ -5,14 +5,15 @@
     "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.jpeg",
+    "icon": "./assets/images/icon.png",
     "scheme": "slimtrack",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/icon.jpeg",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.zaitul.slimtrack",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Slimora uses the camera to scan food barcodes."
       }
     },
     "android": {
@@ -28,7 +29,7 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
-      "package": "com.anonymous.slimtrack"
+      "package": "com.zaitul.slimora"
     },
     "web": {
       "output": "static",
@@ -51,6 +52,12 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Slimora needs your location to find nearby grocery stores.",
           "locationWhenInUsePermission": "Slimora needs your location to find nearby grocery stores."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Slimora uses the camera to scan food barcodes."
         }
       ],
       "expo-sqlite",
