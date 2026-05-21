@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { ForkKnife, House, UserCircle } from 'phosphor-react-native';
+import { ForkKnifeIcon, HouseIcon, UserCircleIcon } from 'phosphor-react-native';
 import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
@@ -8,15 +8,15 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#B39DDB',
-        tabBarInactiveTintColor: '#C4B5FD',
+        tabBarActiveTintColor: '#1A2B5C',
+        tabBarInactiveTintColor: '#9AA3C0',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 0,
           height: 72,
           paddingBottom: 10,
           paddingTop: 8,
-          shadowColor: '#000',
+          shadowColor: '#1A2B5C',
           shadowOpacity: 0.10,
           shadowRadius: 16,
           shadowOffset: { width: 0, height: -4 },
@@ -36,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.home'),
           tabBarIcon: ({ focused, color, size }) => (
-            <House size={size} weight={focused ? 'fill' : 'regular'} color={color} />
+            <HouseIcon size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -45,7 +45,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.food'),
           tabBarIcon: ({ focused, color, size }) => (
-            <ForkKnife size={size} weight={focused ? 'fill' : 'regular'} color={color} />
+            <ForkKnifeIcon size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />
@@ -54,7 +54,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.profile'),
           tabBarIcon: ({ focused, color, size }) => (
-            <UserCircle size={size} weight={focused ? 'fill' : 'regular'} color={color} />
+            <UserCircleIcon size={size} weight={focused ? 'fill' : 'regular'} color={color} />
           ),
         }}
       />

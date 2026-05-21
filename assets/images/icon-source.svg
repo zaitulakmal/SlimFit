@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF82"/>
+      <stop offset="100%" stop-color="#2E7D5E"/>
+    </linearGradient>
+    <linearGradient id="bowl" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F0F0F0" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="1024" height="1024" rx="230" ry="230" fill="url(#bg)"/>
+
+  <!-- Subtle radial glow -->
+  <radialGradient id="glow" cx="40%" cy="30%" r="60%">
+    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.15"/>
+    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1024" height="1024" rx="230" ry="230" fill="url(#glow)"/>
+
+  <!-- Bowl body -->
+  <ellipse cx="512" cy="560" rx="280" ry="60" fill="url(#bowl)"/>
+  <path d="M232,520 Q232,700 512,700 Q792,700 792,520 Z" fill="url(#bowl)"/>
+
+  <!-- Bowl rim highlight -->
+  <ellipse cx="512" cy="520" rx="280" ry="52" fill="#FFFFFF"/>
+  <ellipse cx="512" cy="520" rx="262" ry="44" fill="#F5F5F5"/>
+
+  <!-- Salad contents -->
+  <!-- Dark green lettuce base -->
+  <ellipse cx="512" cy="510" rx="240" ry="38" fill="#388E3C"/>
+
+  <!-- Light green leaves -->
+  <ellipse cx="420" cy="490" rx="90" ry="30" fill="#66BB6A" transform="rotate(-15,420,490)"/>
+  <ellipse cx="600" cy="488" rx="85" ry="28" fill="#81C784" transform="rotate(12,600,488)"/>
+  <ellipse cx="510" cy="475" rx="80" ry="26" fill="#A5D6A7" transform="rotate(-5,510,475)"/>
+  <ellipse cx="350" cy="500" rx="70" ry="22" fill="#66BB6A" transform="rotate(-20,350,500)"/>
+  <ellipse cx="660" cy="498" rx="72" ry="24" fill="#4CAF50" transform="rotate(18,660,498)"/>
+
+  <!-- Tomatoes -->
+  <circle cx="450" cy="472" r="32" fill="#EF5350"/>
+  <circle cx="450" cy="472" r="32" fill="none" stroke="#E53935" stroke-width="2"/>
+  <ellipse cx="450" cy="462" rx="10" ry="6" fill="#FF8A80" opacity="0.6"/>
+  <!-- Tomato stem -->
+  <path d="M450,440 Q455,432 460,435" stroke="#388E3C" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <circle cx="570" cy="470" r="28" fill="#EF5350"/>
+  <ellipse cx="570" cy="461" rx="9" ry="5" fill="#FF8A80" opacity="0.6"/>
+  <path d="M570,442 Q575,434 580,437" stroke="#388E3C" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Cucumber slices -->
+  <circle cx="390" cy="480" r="24" fill="#8BC34A"/>
+  <circle cx="390" cy="480" r="18" fill="#AED581"/>
+  <circle cx="390" cy="480" r="8" fill="#DCEDC8"/>
+
+  <circle cx="630" cy="482" r="22" fill="#8BC34A"/>
+  <circle cx="630" cy="482" r="16" fill="#AED581"/>
+  <circle cx="630" cy="482" r="7" fill="#DCEDC8"/>
+
+  <!-- Carrot bits -->
+  <ellipse cx="510" cy="460" rx="18" ry="10" fill="#FF8F00" transform="rotate(20,510,460)"/>
+  <ellipse cx="480" cy="455" rx="12" ry="7" fill="#FFA000" transform="rotate(-15,480,455)"/>
+  <ellipse cx="545" cy="458" rx="14" ry="8" fill="#FF8F00" transform="rotate(10,545,458)"/>
+
+  <!-- Fork on right side -->
+  <g transform="translate(730,300) rotate(20)">
+    <!-- Fork handle -->
+    <rect x="-14" y="80" width="28" height="190" rx="14" fill="#FFFFFF" opacity="0.95"/>
+    <!-- Fork neck -->
+    <rect x="-10" y="20" width="20" height="75" rx="5" fill="#FFFFFF" opacity="0.95"/>
+    <!-- Fork tines -->
+    <rect x="-18" y="-80" width="8" height="110" rx="4" fill="#FFFFFF" opacity="0.95"/>
+    <rect x="-6" y="-80" width="8" height="110" rx="4" fill="#FFFFFF" opacity="0.95"/>
+    <rect x="6" y="-80" width="8" height="110" rx="4" fill="#FFFFFF" opacity="0.95"/>
+    <rect x="18" y="-80" width="8" height="110" rx="4" fill="#FFFFFF" opacity="0.95"/>
+  </g>
+
+  <!-- App name "S" monogram subtle -->
+  <!-- Shine overlay top -->
+  <rect width="1024" height="500" rx="230" ry="0" fill="url(#shine)"/>
+</svg>

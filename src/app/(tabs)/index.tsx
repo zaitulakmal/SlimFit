@@ -157,7 +157,7 @@ function AnimatedCalorieRing({
           cx={size/2}
           cy={size/2}
           r={r}
-          stroke="#E8DCC4"
+          stroke="rgba(255,255,255,0.15)"
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -372,58 +372,65 @@ function AnimatedFastingClock({
   );
 }
 
-// ── Decorative food illustrations ───────────────────────────────────────────────
-function HeaderDecoration() {
-  const screenWidth = Dimensions.get('window').width;
-  const WR = screenWidth;
-  const svgH = RFV(420);
-  
+// ── Decorative header (navy + food graphics) ────────────────────────────────
+function HeaderDecoration({ h }: { h: number }) {
   return (
-    <Svg width={W} height={svgH} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 420`}>
+    <Svg width={W} height={h} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} ${h}`}>
       <Defs>
-        <LinearGradient id="creamHeaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#E8DCC4" />
-          <Stop offset="55%" stopColor="#F5EFE7" />
-          <Stop offset="100%" stopColor="#FFF9E6" />
+        <LinearGradient id="navyHomeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#1A2B5C" />
+          <Stop offset="100%" stopColor="#243470" />
         </LinearGradient>
       </Defs>
 
-      {/* Cream/papyrus gradient background */}
-      <Rect width={W} height={420} fill="url(#creamHeaderGrad)" />
+      {/* Navy background */}
+      <Rect width={W} height={h} fill="url(#navyHomeGrad)" />
 
-      {/* Ruby glow — top left */}
-      <SvgCircle cx={W * 0.05} cy={60}  r={110} fill="#C41E3A" opacity={0.06} />
-      {/* Citron glow — top right */}
-      <SvgCircle cx={W * 0.92} cy={30}  r={120} fill="#F0C808" opacity={0.12} />
-      {/* Papyrus bottom circle */}
-      <SvgCircle cx={W * 0.5}  cy={430} r={100} fill="#E8DCC4" opacity={0.5} />
+      {/* Ambient glows */}
+      <SvgCircle cx={W * 0.85} cy={-20}    r={130} fill="#FFFFFF" opacity={0.03} />
+      <SvgCircle cx={W * 0.08} cy={h * 0.9} r={110} fill="#F0C808" opacity={0.06} />
 
       {/* ── Apple — top left */}
-      <Ellipse cx={44} cy={88} rx={26} ry={28} fill="#C41E3A" opacity={0.85} />
-      <Ellipse cx={44} cy={88} rx={18} ry={20} fill="#E84060" opacity={0.5} />
-      <Rect x={42} y={57} width={4} height={10} rx={2} fill="#10B981" />
-      <Path d="M42,57 Q50,49 55,56" fill="#10B981" opacity={0.8} />
+      <SvgCircle cx={38}  cy={90} r={28} fill="#C41E3A" opacity={0.9} />
+      <SvgCircle cx={38}  cy={90} r={20} fill="#E84060" opacity={0.45} />
+      <SvgCircle cx={30}  cy={80} r={6}  fill="rgba(255,255,255,0.25)" />
+      {/* stem */}
+      <Rect x={36} y={60} width={4} height={10} rx={2} fill="#34D399" opacity={0.9} />
+      <Path d="M36,62 Q44,54 50,60" stroke="#34D399" strokeWidth={2.5} fill="none" opacity={0.9} />
 
       {/* ── Lemon — top right */}
-      <Ellipse cx={WR - 44} cy={72} rx={26} ry={20} fill="#F0C808" opacity={0.9} />
-      <Ellipse cx={WR - 44} cy={72} rx={18} ry={14} fill="#FFF176" opacity={0.8} />
-      <SvgCircle cx={WR - 52} cy={66} r={4} fill="rgba(255,255,255,0.6)" />
+      <Ellipse cx={W - 38} cy={76} rx={28} ry={22} fill="#F0C808" opacity={0.92} />
+      <Ellipse cx={W - 38} cy={76} rx={18} ry={14} fill="#FFF176" opacity={0.7} />
+      <SvgCircle cx={W - 48} cy={68} r={5} fill="rgba(255,255,255,0.5)" />
 
-      {/* ── Orange — mid right */}
-      <SvgCircle cx={WR - 30} cy={200} r={30} fill="#FB923C" opacity={0.75} />
-      <SvgCircle cx={WR - 30} cy={200} r={22} fill="#FDBA74" opacity={0.6} />
-      <SvgCircle cx={WR - 38} cy={192} r={5}  fill="rgba(255,255,255,0.5)" />
+      {/* ── Orange — right side mid */}
+      <SvgCircle cx={W - 22} cy={h * 0.45} r={34} fill="#FB923C" opacity={0.8} />
+      <SvgCircle cx={W - 22} cy={h * 0.45} r={24} fill="#FDBA74" opacity={0.55} />
+      <SvgCircle cx={W - 32} cy={h * 0.45 - 9} r={7} fill="rgba(255,255,255,0.35)" />
 
-      {/* ── Green herb dots — mid left */}
-      <SvgCircle cx={28} cy={220} r={10} fill="#10B981" opacity={0.7} />
-      <SvgCircle cx={44} cy={212} r={8}  fill="#34D399" opacity={0.6} />
-      <SvgCircle cx={20} cy={236} r={7}  fill="#10B981" opacity={0.5} />
+      {/* ── Water drop — left side */}
+      <Path
+        d={`M28,${h * 0.5 - 20} Q18,${h * 0.5} 28,${h * 0.5 + 20} Q38,${h * 0.5} 28,${h * 0.5 - 20}`}
+        fill="#7EC8E3" opacity={0.7}
+      />
+      <SvgCircle cx={24} cy={h * 0.5 - 5} r={3} fill="rgba(255,255,255,0.5)" />
 
-      {/* Decorative dots */}
-      <SvgCircle cx={W * 0.4} cy={50}  r={4} fill="#C41E3A" opacity={0.25} />
-      <SvgCircle cx={W * 0.6} cy={80}  r={3} fill="#F0C808" opacity={0.35} />
-      <SvgCircle cx={W * 0.3} cy={340} r={3} fill="#E8DCC4" opacity={0.6} />
-      <SvgCircle cx={W * 0.75} cy={360} r={4} fill="#C41E3A" opacity={0.15} />
+      {/* ── Avocado — bottom left area */}
+      <Ellipse cx={52} cy={h - 80} rx={20} ry={26} fill="#34D399" opacity={0.75} />
+      <Ellipse cx={52} cy={h - 76} rx={12} ry={16} fill="#FDE68A" opacity={0.85} />
+      <Ellipse cx={52} cy={h - 74} rx={6}  ry={9}  fill="#92400E" opacity={0.6} />
+
+      {/* Sparkle dots */}
+      <SvgCircle cx={W * 0.38} cy={50}        r={3}   fill="#F0C808" opacity={0.6} />
+      <SvgCircle cx={W * 0.62} cy={40}        r={2}   fill="#FFFFFF" opacity={0.3} />
+      <SvgCircle cx={W - 16}   cy={h * 0.65}  r={4}   fill="#F0C808" opacity={0.5} />
+      <SvgCircle cx={14}       cy={h * 0.72}  r={3}   fill="#FFFFFF" opacity={0.2} />
+
+      {/* Wavy bottom transition to cream */}
+      <Path
+        d={`M0,${h - 28} Q${W * 0.25},${h - 8} ${W * 0.5},${h - 22} Q${W * 0.75},${h - 36} ${W},${h - 16} L${W},${h} L0,${h} Z`}
+        fill="#F5EFE7"
+      />
     </Svg>
   );
 }
@@ -736,7 +743,7 @@ export default function HomeScreen() {
     >
       {/* ── HEADER ─────────────────────────────────────── */}
       <View style={s.header}>
-        <HeaderDecoration />
+        <HeaderDecoration h={s.header.minHeight as number} />
 
         {/* Greeting row */}
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.greetRow}>
@@ -748,7 +755,7 @@ export default function HomeScreen() {
           </View>
           {foodStreak >= 2 && (
             <View style={s.streakPill}>
-              <Fire size={16} color="#A6171C" weight="fill" />
+              <Fire size={16} color="#F0C808" weight="fill" />
               <Text style={s.streakNum}>{foodStreak}</Text>
             </View>
           )}
@@ -758,7 +765,7 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInDown.delay(80).springify()} style={s.ringWrap}>
           <AnimatedCalorieRing progress={calorieProgress} size={210} color={ringColor} />
           <View style={s.ringCenter}>
-            <Text style={[s.ringMain, { color: C.primary }]}>
+            <Text style={s.ringMain}>
               {Number(remaining).toLocaleString()}
             </Text>
             <Text style={s.ringSub}>kcal remaining</Text>
@@ -766,90 +773,96 @@ export default function HomeScreen() {
           </View>
         </Animated.View>
 
-        {/* Macro bars */}
-        <Animated.View entering={FadeInDown.delay(160).springify()} style={s.macroRow}>
-          <MacroBar label="Protein" value={Number(foodTotals.proteinG)} total={proteinTarget} color={C.proteinColor} delay={180} />
-          <View style={s.macroDivider} />
-          <MacroBar label="Carbs"   value={Number(foodTotals.carbsG)}   total={carbsTarget}   color={C.carbsColor} delay={230} />
-          <View style={s.macroDivider} />
-          <MacroBar label="Fat"     value={Number(foodTotals.fatG)}      total={fatTarget}     color={C.fatColor} delay={280} />
-        </Animated.View>
       </View>
 
       {/* ── BODY ───────────────────────────────────────── */}
       <View style={s.body}>
 
-        {/* Stat chips row */}
-        <Animated.View entering={FadeInUp.delay(100).springify()} style={s.sectionLabel}>
-          <Text style={s.sectionTitle}>Today's Stats</Text>
-        </Animated.View>
+        {/* ── BENTO GRID ─────────────────────────────────────── */}
 
-        <View style={s.chipsRow}>
-          <StatChip
-            icon={<Fire size={22} weight="fill" color="#A6171C" />}
-            value={Number(consumed).toLocaleString()}
-            label="Consumed"
-            color="#A6171C"
-            bgColor="#FFEBEE"
-            index={0}
-          />
-          <StatChip
-            icon={<Drop size={22} weight="fill" color="#4CAF50" />}
-            value={waterDisplay(waterTotalMl)}
-            label="Water"
-            color="#4CAF50"
-            bgColor="#E8F5E9"
-            index={1}
-          />
+        {/* Row 1: Macros */}
+        <View style={s.bentoRow}>
+          {([
+            { label: 'Protein', value: Number(foodTotals.proteinG), target: proteinTarget, color: '#C41E3A', bg: '#FFF0F1' },
+            { label: 'Carbs',   value: Number(foodTotals.carbsG),   target: carbsTarget,   color: '#B8860B', bg: '#FFFDE7' },
+            { label: 'Fat',     value: Number(foodTotals.fatG),      target: fatTarget,     color: '#E07B2A', bg: '#FFF3E0' },
+          ] as const).map((m, i) => (
+            <Animated.View key={m.label} entering={FadeInUp.delay(80 + i * 40).springify()} style={[s.bentoCard, s.bentoThird, { backgroundColor: m.bg }]}>
+              <Text style={[s.bentoNum, { color: m.color }]}>
+                {Math.round(m.value)}<Text style={s.bentoUnit}>g</Text>
+              </Text>
+              <Text style={[s.bentoLabel, { color: m.color }]}>{m.label}</Text>
+              <View style={[s.bentoTrack, { backgroundColor: `${m.color}20` }]}>
+                <View style={[s.bentoFill, {
+                  width: `${m.target > 0 ? Math.min((m.value / m.target) * 100, 100) : 0}%` as any,
+                  backgroundColor: m.color,
+                }]} />
+              </View>
+              <Text style={s.bentoGoal}>{Math.round(m.target)}g goal</Text>
+            </Animated.View>
+          ))}
+        </View>
+
+        {/* Row 2: Water + Burned */}
+        <View style={s.bentoRow}>
+          <Animated.View entering={FadeInUp.delay(200).springify()} style={{ flex: 3 }}>
+            <TouchableOpacity onPress={() => router.push('/water-hidden')} activeOpacity={0.85}>
+              <View style={[s.bentoCard, { backgroundColor: '#E8F5E9' }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Drop size={18} weight="fill" color="#4CAF50" />
+                  <Text style={[s.bentoLabel, { color: '#388E3C' }]}>Water</Text>
+                </View>
+                <Text style={[s.bentoNum, { color: '#2E7D32', fontSize: RF(28), marginTop: 6 }]}>
+                  {waterDisplay(waterTotalMl)}
+                </Text>
+                <View style={[s.bentoTrack, { backgroundColor: 'rgba(76,175,80,0.15)', marginTop: 10 }]}>
+                  <View style={[s.bentoFill, { width: `${Math.min(waterProgress * 100, 100)}%` as any, backgroundColor: '#4CAF50' }]} />
+                </View>
+                <Text style={s.bentoGoal}>of {waterDisplay(waterGoalMl)}</Text>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+
           {totalBurned > 0 && (
-            <StatChip
-              icon={<Lightning size={22} weight="fill" color="#F1C045" />}
-              value={Number(totalBurned).toLocaleString()}
-              label="Burned"
-              color="#F1C045"
-              bgColor="#FFF8E1"
-              index={2}
-            />
+            <Animated.View entering={FadeInUp.delay(230).springify()} style={{ flex: 2 }}>
+              <View style={[s.bentoCard, { backgroundColor: '#FFF8E1', alignItems: 'center', justifyContent: 'center', minHeight: 120 }]}>
+                <Lightning size={24} weight="fill" color="#F1C045" />
+                <Text style={[s.bentoNum, { color: '#B8860B', fontSize: RF(24), marginTop: 6 }]}>
+                  {Number(totalBurned).toLocaleString()}
+                </Text>
+                <Text style={[s.bentoLabel, { color: '#B8860B' }]}>Burned</Text>
+              </View>
+            </Animated.View>
           )}
         </View>
 
-        {/* Water + Fasting cards */}
-        <View style={s.miniCardsRow}>
-          <MiniCard
-            icon={<Drop size={16} weight="fill" color="#4CAF50" />}
-            label="Water"
-            labelColor="#4CAF50"
-            bgColor="#E8F5E9"
-            onPress={() => router.push('/water-hidden')}
-            index={0}
-          >
-            <WaterBottle progress={waterProgress} />
-            <Text style={s.miniSub}>
-              {waterDisplay(waterTotalMl)} / {waterDisplay(waterGoalMl)}
-            </Text>
-          </MiniCard>
-
-          <MiniCard
-            icon={<Clock size={16} weight="fill" color="#A6171C" />}
-            label="Fasting"
-            labelColor="#A6171C"
-            bgColor="#FFEBEE"
-            onPress={() => router.push('/fasting-hidden')}
-            index={1}
-          >
-            <AnimatedFastingClock 
-              schedule={FASTING_SCHEDULES.find(s => s.fastingHours === fastingToday?.durationHours) || FASTING_SCHEDULES[0]}
-              currentHour={new Date().getHours() + new Date().getMinutes() / 60}
-              isFasting={fastingToday?.isActive || false}
-              startHour={fastingToday?.startHour || 20}
-            />
-            <Text style={[s.miniSub, { color: '#A6171C', marginTop: RF(4) }]}>
-              {fastingToday?.isActive 
-                ? `${fastingToday.durationHours}h Fast` 
-                : 'Select Schedule'}
-            </Text>
-          </MiniCard>
-        </View>
+        {/* Row 3: Fasting */}
+        <Animated.View entering={FadeInUp.delay(260).springify()}>
+          <TouchableOpacity onPress={() => router.push('/fasting-hidden')} activeOpacity={0.85}>
+            <View style={[s.bentoCard, { backgroundColor: '#FFF8F8' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+                <AnimatedFastingClock
+                  schedule={FASTING_SCHEDULES.find(sch => sch.fastingHours === fastingToday?.durationHours) || FASTING_SCHEDULES[0]}
+                  currentHour={new Date().getHours() + new Date().getMinutes() / 60}
+                  isFasting={fastingToday?.isActive || false}
+                  startHour={fastingToday?.startHour || 20}
+                />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                    <Clock size={14} weight="fill" color="#A6171C" />
+                    <Text style={[s.bentoLabel, { color: '#A6171C' }]}>Fasting</Text>
+                  </View>
+                  <Text style={[s.bentoNum, { color: '#3D2B1F', fontSize: RF(28) }]}>
+                    {fastingToday?.isActive ? `${fastingToday.durationHours}h` : '—'}
+                  </Text>
+                  <Text style={s.bentoGoal}>
+                    {fastingToday?.isActive ? 'Active fast' : 'Tap to set schedule'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
 
         {/* Quick Actions — matching Figma */}
         <Animated.View entering={FadeInUp.delay(180).springify()} style={s.sectionLabel}>
@@ -908,15 +921,15 @@ const s = StyleSheet.create({
   root:    { flex: 1, backgroundColor: C.bg },
   content: { paddingBottom: 40 },
 
-  // Header — cream/papyrus (Figma Dashboard)
+  // Header — navy (consistent with food-log & profile)
   header: {
-    paddingTop: RFV(60),
-    paddingBottom: RFV(32),
+    paddingTop: RFV(64),
+    paddingBottom: RFV(36),
     paddingHorizontal: RF(20),
     alignItems: 'center',
     overflow: 'hidden',
     minHeight: RFV(420),
-    backgroundColor: '#E8DCC4',
+    backgroundColor: '#1A2B5C',
   },
   greetRow: {
     flexDirection: 'row',
@@ -929,34 +942,34 @@ const s = StyleSheet.create({
   greetText: {
     fontSize: RF(22),
     fontWeight: '800',
-    color: '#3D2B1F',
+    color: '#FFFFFF',
     letterSpacing: -0.4,
     lineHeight: RF(28),
   },
   dateText: {
     fontSize: RF(12),
     fontWeight: '500',
-    color: '#7A6A5A',
+    color: 'rgba(255,255,255,0.6)',
     marginTop: RFV(4),
   },
   streakPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(196,30,58,0.10)',
+    backgroundColor: 'rgba(240,200,8,0.18)',
     paddingHorizontal: RF(12),
     paddingVertical: RF(6),
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(196,30,58,0.20)',
+    borderColor: 'rgba(240,200,8,0.35)',
   },
-  streakNum: { fontSize: RF(14), fontWeight: '800', color: '#C41E3A' },
+  streakNum: { fontSize: RF(14), fontWeight: '800', color: '#F0C808' },
 
   ringWrap:   { marginBottom: RFV(20), zIndex: 1, alignItems: 'center', justifyContent: 'center' },
   ringCenter: { position: 'absolute', alignItems: 'center', justifyContent: 'center', paddingTop: RFV(24) },
-  ringMain:   { fontSize: RF(30), fontWeight: '800', letterSpacing: -0.6, lineHeight: RF(36) },
-  ringSub:    { fontSize: RF(11), fontWeight: '600', color: '#7A6A5A', marginTop: RFV(4) },
-  ringBudget: { fontSize: RF(10), fontWeight: '500', color: '#A89880', marginTop: RFV(2) },
+  ringMain:   { fontSize: RF(30), fontWeight: '800', letterSpacing: -0.6, lineHeight: RF(36), color: '#FFFFFF' },
+  ringSub:    { fontSize: RF(11), fontWeight: '600', color: 'rgba(255,255,255,0.65)', marginTop: RFV(4) },
+  ringBudget: { fontSize: RF(10), fontWeight: '500', color: 'rgba(255,255,255,0.4)', marginTop: RFV(2) },
 
   macroRow: {
     flexDirection: 'row',
@@ -978,13 +991,24 @@ const s = StyleSheet.create({
   sectionLabel: { marginBottom: RFV(12), marginTop: RFV(4) },
   sectionTitle: { fontSize: RF(17), fontWeight: '700', color: '#3D2B1F', letterSpacing: -0.2 },
 
-  chipsRow:    { flexDirection: 'row', gap: RF(10), marginBottom: RFV(16) },
-  miniCardsRow:{ flexDirection: 'row', gap: RF(12), marginBottom: RFV(20) },
-
-  miniSub:  { fontSize: RF(10), fontWeight: '600', color: '#7A6A5A', textAlign: 'center' },
-  bigValue: { fontSize: RF(20), fontWeight: '800', letterSpacing: -0.3 },
-  goalTrack:{ width: '100%', height: RFV(6), backgroundColor: '#EDE8DF', borderRadius: 4, overflow: 'hidden' },
-  goalFill: { height: RFV(6), backgroundColor: '#C41E3A', borderRadius: 4 },
+  // Bento grid
+  bentoRow: { flexDirection: 'row', gap: RF(10), marginBottom: RFV(10) },
+  bentoCard: {
+    borderRadius: 24,
+    padding: RF(16),
+    shadowColor: '#1A2B5C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  bentoThird: { flex: 1 },
+  bentoNum: { fontSize: RF(26), fontWeight: '900', letterSpacing: -0.5 },
+  bentoUnit: { fontSize: RF(14), fontWeight: '700' },
+  bentoLabel: { fontSize: RF(11), fontWeight: '700', marginTop: 2 },
+  bentoGoal: { fontSize: RF(10), fontWeight: '500', color: '#9A9A9A', marginTop: RF(4) },
+  bentoTrack: { width: '100%', height: 5, borderRadius: 3, overflow: 'hidden', marginTop: RF(8) },
+  bentoFill: { height: 5, borderRadius: 3 },
 
   // Quick Actions
   quickActionsRow: { flexDirection: 'row', gap: RF(12), marginBottom: RFV(20) },

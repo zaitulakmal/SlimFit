@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slimora – Smart Calorie & Fitness Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    header {
+      background: linear-gradient(135deg, #208AEF 0%, #1a6fc4 100%);
+      color: #fff;
+      padding: 80px 24px 72px;
+      text-align: center;
+    }
+    header h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; }
+    header p  { margin-top: 16px; font-size: 1.15rem; opacity: 0.9; max-width: 480px; margin-inline: auto; }
+    .badge {
+      display: inline-block;
+      margin-top: 32px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 99px;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 24px 80px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .feature-card .icon { font-size: 2rem; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+    .section-title {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #208AEF;
+    }
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+    footer a { color: #208AEF; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Slimora</h1>
+  <p>Your smart calorie tracker, fasting timer, and fitness companion — built for real life.</p>
+  <span class="badge">Available on Google Play</span>
+</header>
+
+<main>
+  <p class="section-title">Everything you need to reach your goals</p>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">🍽️</div>
+      <h3>Food Logging</h3>
+      <p>Log meals by barcode scan, AI photo capture, or search from thousands of foods including Malaysian favourites.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔥</div>
+      <h3>Calorie Tracking</h3>
+      <p>Personalised TDEE calculation based on your age, weight, height, activity level, and goals.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⏱️</div>
+      <h3>Intermittent Fasting</h3>
+      <p>Start 16:8, 18:6, or 20:4 fasting protocols with a visual clock timer and progress tracking.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💧</div>
+      <h3>Water Intake</h3>
+      <p>Track daily hydration with reminders to keep you on target throughout the day.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚖️</div>
+      <h3>Weight Tracking</h3>
+      <p>Log your weight over time and visualise your progress toward your target weight.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🏋️</div>
+      <h3>Workout Tracker</h3>
+      <p>Log workouts and see calories burned factored into your daily budget.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🌐</div>
+      <h3>Bilingual</h3>
+      <p>Full support for English and Bahasa Melayu — switch anytime from your profile.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🏆</div>
+      <h3>Streaks &amp; Badges</h3>
+      <p>Stay motivated with achievement badges and logging streaks that reward consistency.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2026 Slimora &nbsp;|&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="mailto:zaitulakmal02@gmail.com">Contact</a></p>
+</footer>
+
+</body>
+</html>
