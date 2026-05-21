@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TextInput,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -219,35 +219,35 @@ export default function FoodSearchScreen() {
       <View style={[s.navySection, { paddingTop: insets.top + 12 }]}>
         {/* Icon row */}
         <View style={s.header}>
-          <TouchableOpacity onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
+          <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityLabel={t('common.back')}>
             <ArrowLeft size={24} weight="regular" color="#FFFFFF" />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={s.headerTitle}>{t(`food.meal_${mealType ?? 'breakfast'}`)}</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() =>
               router.push({ pathname: '/(tabs)/food-log/scan', params: { mealType } })
             }
-            style={s.scanBtn}
+            style={s.actionBtn}
             accessibilityLabel="Scan barcode"
           >
-            <Barcode size={24} weight="regular" color="rgba(255,255,255,0.85)" />
-          </TouchableOpacity>
-          <TouchableOpacity
+            <Barcode size={22} weight="regular" color="rgba(255,255,255,0.85)" />
+          </Pressable>
+          <Pressable
             onPress={() =>
               router.push({ pathname: '/(tabs)/food-log/capture', params: { mealType } })
             }
-            style={s.scanBtn}
+            style={s.actionBtn}
             accessibilityLabel="Capture food"
           >
-            <Camera size={24} weight="regular" color="rgba(255,255,255,0.85)" />
-          </TouchableOpacity>
-          <TouchableOpacity
+            <Camera size={22} weight="regular" color="rgba(255,255,255,0.85)" />
+          </Pressable>
+          <Pressable
             onPress={() => setShowManualModal(true)}
-            style={s.scanBtn}
+            style={s.actionBtn}
             accessibilityLabel="Add manually"
           >
-            <Plus size={24} weight="bold" color="rgba(255,255,255,0.85)" />
-          </TouchableOpacity>
+            <Plus size={22} weight="bold" color="rgba(255,255,255,0.85)" />
+          </Pressable>
         </View>
 
         {/* Search bar — inside navy section */}
@@ -273,10 +273,13 @@ export default function FoodSearchScreen() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: selected ? 320 : 40 }}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[s.resultRow, selected?.id === item.id && s.resultRowSelected]}
+          <Pressable
+            style={({ pressed }) => [
+              s.resultRow,
+              selected?.id === item.id && s.resultRowSelected,
+              pressed && { opacity: 0.85 },
+            ]}
             onPress={() => handleSelect(item)}
-            activeOpacity={0.7}
           >
             <View style={s.resultInfo}>
               <Text style={s.resultName} numberOfLines={1}>
@@ -296,7 +299,7 @@ export default function FoodSearchScreen() {
               <Text style={s.macroPill}>C {Math.round(item.carbsG)}g</Text>
               <Text style={s.macroPill}>F {Math.round(item.fatG)}g</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         )}
         ListHeaderComponent={
           !query.trim() ? (
@@ -308,10 +311,10 @@ export default function FoodSearchScreen() {
             <View style={s.emptyState}>
               <MagnifyingGlass size={40} weight="regular" color={colors.border} />
               <Text style={s.emptyText}>{t('food.no_results')}</Text>
-              <TouchableOpacity style={s.manualEntryBtn} onPress={() => setShowManualModal(true)}>
+              <Pressable style={s.manualEntryBtn} onPress={() => setShowManualModal(true)}>
                 <Plus size={18} weight="bold" color={colors.white} />
                 <Text style={s.manualEntryBtnText}>Add Manually</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : null
         }
@@ -322,7 +325,7 @@ export default function FoodSearchScreen() {
       <Modal visible={showManualModal} animationType="slide" presentationStyle="pageSheet">
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <View style={[s.modalHeader, { paddingTop: insets.top + 12 }]}>
-            <TouchableOpacity onPress={() => setShowManualModal(false)} style={s.backBtn}>
+            <Pressable onPress={() => setShowManualModal(false)} style={s.backBtn}>
               <X size={24} weight="bold" color={colors.textPrimary} />
             </TouchableOpacity>
             <Text style={s.headerTitle}>Add Food</Text>
@@ -360,10 +363,10 @@ export default function FoodSearchScreen() {
                 <TextInput style={s.input} value={manualFat} onChangeText={setManualFat} placeholder="0" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
               </View>
             </View>
-            <TouchableOpacity style={s.addManualBtn} onPress={handleManualAdd}>
+            <Pressable style={({ pressed }) => [s.addManualBtn, pressed && { opacity: 0.85 }]} onPress={handleManualAdd}>
               <PlusCircle size={20} weight="fill" color={colors.white} />
               <Text style={s.addManualBtnText}>Add to Log</Text>
-            </TouchableOpacity>
+            </Pressable>
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
@@ -397,9 +400,9 @@ export default function FoodSearchScreen() {
                   <Text style={s.sheetBrand}>{selected.brandName}</Text>
                 ) : null}
               </View>
-              <TouchableOpacity onPress={handleDismissSheet} style={s.sheetClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              <Pressable onPress={handleDismissSheet} style={s.sheetClose} hitSlop={12}>
                 <X size={22} weight="bold" color="rgba(26,43,92,0.7)" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {/* Nutrition grid */}
@@ -434,10 +437,10 @@ export default function FoodSearchScreen() {
 
             {/* Add button — full width, always visible */}
             <Animated.View style={addBtnStyle}>
-              <TouchableOpacity style={s.addConfirmBtn} onPress={handleAdd} activeOpacity={0.85}>
+              <Pressable style={({ pressed }) => [s.addConfirmBtn, pressed && { opacity: 0.85 }]} onPress={handleAdd}>
                 <PlusCircle size={20} weight="fill" color="#FFFFFF" />
                 <Text style={s.addConfirmText}>Add to Log</Text>
-              </TouchableOpacity>
+              </Pressable>
             </Animated.View>
           </View>
         </View>
@@ -460,9 +463,9 @@ const s = StyleSheet.create({
     paddingBottom: spacing.sm,
     gap: spacing.sm,
   },
-  backBtn: { padding: spacing.xs },
+  backBtn: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { ...typography.heading, color: '#FFFFFF', flex: 1 },
-  scanBtn: { padding: spacing.xs },
+  actionBtn: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
