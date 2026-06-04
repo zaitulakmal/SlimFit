@@ -26,6 +26,8 @@ import Animated, {
 import { colors, spacing, typography, shadow, radius } from '../../constants/theme-new';
 import { pastelColors } from '../../constants/pastel-theme';
 import BottomNav from '../../components/BottomNav';
+import { useProStore } from '../../stores/proStore';
+import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 interface Place {
   id: string;
@@ -201,7 +203,7 @@ const rowStyles = StyleSheet.create({
   dist: { ...typography.bodySm, color: colors.primary, fontWeight: '700' },
 });
 
-export default function GroceryScreen() {
+function GroceryScreenContent() {
   const { t } = useTranslation();
   const mapRef = useRef<MapView>(null);
 
@@ -495,3 +497,9 @@ const styles = StyleSheet.create({
   },
   retryBtnText: { ...typography.body, color: colors.textInverse, fontWeight: '700' },
 });
+
+export default function GroceryScreen() {
+  const isPro = useProStore((s) => s.isPro);
+  if (!isPro) return <ProOnlyScreen />;
+  return <GroceryScreenContent />;
+}

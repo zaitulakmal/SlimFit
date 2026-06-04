@@ -40,6 +40,7 @@ import { useProfileStore } from '../../../stores/profileStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useNotificationStore } from '../../../stores/notificationStore';
 import { useStatsStore, BADGE_DEFS } from '../../../stores/statsStore';
+import { useProStore } from '../../../stores/proStore';
 import type { NotifType } from '../../../services/notifications';
 
 const W = Dimensions.get('window').width;
@@ -245,6 +246,7 @@ export default function ProfileScreen() {
 
   const { settings: notifSettings, loadSettings, toggleNotification, updateTime } = useNotificationStore();
   const { streakMap, unlockedBadgeIds, weeklyCalories, loadStats } = useStatsStore();
+  const isPro = useProStore((s) => s.isPro);
   const [timePickerFor, setTimePickerFor] = useState<NotifType | null>(null);
 
   useFocusEffect(useCallback(() => { loadSettings(); loadStats(); }, []));
@@ -373,7 +375,22 @@ export default function ProfileScreen() {
                 <Text style={s.avatarLetter}>{initials}</Text>
               </View>
             </View>
-            <Text style={s.userName}>{profile.name || '—'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <Text style={[s.userName, { marginBottom: 0 }]}>{profile.name || '—'}</Text>
+              {isPro && (
+                <View style={{ backgroundColor: '#F0C808', borderRadius: 99, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#1A2B5C' }}>PRO</Text>
+                </View>
+              )}
+            </View>
+            {!isPro && (
+              <Pressable
+                onPress={() => router.push('/paywall')}
+                style={{ backgroundColor: 'rgba(240,200,8,0.18)', borderRadius: 99, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 8, borderWidth: 1, borderColor: 'rgba(240,200,8,0.35)' }}
+              >
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#F0C808' }}>⭐ Upgrade to Pro — RM 9.99</Text>
+              </Pressable>
+            )}
             <View style={[s.bmiChip, { backgroundColor: chipCol + '22', borderColor: chipCol + '55' }]}>
               <View style={[s.bmiDot, { backgroundColor: chipCol }]} />
               <Text style={[s.bmiText, { color: chipCol }]}>{t(`profile.bmi_${bmiCat}`)}</Text>

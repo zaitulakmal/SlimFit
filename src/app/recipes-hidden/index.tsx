@@ -29,6 +29,8 @@ import { colors, spacing, typography, shadow, radius, animation } from '../../co
 import { pastelColors } from '../../constants/pastel-theme';
 import { RECIPES, searchRecipes, type Recipe } from '../../data/recipes';
 import BottomNav from '../../components/BottomNav';
+import { useProStore } from '../../stores/proStore';
+import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 type Category = 'all' | Recipe['category'];
 
@@ -321,7 +323,7 @@ function CategoryChip({ category: catKey, Icon, active, onPress, label }: {
   );
 }
 
-export default function RecipesScreen() {
+function RecipesScreenContent() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
@@ -398,4 +400,10 @@ export default function RecipesScreen() {
       <BottomNav />
     </View>
   );
+}
+
+export default function RecipesScreen() {
+  const isPro = useProStore((s) => s.isPro);
+  if (!isPro) return <ProOnlyScreen />;
+  return <RecipesScreenContent />;
 }
