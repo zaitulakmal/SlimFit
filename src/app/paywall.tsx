@@ -78,13 +78,13 @@ export default function PaywallScreen() {
     }
   }, [error]);
 
-  const price = product?.localizedPrice ?? 'RM 9.99';
+  const price = (product as any)?.localizedPrice ?? (product as any)?.price ?? 'RM 9.99';
 
   const handlePurchase = async () => {
     const ok = await purchase();
     if (ok) {
       Alert.alert('🎉 Welcome to Pro!', 'All features are now unlocked. Enjoy Slimora Pro!', [
-        { text: 'Let's go!', onPress: () => router.back() },
+        { text: "Let's go!", onPress: () => router.back() },
       ]);
     }
   };

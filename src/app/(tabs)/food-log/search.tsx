@@ -384,10 +384,9 @@ export default function FoodSearchScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
         <View style={s.sheetOverlay}>
-          <TouchableOpacity
+          <Pressable
             style={StyleSheet.absoluteFill}
             onPress={handleDismissSheet}
-            activeOpacity={1}
           />
           <View style={s.bottomSheet}>
             <View style={s.sheetHandle} />
