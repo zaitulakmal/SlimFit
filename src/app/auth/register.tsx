@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, Pressable,
+  View, Text, TextInput, TouchableOpacity,
   StyleSheet, KeyboardAvoidingView, Platform,
   ScrollView, ActivityIndicator, Dimensions,
 } from 'react-native';
@@ -9,54 +9,89 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withSpring, withDelay,
-  withRepeat, withSequence, Easing,
+  withSequence, withRepeat, Easing,
 } from 'react-native-reanimated';
-import Svg, { Path, Defs, LinearGradient, Stop, Circle } from 'react-native-svg';
-import {
-  Eye, EyeSlash, EnvelopeSimple, LockSimple, User,
-} from 'phosphor-react-native';
+import Svg, {
+  Ellipse, Path, Circle as SvgCircle,
+  Defs, LinearGradient, Stop,
+} from 'react-native-svg';
 import { useAuthStore } from '../../stores/authStore';
+import { colors, spacing } from '../../constants/theme';
 
 const { width: W, height: H } = Dimensions.get('window');
 
-const BLUE     = '#208AEF';
-const NAVY     = '#1A2B5C';
-const RUBY     = '#C41E3A';
-const WHITE    = '#FFFFFF';
-const BG       = '#F8FAFC';
-const TEXT     = '#1E293B';
-const MUTED    = '#64748B';
-const BORDER   = '#E2E8F0';
-const INPUT_BG = '#F1F5F9';
+const GREEN1 = '#56AB2F';
+const GREEN2 = '#A8E063';
+const BOWL_DARK  = '#D4A96A';
+const BOWL_LIGHT = '#F0C97A';
+const TOMATO  = '#E53935';
+const TOMATO2 = '#EF9A9A';
+const LEAF1 = '#43A047';
+const LEAF2 = '#66BB6A';
+const LEAF3 = '#A5D6A7';
+const WHITE = '#FFFFFF';
 
-function FloatingOrb({ x, y, r, color, delay }: {
-  x: number; y: number; r: number; color: string; delay: number;
+function SaladBowl() {
+  return (
+    <Svg width={140} height={140} viewBox="0 0 220 220">
+      <Defs>
+        <LinearGradient id="bowlGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+          <Stop offset="0%" stopColor={BOWL_LIGHT} />
+          <Stop offset="100%" stopColor={BOWL_DARK} />
+        </LinearGradient>
+      </Defs>
+      <Ellipse cx={110} cy={195} rx={75} ry={10} fill="rgba(0,0,0,0.10)" />
+      <Path d="M 35,110 Q 35,185 110,185 Q 185,185 185,110 Z" fill="url(#bowlGrad3)" />
+      <Ellipse cx={110} cy={110} rx={75} ry={18} fill={BOWL_LIGHT} />
+      <Ellipse cx={110} cy={110} rx={68} ry={14} fill={BOWL_DARK} opacity={0.3} />
+      <Ellipse cx={80}  cy={95}  rx={28} ry={18} fill={LEAF1} transform="rotate(-25,80,95)" />
+      <Ellipse cx={140} cy={93}  rx={28} ry={18} fill={LEAF2} transform="rotate(20,140,93)" />
+      <Ellipse cx={110} cy={88}  rx={30} ry={16} fill={LEAF3} />
+      <Ellipse cx={68}  cy={105} rx={22} ry={13} fill={LEAF2} transform="rotate(-30,68,105)" />
+      <Ellipse cx={152} cy={103} rx={22} ry={13} fill={LEAF1} transform="rotate(30,152,103)" />
+      <SvgCircle cx={88}  cy={112} r={12} fill={TOMATO} />
+      <SvgCircle cx={88}  cy={112} r={7}  fill={TOMATO2} opacity={0.5} />
+      <SvgCircle cx={132} cy={115} r={11} fill={TOMATO} />
+      <SvgCircle cx={132} cy={115} r={6}  fill={TOMATO2} opacity={0.5} />
+      <Ellipse cx={110} cy={118} rx={26} ry={13} fill={LEAF1} />
+      <Ellipse cx={90}  cy={122} rx={18} ry={10} fill={LEAF3} transform="rotate(-15,90,122)" />
+      <Ellipse cx={130} cy={120} rx={18} ry={10} fill={LEAF2} transform="rotate(15,130,120)" />
+    </Svg>
+  );
+}
+
+function FloatingLeaf({ x, y, size, delay, color }: {
+  x: number; y: number; size: number; delay: number; color: string;
 }) {
-  const ty = useSharedValue(0);
-  const op = useSharedValue(0);
+  const ty  = useSharedValue(0);
+  const rot = useSharedValue(0);
+  const op  = useSharedValue(0);
 
   useEffect(() => {
-    op.value = withDelay(delay, withTiming(0.18, { duration: 800 }));
-    ty.value = withDelay(delay, withRepeat(
+    op.value  = withDelay(delay, withTiming(0.6, { duration: 600 }));
+    ty.value  = withDelay(delay, withRepeat(
       withSequence(
-        withTiming(-10, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
-        withTiming(0,   { duration: 2400, easing: Easing.inOut(Easing.sin) }),
+        withTiming(-10, { duration: 1600, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0,   { duration: 1600, easing: Easing.inOut(Easing.sin) }),
       ), -1, true
+    ));
+    rot.value = withDelay(delay, withRepeat(
+      withSequence(withTiming(12, { duration: 1400 }), withTiming(-12, { duration: 1400 })),
+      -1, true
     ));
   }, []);
 
   const style = useAnimatedStyle(() => ({
+    transform: [{ translateY: ty.value }, { rotate: `${rot.value}deg` }],
     opacity: op.value,
-    transform: [{ translateY: ty.value }],
-    position: 'absolute',
-    left: x - r,
-    top: y - r,
+    position: 'absolute', left: x, top: y,
   }));
 
   return (
     <Animated.View style={style}>
-      <Svg width={r * 2} height={r * 2}>
-        <Circle cx={r} cy={r} r={r} fill={color} />
+      <Svg width={size} height={size} viewBox="0 0 40 40">
+        <Ellipse cx={20} cy={20} rx={18} ry={10} fill={color} />
+        <Path d="M20,10 L20,30" stroke={WHITE} strokeWidth={1.5} opacity={0.4} strokeLinecap="round" />
       </Svg>
     </Animated.View>
   );
@@ -65,35 +100,28 @@ function FloatingOrb({ x, y, r, color, delay }: {
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const { register, error, clearError } = useAuthStore();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
 
-  const [name, setName]                 = useState('');
-  const [email, setEmail]               = useState('');
-  const [password, setPassword]         = useState('');
-  const [confirmPwd, setConfirmPwd]     = useState('');
-  const [showPwd, setShowPwd]           = useState(false);
-  const [showConfirm, setShowConfirm]   = useState(false);
-  const [loading, setLoading]           = useState(false);
-  const [localError, setLocalError]     = useState('');
-
-  const emailRef   = useRef<TextInput>(null);
-  const pwdRef     = useRef<TextInput>(null);
-  const confirmRef = useRef<TextInput>(null);
-
-  const headerOp = useSharedValue(0);
-  const headerY  = useSharedValue(-20);
-  const formOp   = useSharedValue(0);
-  const formY    = useSharedValue(32);
+  const bowlOp = useSharedValue(0);
+  const bowlY  = useSharedValue(-30);
+  const formOp = useSharedValue(0);
+  const formY  = useSharedValue(40);
 
   useEffect(() => {
-    headerOp.value = withTiming(1, { duration: 600 });
-    headerY.value  = withSpring(0, { damping: 14, stiffness: 100 });
-    formOp.value   = withDelay(240, withTiming(1, { duration: 600 }));
-    formY.value    = withDelay(240, withSpring(0, { damping: 16, stiffness: 110 }));
+    bowlOp.value = withTiming(1, { duration: 500 });
+    bowlY.value  = withSpring(0, { damping: 12, stiffness: 90 });
+    formOp.value = withDelay(250, withTiming(1, { duration: 500 }));
+    formY.value  = withDelay(250, withSpring(0, { damping: 14, stiffness: 100 }));
   }, []);
 
-  const headerStyle = useAnimatedStyle(() => ({
-    opacity: headerOp.value,
-    transform: [{ translateY: headerY.value }],
+  const bowlStyle = useAnimatedStyle(() => ({
+    opacity: bowlOp.value,
+    transform: [{ translateY: bowlY.value }],
   }));
   const formStyle = useAnimatedStyle(() => ({
     opacity: formOp.value,
@@ -103,53 +131,50 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     setLocalError('');
     if (!name.trim() || !email.trim() || !password) return;
-    if (password.length < 6) {
-      setLocalError('Password must be at least 6 characters.');
-      return;
-    }
-    if (password !== confirmPwd) {
-      setLocalError('Passwords do not match.');
-      return;
-    }
+    if (password !== confirmPassword) { setLocalError('Passwords do not match.'); return; }
+    if (password.length < 6) { setLocalError('Password must be at least 6 characters.'); return; }
     setLoading(true);
-    try { await register(name.trim(), email.trim(), password); } catch {}
-    finally { setLoading(false); }
+    try {
+      await register(name.trim(), email.trim(), password);
+    } catch {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const displayError = localError || error;
-  const canSubmit = name.trim() && email.trim() && password && confirmPwd && !loading;
+  const isValid = name && email && password && confirmPassword;
 
   return (
     <View style={s.root}>
-      {/* Gradient header — shorter on register to leave room for 4 fields */}
-      <View style={s.header}>
-        <Svg style={StyleSheet.absoluteFillObject} width={W} height={H * 0.30}>
+      {/* Green header */}
+      <View style={s.headerBg}>
+        <Svg style={StyleSheet.absoluteFillObject} width={W} height={H * 0.32}>
           <Defs>
-            <LinearGradient id="lgRegister" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={BLUE} />
-              <Stop offset="100%" stopColor={NAVY} />
+            <LinearGradient id="regHeaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor={GREEN1} />
+              <Stop offset="100%" stopColor={GREEN2} />
             </LinearGradient>
           </Defs>
           <Path
-            d={`M0,0 L${W},0 L${W},${H * 0.24} Q${W * 0.5},${H * 0.33} 0,${H * 0.24} Z`}
-            fill="url(#lgRegister)"
+            d={`M0,0 L${W},0 L${W},${H * 0.26} Q${W * 0.5},${H * 0.35} 0,${H * 0.26} Z`}
+            fill="url(#regHeaderGrad)"
           />
         </Svg>
 
-        <FloatingOrb x={W * 0.08}  y={H * 0.06} r={44} color={WHITE} delay={0}   />
-        <FloatingOrb x={W * 0.88}  y={H * 0.04} r={32} color={WHITE} delay={250} />
-        <FloatingOrb x={W * 0.70}  y={H * 0.18} r={20} color={WHITE} delay={450} />
-        <FloatingOrb x={W * 0.22}  y={H * 0.22} r={14} color={WHITE} delay={150} />
+        <FloatingLeaf x={15}   y={30}  size={28} delay={200} color={LEAF3} />
+        <FloatingLeaf x={W-55} y={20}  size={24} delay={400} color={LEAF1} />
+        <FloatingLeaf x={W-35} y={80}  size={20} delay={600} color={LEAF2} />
 
-        <Animated.View style={[s.brand, headerStyle, { paddingTop: insets.top + 10 }]}>
+        <Animated.View style={[s.bowlContainer, bowlStyle]}>
+          <SaladBowl />
           <Text style={s.appName}>Slimora</Text>
-          <Text style={s.tagline}>Start your journey today</Text>
         </Animated.View>
       </View>
 
       {/* Form */}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={s.formWrapper}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
@@ -158,135 +183,81 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
         >
           <Animated.View style={[s.card, formStyle]}>
-            <View style={s.cardHeader}>
-              <Text style={s.cardTitle}>Create Account</Text>
-              <Text style={s.cardSub}>Fill in the details below to get started</Text>
-            </View>
+            <Text style={s.cardTitle}>Create Account</Text>
 
-            {displayError ? (
+            {displayError && (
               <View style={s.errorBox}>
                 <Text style={s.errorText}>{displayError}</Text>
               </View>
-            ) : null}
+            )}
 
-            {/* Full Name */}
-            <View style={s.fieldWrap}>
-              <Text style={s.fieldLabel}>Full Name</Text>
-              <View style={s.inputRow}>
-                <User size={18} color={MUTED} />
-                <TextInput
-                  style={s.input}
-                  value={name}
-                  onChangeText={(t) => { setName(t); clearError(); setLocalError(''); }}
-                  placeholder="Your name"
-                  placeholderTextColor={MUTED}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                  onSubmitEditing={() => emailRef.current?.focus()}
-                  blurOnSubmit={false}
-                />
-              </View>
+            <View style={s.inputGroup}>
+              <Text style={s.label}>Full Name</Text>
+              <TextInput
+                style={s.input}
+                value={name}
+                onChangeText={(t) => { setName(t); clearError(); setLocalError(''); }}
+                placeholder="Your name"
+                placeholderTextColor={colors.textTertiary}
+                autoCapitalize="words"
+              />
             </View>
 
-            {/* Email */}
-            <View style={s.fieldWrap}>
-              <Text style={s.fieldLabel}>Email</Text>
-              <View style={s.inputRow}>
-                <EnvelopeSimple size={18} color={MUTED} />
-                <TextInput
-                  ref={emailRef}
-                  style={s.input}
-                  value={email}
-                  onChangeText={(t) => { setEmail(t); clearError(); setLocalError(''); }}
-                  placeholder="you@email.com"
-                  placeholderTextColor={MUTED}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  onSubmitEditing={() => pwdRef.current?.focus()}
-                  blurOnSubmit={false}
-                />
-              </View>
+            <View style={s.inputGroup}>
+              <Text style={s.label}>Email</Text>
+              <TextInput
+                style={s.input}
+                value={email}
+                onChangeText={(t) => { setEmail(t); clearError(); setLocalError(''); }}
+                placeholder="you@email.com"
+                placeholderTextColor={colors.textTertiary}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
             </View>
 
-            {/* Password */}
-            <View style={s.fieldWrap}>
-              <Text style={s.fieldLabel}>Password</Text>
-              <View style={s.inputRow}>
-                <LockSimple size={18} color={MUTED} />
+            <View style={s.row}>
+              <View style={[s.inputGroup, { flex: 1 }]}>
+                <Text style={s.label}>Password</Text>
                 <TextInput
-                  ref={pwdRef}
-                  style={[s.input, { flex: 1 }]}
+                  style={s.input}
                   value={password}
                   onChangeText={(t) => { setPassword(t); clearError(); setLocalError(''); }}
-                  placeholder="Min. 6 characters"
-                  placeholderTextColor={MUTED}
-                  secureTextEntry={!showPwd}
-                  returnKeyType="next"
-                  onSubmitEditing={() => confirmRef.current?.focus()}
-                  blurOnSubmit={false}
+                  placeholder="Min. 6 chars"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry
                 />
-                <Pressable onPress={() => setShowPwd(v => !v)} hitSlop={10} style={s.eyeBtn}>
-                  {showPwd
-                    ? <EyeSlash size={18} color={MUTED} />
-                    : <Eye size={18} color={MUTED} />
-                  }
-                </Pressable>
               </View>
-            </View>
-
-            {/* Confirm Password */}
-            <View style={s.fieldWrap}>
-              <Text style={s.fieldLabel}>Confirm Password</Text>
-              <View style={[
-                s.inputRow,
-                password && confirmPwd && password !== confirmPwd && s.inputRowError,
-              ]}>
-                <LockSimple size={18} color={MUTED} />
+              <View style={[s.inputGroup, { flex: 1 }]}>
+                <Text style={s.label}>Confirm</Text>
                 <TextInput
-                  ref={confirmRef}
-                  style={[s.input, { flex: 1 }]}
-                  value={confirmPwd}
-                  onChangeText={(t) => { setConfirmPwd(t); setLocalError(''); }}
-                  placeholder="Repeat password"
-                  placeholderTextColor={MUTED}
-                  secureTextEntry={!showConfirm}
-                  returnKeyType="done"
-                  onSubmitEditing={handleRegister}
+                  style={s.input}
+                  value={confirmPassword}
+                  onChangeText={(t) => { setConfirmPassword(t); clearError(); setLocalError(''); }}
+                  placeholder="Repeat"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry
                 />
-                <Pressable onPress={() => setShowConfirm(v => !v)} hitSlop={10} style={s.eyeBtn}>
-                  {showConfirm
-                    ? <EyeSlash size={18} color={MUTED} />
-                    : <Eye size={18} color={MUTED} />
-                  }
-                </Pressable>
               </View>
-              {password && confirmPwd && password !== confirmPwd ? (
-                <Text style={s.inlineError}>Passwords don't match</Text>
-              ) : null}
             </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                s.btn,
-                !canSubmit && s.btnDisabled,
-                pressed && canSubmit && s.btnPressed,
-              ]}
+            <TouchableOpacity
+              style={[s.btn, (!isValid || loading) && s.btnDisabled]}
               onPress={handleRegister}
-              disabled={!canSubmit}
+              disabled={!isValid || loading}
             >
               {loading
                 ? <ActivityIndicator color={WHITE} />
                 : <Text style={s.btnText}>Create Account</Text>
               }
-            </Pressable>
+            </TouchableOpacity>
 
             <View style={s.footer}>
               <Text style={s.footerText}>Already have an account? </Text>
-              <Pressable onPress={() => router.replace('/auth/login')} hitSlop={8}>
+              <TouchableOpacity onPress={() => router.replace('/auth/login')}>
                 <Text style={s.footerLink}>Log In</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </Animated.View>
         </ScrollView>
@@ -296,100 +267,65 @@ export default function RegisterScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: BG },
-
-  header: {
-    height: H * 0.30,
+  root: { flex: 1, backgroundColor: '#F6FFF0' },
+  headerBg: {
+    height: H * 0.32,
     alignItems: 'center',
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
-  brand: {
-    alignItems: 'center',
-    paddingBottom: 22,
-  },
+  bowlContainer: { alignItems: 'center', paddingBottom: spacing.md },
   appName: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800',
     color: WHITE,
     letterSpacing: -0.5,
+    marginTop: -spacing.xs,
   },
-  tagline: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.78)',
-    marginTop: 4,
-  },
-
-  scroll: { flexGrow: 1, paddingHorizontal: 20, paddingTop: 18 },
-
+  formWrapper: { flex: 1 },
+  scroll: { flexGrow: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
   card: {
     backgroundColor: WHITE,
     borderRadius: 24,
-    padding: 24,
-    gap: 16,
-    shadowColor: NAVY,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.10,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-  cardHeader: { gap: 4 },
-  cardTitle:  { fontSize: 22, fontWeight: '700', color: TEXT },
-  cardSub:    { fontSize: 14, color: MUTED },
-
-  errorBox:  { backgroundColor: '#FEF2F2', borderRadius: 12, padding: 12 },
-  errorText: { color: '#DC2626', fontSize: 14, lineHeight: 20 },
-
-  fieldWrap:  { gap: 6 },
-  fieldLabel: { fontSize: 13, fontWeight: '600', color: TEXT },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: INPUT_BG,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: BORDER,
-    paddingHorizontal: 14,
-    gap: 10,
-    minHeight: 52,
-  },
-  inputRowError: {
-    borderColor: '#FCA5A5',
-    backgroundColor: '#FFF5F5',
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: TEXT,
-    paddingVertical: 0,
-  },
-  eyeBtn: {
-    padding: 4,
-    minWidth: 28,
-    minHeight: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inlineError: { fontSize: 12, color: '#DC2626', marginTop: -2 },
-
-  btn: {
-    backgroundColor: BLUE,
-    borderRadius: 14,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: BLUE,
+    padding: spacing.xl,
+    gap: spacing.md,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 10,
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
     elevation: 4,
-    marginTop: 4,
   },
-  btnDisabled: { opacity: 0.45, shadowOpacity: 0 },
-  btnPressed:  { opacity: 0.88 },
-  btnText: { fontSize: 16, fontWeight: '700', color: WHITE, letterSpacing: 0.2 },
-
-  footer: { flexDirection: 'row', justifyContent: 'center', paddingVertical: 4 },
-  footerText: { fontSize: 14, color: MUTED },
-  footerLink: { fontSize: 14, color: RUBY, fontWeight: '700' },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  errorBox: { backgroundColor: '#FEE2E2', borderRadius: 10, padding: spacing.md },
+  errorText: { color: '#DC2626', fontSize: 14 },
+  inputGroup: { gap: 6 },
+  label: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
+  input: {
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: colors.textPrimary,
+    backgroundColor: colors.background,
+  },
+  row: { flexDirection: 'row', gap: spacing.sm },
+  btn: {
+    backgroundColor: GREEN1,
+    borderRadius: 12,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: spacing.xs,
+  },
+  btnDisabled: { opacity: 0.5 },
+  btnText: { fontSize: 16, fontWeight: '700', color: WHITE },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: spacing.xs },
+  footerText: { fontSize: 14, color: colors.textSecondary },
+  footerLink: { fontSize: 14, color: GREEN1, fontWeight: '700' },
 });
