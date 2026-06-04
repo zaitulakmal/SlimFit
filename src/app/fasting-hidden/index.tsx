@@ -47,6 +47,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { pastelColors } from '../../constants/pastel-theme';
 import { colors } from '../../constants/theme-new';
 import { useFastingStore } from '../../stores/fastingStore';
+import { useProStore } from '../../stores/proStore';
+import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 const { width: W, height: H } = Dimensions.get('window');
 const RF = (n: number) => Math.round(n * (W / 390));
@@ -310,7 +312,7 @@ function BodyGraphic({ elapsedHours, isFasting }: { elapsedHours: number; isFast
 }
 
 // ── Main screen ──────────────────────────────────────────────────────────────
-export default function FastingScreen() {
+function FastingScreenContent() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -669,3 +671,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 });
+
+
+export default function FastingScreen() {
+  const isPro = useProStore((s) => s.isPro);
+  if (!isPro) return <ProOnlyScreen />;
+  return <FastingScreenContent />;
+}

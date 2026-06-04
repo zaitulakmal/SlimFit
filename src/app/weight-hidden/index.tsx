@@ -31,6 +31,8 @@ import { colors, spacing, radius, shadow, typography } from '../../constants/the
 import { useWeightStore } from '../../stores/weightStore';
 import { useProfileStore } from '../../stores/profileStore';
 import { calculateBMI, getBMICategory } from '../../constants/tdee';
+import { useProStore } from '../../stores/proStore';
+import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_WIDTH = SCREEN_WIDTH - spacing.md * 2;
@@ -193,7 +195,7 @@ function WeightChart({ logs }: { logs: Array<{ dateStr: string; weightKg: number
   );
 }
 
-export default function WeightScreen() {
+function WeightScreenContent() {
   const { t } = useTranslation();
   const { logs, todayLog, logWeight, deleteLog } = useWeightStore();
   const profile = useProfileStore((s) => s.profile);
@@ -675,3 +677,9 @@ const styles = StyleSheet.create({
     height: spacing.xl,
   },
 });
+
+export default function WeightScreen() {
+  const isPro = useProStore((s) => s.isPro);
+  if (!isPro) return <ProOnlyScreen />;
+  return <WeightScreenContent />;
+}

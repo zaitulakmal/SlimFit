@@ -19,6 +19,8 @@ import BottomNav from '../../components/BottomNav';
 const { width: W } = Dimensions.get('window');
 const C = pastelColors;
 import { Dimensions } from 'react-native';
+import { useProStore } from '../../stores/proStore';
+import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 function WorkoutIcon({ category, size, color }: { category: string; size: number; color: string }) {
   const props = { size, color, weight: 'regular' as const };
@@ -96,7 +98,7 @@ function WorkoutInstructionsModal({
   );
 }
 
-export default function ActivityScreen() {
+function ActivityScreenContent() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { todayWorkouts, totalBurned, loadToday, logWorkout, deleteWorkout } = useWorkoutStore();
@@ -478,3 +480,9 @@ const s = StyleSheet.create({
   },
   modalDoneText: { fontSize: 16, fontWeight: '700', color: C.white },
 });
+
+export default function ActivityScreen() {
+  const isPro = useProStore((s) => s.isPro);
+  if (!isPro) return <ProOnlyScreen />;
+  return <ActivityScreenContent />;
+}
