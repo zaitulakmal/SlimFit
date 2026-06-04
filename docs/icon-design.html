@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 512px; height: 512px; overflow: hidden; background: transparent; }
+</style>
+</head>
+<body>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="roundRect">
+      <rect width="512" height="512" rx="112" ry="112"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#roundRect)">
+    <!-- Background dark navy -->
+    <rect width="512" height="512" fill="#1B2B45"/>
+
+    <!-- Diamond / napkin shape -->
+    <rect x="156" y="156" width="200" height="200" rx="12" fill="#F0E5A0" transform="rotate(45 256 256)"/>
+
+    <!-- Plate shadow -->
+    <ellipse cx="262" cy="278" rx="145" ry="20" fill="rgba(0,0,0,0.25)"/>
+
+    <!-- Plate outer ring -->
+    <circle cx="256" cy="256" r="148" fill="#2E2E3E"/>
+    <!-- Plate rim highlight -->
+    <circle cx="256" cy="256" r="140" fill="none" stroke="#3E3E50" stroke-width="6"/>
+    <!-- Plate inner -->
+    <circle cx="256" cy="256" r="134" fill="#252535"/>
+
+    <!-- Green leaf base (lettuce) -->
+    <ellipse cx="256" cy="270" rx="105" ry="72" fill="#2D7A2D"/>
+    <ellipse cx="210" cy="260" rx="55" ry="40" fill="#3A9A3A" transform="rotate(-15,210,260)"/>
+    <ellipse cx="300" cy="255" rx="55" ry="38" fill="#2D8A2D" transform="rotate(10,300,255)"/>
+    <ellipse cx="256" cy="248" rx="60" ry="35" fill="#4CAF50"/>
+
+    <!-- French fries (top left area of plate) -->
+    <rect x="185" y="185" width="14" height="65" rx="4" fill="#F4A124" transform="rotate(-15,192,217)"/>
+    <rect x="202" y="180" width="14" height="70" rx="4" fill="#F0B030" transform="rotate(-8,209,215)"/>
+    <rect x="220" y="178" width="13" height="68" rx="4" fill="#F4A124" transform="rotate(0,226,212)"/>
+    <rect x="236" y="180" width="13" height="65" rx="4" fill="#E89A20" transform="rotate(8,242,212)"/>
+
+    <!-- Fried egg white -->
+    <ellipse cx="270" cy="248" rx="62" ry="50" fill="white"/>
+    <ellipse cx="258" cy="252" rx="30" ry="24" fill="white"/>
+    <ellipse cx="285" cy="238" rx="28" ry="22" fill="white"/>
+    <ellipse cx="265" cy="264" rx="25" ry="18" fill="white"/>
+    <!-- Egg white organic blob shape -->
+    <path d="M215,248 C210,228 225,210 248,210 C262,210 272,218 278,220 C288,215 305,218 315,230 C328,245 322,268 308,275 C300,280 285,278 275,280 C262,285 245,285 232,278 C218,270 218,260 215,248 Z" fill="white"/>
+    <!-- Egg yolk -->
+    <circle cx="268" cy="246" r="28" fill="#F9C740"/>
+    <circle cx="268" cy="246" r="22" fill="#F5B800"/>
+    <!-- Yolk highlight -->
+    <circle cx="260" cy="238" r="7" fill="rgba(255,255,255,0.35)"/>
+
+    <!-- Broccoli top right -->
+    <circle cx="330" cy="215" r="18" fill="#2E7D32"/>
+    <circle cx="348" cy="210" r="14" fill="#388E3C"/>
+    <circle cx="336" cy="200" r="15" fill="#43A047"/>
+    <circle cx="320" cy="205" r="13" fill="#2E7D32"/>
+    <rect x="328" y="225" width="8" height="18" rx="3" fill="#1B5E20"/>
+
+    <!-- Tomato half (bottom left) -->
+    <path d="M172,295 Q172,330 205,330 Q238,330 238,295 Z" fill="#E53935"/>
+    <ellipse cx="205" cy="295" rx="33" ry="10" fill="#EF5350"/>
+    <!-- Tomato seeds -->
+    <ellipse cx="196" cy="310" rx="6" ry="3" fill="#FFCDD2" transform="rotate(-20,196,310)"/>
+    <ellipse cx="215" cy="315" rx="6" ry="3" fill="#FFCDD2" transform="rotate(10,215,315)"/>
+    <ellipse cx="205" cy="322" rx="6" ry="3" fill="#FFCDD2"/>
+    <!-- Tomato top -->
+    <path d="M200,292 Q202,285 205,282" stroke="#2E7D32" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- Green pepper rings -->
+    <ellipse cx="280" cy="305" rx="28" ry="14" fill="none" stroke="#43A047" stroke-width="9"/>
+    <ellipse cx="305" cy="318" rx="24" ry="12" fill="none" stroke="#388E3C" stroke-width="8"/>
+    <ellipse cx="260" cy="320" rx="22" ry="11" fill="none" stroke="#4CAF50" stroke-width="7"/>
+
+    <!-- Lemon slice -->
+    <circle cx="336" cy="300" r="26" fill="#FDD835"/>
+    <circle cx="336" cy="300" r="20" fill="#FFEE58"/>
+    <!-- Lemon segments -->
+    <line x1="336" y1="280" x2="336" y2="320" stroke="#F9A825" stroke-width="1.5"/>
+    <line x1="316" y1="300" x2="356" y2="300" stroke="#F9A825" stroke-width="1.5"/>
+    <line x1="322" y1="286" x2="350" y2="314" stroke="#F9A825" stroke-width="1.5"/>
+    <line x1="350" y1="286" x2="322" y2="314" stroke="#F9A825" stroke-width="1.5"/>
+
+    <!-- Radish slices -->
+    <circle cx="195" cy="260" r="10" fill="#F48FB1"/>
+    <ellipse cx="195" cy="260" rx="6" ry="6" fill="white" opacity="0.7"/>
+    <circle cx="215" cy="278" r="8" fill="#EC407A"/>
+    <ellipse cx="215" cy="278" rx="5" ry="5" fill="white" opacity="0.7"/>
+
+    <!-- FORK (left side) -->
+    <!-- Handle -->
+    <rect x="92" y="210" width="22" height="140" rx="11" fill="#8090A8"/>
+    <rect x="92" y="210" width="22" height="140" rx="11" fill="url(#forkGrad)" opacity="0.3"/>
+    <!-- Fork head -->
+    <rect x="92" y="150" width="22" height="70" rx="6" fill="#8090A8"/>
+    <!-- Tines -->
+    <rect x="96" y="128" width="5" height="42" rx="3" fill="#8090A8"/>
+    <rect x="105" y="128" width="5" height="42" rx="3" fill="#8090A8"/>
+    <rect x="114" y="128" width="5" height="42" rx="3" fill="#8090A8"/>
+    <!-- Fork divider line -->
+    <rect x="96" y="190" width="22" height="3" rx="1" fill="#6070888"/>
+
+    <!-- KNIFE (right side) -->
+    <!-- Handle -->
+    <rect x="398" y="210" width="22" height="140" rx="11" fill="#8090A8"/>
+    <!-- Blade -->
+    <rect x="399" y="148" width="20" height="75" rx="5" fill="#9AABB8"/>
+    <!-- Blade tip -->
+    <path d="M399,148 L419,148 L419,160 Q409,148 399,160 Z" fill="#7A8A98"/>
+
+    <!-- Highlight on fork/knife -->
+    <rect x="97" y="215" width="6" height="80" rx="3" fill="rgba(255,255,255,0.15)"/>
+    <rect x="403" y="215" width="6" height="80" rx="3" fill="rgba(255,255,255,0.15)"/>
+  </g>
+</svg>
+</body>
+</html>
