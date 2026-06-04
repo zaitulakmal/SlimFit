@@ -327,7 +327,7 @@ export default function FoodSearchScreen() {
           <View style={[s.modalHeader, { paddingTop: insets.top + 12 }]}>
             <Pressable onPress={() => setShowManualModal(false)} style={s.backBtn}>
               <X size={24} weight="bold" color={colors.textPrimary} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={s.headerTitle}>Add Food</Text>
             <View style={{ width: 40 }} />
           </View>
