@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, AppState } from 'react-native';
 import { Slot, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import mobileAds from 'react-native-google-mobile-ads';
 import { useProfileStore } from '../stores/profileStore';
 import { useAuthStore } from '../stores/authStore';
-import { useProStore } from '../stores/proStore';
 import { reconcileTodayNotifications, scheduleWeeklyReport } from '../services/notificationEngine';
+import { preloadInterstitial } from '../services/ads';
 import '../i18n';
 
 SplashScreen.preventAutoHideAsync();
@@ -13,12 +14,18 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { profile, isLoaded: profileLoaded, loadProfile } = useProfileStore();
   const { user, isLoaded: authLoaded, init } = useAuthStore();
-  const initPro = useProStore((s) => s.init);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { initPro(); }, []);
   const isReady = authLoaded && profileLoaded;
   const prevUser = useRef<typeof user>(undefined);
+
+  // Init Google Mobile Ads SDK once at app start
+  useEffect(() => {
+    mobileAds()
+      .initialize()
+      .then(() => preloadInterstitial())
+      .catch(() => {});
+  }, []);
 
   // Init Firebase auth listener
   useEffect(() => {

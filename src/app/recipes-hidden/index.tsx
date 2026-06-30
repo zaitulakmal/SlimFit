@@ -3,16 +3,17 @@
  * Keeps all existing data/logic, only UI layer changed.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, TextInput, FlatList, StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
 import {
   Clock, Users, CaretUp, CaretDown, Lightbulb, MagnifyingGlass,
-  GridFour, Sun, CloudSun, Moon, Coffee, Drop, ForkKnife, BookOpen,
+  GridFour, Sun, CloudSun, Moon, Coffee, Drop, ForkKnife, BookOpen, CaretLeft,
 } from 'phosphor-react-native';
 import Animated, {
   FadeInDown,
@@ -29,8 +30,8 @@ import { colors, spacing, typography, shadow, radius, animation } from '../../co
 import { pastelColors } from '../../constants/pastel-theme';
 import { RECIPES, searchRecipes, type Recipe } from '../../data/recipes';
 import BottomNav from '../../components/BottomNav';
-import { useProStore } from '../../stores/proStore';
-import { ProOnlyScreen } from '../../components/ui/LockedFeature';
+import AdBanner from '../../components/ui/AdBanner';
+import { maybeShowInterstitial } from '../../services/ads';
 
 type Category = 'all' | Recipe['category'];
 
@@ -211,6 +212,11 @@ function RecipeCard({ recipe, index }: { recipe: Recipe; index: number }) {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   header: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  backBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.surface, marginBottom: spacing.sm,
+  },
   headerTitle: { ...typography.display, color: colors.text },
   headerSub:   { ...typography.body, color: colors.textSecondary, marginTop: spacing.xs },
 
@@ -333,12 +339,17 @@ function RecipesScreenContent() {
     (r) => cat === 'all' || r.category === cat
   );
 
+  useEffect(() => { maybeShowInterstitial(); }, []);
+
   return (
     <View style={s.root}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       {/* Header */}
       <Animated.View entering={FadeInDown.springify()} style={[s.header, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
+          <CaretLeft size={22} color={colors.text} weight="bold" />
+        </TouchableOpacity>
         <Text style={s.headerTitle}>{t('recipe.title')}</Text>
         <Text style={s.headerSub}>{t('recipe.subtitle')}</Text>
       </Animated.View>
@@ -397,13 +408,12 @@ function RecipesScreenContent() {
           </View>
         }
       />
+      <AdBanner />
       <BottomNav />
     </View>
   );
 }
 
 export default function RecipesScreen() {
-  const isPro = useProStore((s) => s.isPro);
-  if (!isPro) return <ProOnlyScreen />;
   return <RecipesScreenContent />;
 }

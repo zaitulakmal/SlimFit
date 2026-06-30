@@ -11,8 +11,9 @@ import {
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
 import {
-  ArrowsCounterClockwise, MapPin, Crosshair, NavigationArrow, Storefront, MapTrifold,
+  ArrowsCounterClockwise, MapPin, Crosshair, NavigationArrow, Storefront, MapTrifold, CaretLeft,
 } from 'phosphor-react-native';
 import Animated, {
   FadeInDown,
@@ -26,8 +27,8 @@ import Animated, {
 import { colors, spacing, typography, shadow, radius } from '../../constants/theme-new';
 import { pastelColors } from '../../constants/pastel-theme';
 import BottomNav from '../../components/BottomNav';
-import { useProStore } from '../../stores/proStore';
-import { ProOnlyScreen } from '../../components/ui/LockedFeature';
+import AdBanner from '../../components/ui/AdBanner';
+import { maybeShowInterstitial } from '../../services/ads';
 
 interface Place {
   id: string;
@@ -239,6 +240,7 @@ function GroceryScreenContent() {
   };
 
   useEffect(() => { load(); }, []);
+  useEffect(() => { maybeShowInterstitial(); }, []);
 
   const focusPlace = (place: Place) => {
     setSelected(place);
@@ -271,6 +273,9 @@ function GroceryScreenContent() {
       {/* Header */}
       <Animated.View entering={FadeInDown.springify()} style={styles.header}>
         <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <CaretLeft size={20} color={colors.text} weight="bold" />
+          </TouchableOpacity>
           <Storefront size={28} weight="fill" color={colors.primary} />
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>{t('grocery.title')}</Text>
@@ -418,6 +423,7 @@ function GroceryScreenContent() {
           </TouchableOpacity>
         </Animated.View>
       )}
+      <AdBanner />
       <BottomNav />
     </View>
   );
@@ -431,6 +437,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  backBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.borderLight,
+  },
   headerText: {},
   headerTitle: { ...typography.heading, color: colors.text },
   headerSub: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
@@ -499,7 +510,5 @@ const styles = StyleSheet.create({
 });
 
 export default function GroceryScreen() {
-  const isPro = useProStore((s) => s.isPro);
-  if (!isPro) return <ProOnlyScreen />;
   return <GroceryScreenContent />;
 }

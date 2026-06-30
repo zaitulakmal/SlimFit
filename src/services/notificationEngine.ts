@@ -29,7 +29,6 @@ import {
   scheduleWeekly,
   cancelNotification,
 } from './notifications';
-import { predictCycle } from './cycleTracking';
 
 const MAX_DAILY_DYNAMIC = 4;
 const MOTIVATION_COOLDOWN_DAYS = 5;
@@ -55,7 +54,7 @@ interface Candidate {
 
 /** Median minute-of-day a meal was logged over the last 14 days, if there's enough data. */
 async function personalizedMealTime(
-  mealType: 'breakfast' | 'lunch' | 'dinner'
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'
 ): Promise<{ hour: number; minute: number } | null> {
   const since = offsetDateStr(todayStr(), -14);
   const rows = await db
@@ -120,13 +119,14 @@ export async function reconcileTodayNotifications(): Promise<void> {
   const candidates: Candidate[] = [];
 
   // --- Meal reminders (personalized time when there's enough history) ---
-  const mealLogged = (m: 'breakfast' | 'lunch' | 'dinner') => todayFood.some((f) => f.mealType === m);
-  const mealCopy: Record<'breakfast' | 'lunch' | 'dinner', { title: string; body: string }> = {
+  const mealLogged = (m: 'breakfast' | 'lunch' | 'dinner' | 'snack') => todayFood.some((f) => f.mealType === m);
+  const mealCopy: Record<'breakfast' | 'lunch' | 'dinner' | 'snack', { title: string; body: string }> = {
     breakfast: { title: 'Breakfast Reminder', body: 'Log your breakfast to stay on track!' },
     lunch: { title: 'Lunch Reminder', body: "Don't forget to log your lunch!" },
     dinner: { title: 'Dinner Reminder', body: 'Log your dinner for today.' },
+    snack: { title: 'Snack Check-In', body: 'Had a snack today? Log it to keep your totals accurate.' },
   };
-  for (const meal of ['breakfast', 'lunch', 'dinner'] as const) {
+  for (const meal of ['breakfast', 'lunch', 'dinner', 'snack'] as const) {
     if (!isEnabled(meal)) {
       await cancelNotification(meal);
       continue;
@@ -171,27 +171,19 @@ export async function reconcileTodayNotifications(): Promise<void> {
     await cancelNotification('water');
   }
 
-  // --- Weigh-in: cycle-aware copy + softened priority during luteal phase ---
+  // --- Weigh-in ---
   if (isEnabled('weigh_in')) {
     const hasWeighIn = todayWeight.length > 0;
     const { hour, minute } = timeFor('weigh_in');
     if (!hasWeighIn && !minutesPassed(hour, minute)) {
-      let title = 'Daily Weigh-In';
-      let body = 'Start your day by logging your weight.';
-      let priority = 70;
-      if (profile?.cycleTrackingEnabled) {
-        const prediction = predictCycle(
-          profile.lastPeriodStart ?? null,
-          profile.avgCycleLengthDays,
-          profile.avgPeriodLengthDays,
-          today
-        );
-        if (prediction?.phase === 'luteal') {
-          body = "Water retention is normal this week — weigh in if you'd like, but don't stress the number.";
-          priority = 45;
-        }
-      }
-      candidates.push({ type: 'weigh_in', hour, minute, title, body, priority });
+      candidates.push({
+        type: 'weigh_in',
+        hour,
+        minute,
+        title: 'Daily Weigh-In',
+        body: 'Start your day by logging your weight.',
+        priority: 70,
+      });
     } else {
       await cancelNotification('weigh_in');
     }

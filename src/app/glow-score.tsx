@@ -5,7 +5,6 @@ import { router, useFocusEffect } from 'expo-router';
 import { CaretLeft } from 'phosphor-react-native';
 import { colors, typography, spacing, radius, shadow } from '../constants/theme-new';
 import ProgressRingNew from '../components/ui/ProgressRingNew';
-import { LockedFeature } from '../components/ui/LockedFeature';
 import { useGlowScoreStore } from '../stores/glowScoreStore';
 import { glowScoreLabel } from '../services/glowScore';
 
@@ -50,21 +49,19 @@ export default function GlowScoreScreen() {
           <Text style={s.heroSub}>Based on your last 7 days of consistency</Text>
         </View>
 
-        <LockedFeature featureName="Glow Score breakdown">
-          <View style={s.card}>
-            <Text style={s.sectionTitle}>Breakdown</Text>
-            {today &&
-              COMPONENTS.map((c) => (
-                <View key={c.key} style={s.barRow}>
-                  <Text style={s.barLabel}>{c.label}</Text>
-                  <View style={s.barTrack}>
-                    <View style={[s.barFill, { width: `${(today[c.key] / 25) * 100}%` }]} />
-                  </View>
-                  <Text style={s.barValue}>{today[c.key]}/25</Text>
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>Breakdown</Text>
+          {today &&
+            COMPONENTS.map((c) => (
+              <View key={c.key} style={s.barRow}>
+                <Text style={s.barLabel}>{c.label}</Text>
+                <View style={s.barTrack}>
+                  <View style={[s.barFill, { width: `${(today[c.key] / 25) * 100}%` }]} />
                 </View>
-              ))}
-          </View>
-        </LockedFeature>
+                <Text style={s.barValue}>{today[c.key]}/25</Text>
+              </View>
+            ))}
+        </View>
 
         {history.length > 1 && (
           <View style={s.card}>
@@ -94,7 +91,7 @@ const s = StyleSheet.create({
   content: { padding: spacing.md, paddingBottom: spacing['2xl'], gap: spacing.md },
   heroCard: { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.xs },
   heroScore: { ...typography.display, color: C.text },
-  heroOutOf: { ...typography.caption, color: C.textSecondary, marginTop: -6 },
+  heroOutOf: { ...typography.caption, color: C.textSecondary, marginTop: 2 },
   heroLabel: { ...typography.title, color: C.primary, marginTop: spacing.sm },
   heroSub: { ...typography.caption, color: C.textSecondary },
   card: { backgroundColor: C.surface, borderRadius: radius.xl, padding: spacing.md, ...shadow.sm, gap: spacing.sm },

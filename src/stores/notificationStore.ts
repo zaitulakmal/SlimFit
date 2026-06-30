@@ -28,6 +28,7 @@ const ALL_TYPES: NotifType[] = [
   'breakfast',
   'lunch',
   'dinner',
+  'snack',
   'water',
   'weigh_in',
   'exercise',
