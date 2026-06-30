@@ -49,9 +49,7 @@ import { useFoodStore } from '../../stores/foodStore';
 import { useStatsStore, BADGE_DEFS, type BadgeDef } from '../../stores/statsStore';
 import { useWorkoutStore } from '../../stores/workoutStore';
 import { useFastingStore } from '../../stores/fastingStore';
-import { useGlowScoreStore } from '../../stores/glowScoreStore';
 import { projectGoalDate, type GoalProjection } from '../../services/goalProjection';
-import GlowScoreCard from '../../components/ui/GlowScoreCard';
 import GoalCountdownCard from '../../components/ui/GoalCountdownCard';
 import AdBanner from '../../components/ui/AdBanner';
 import CelebrationModal from '../../components/ui/CelebrationModal';
@@ -670,7 +668,6 @@ export default function HomeScreen() {
   };
 
   const foodStreak = Number(streakMap['food']?.current) || 0;
-  const glowToday = useGlowScoreStore((s) => s.today);
 
   const [calorieProgress, setCalorieProgress] = useState(0);
   const [waterProgress,   setWaterProgress]   = useState(0);
@@ -690,7 +687,6 @@ export default function HomeScreen() {
         setMilestoneQueue((q) => [...q, ...defs.filter((d) => d.isMilestone)]);
         setToastQueue((q) => [...q, ...defs.filter((d) => !d.isMilestone)]);
       });
-      useGlowScoreStore.getState().loadAndCompute();
       useWorkoutStore.getState().loadToday();
       useFastingStore.getState().loadToday();
 
@@ -890,9 +886,8 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Glow Score + Goal Countdown */}
-        <Animated.View entering={FadeInUp.delay(160).springify()} style={{ gap: 12, marginBottom: 16 }}>
-          <GlowScoreCard breakdown={glowToday} />
+        {/* Goal Countdown */}
+        <Animated.View entering={FadeInUp.delay(160).springify()} style={{ marginBottom: 16 }}>
           <GoalCountdownCard projection={goalProjection} />
         </Animated.View>
 

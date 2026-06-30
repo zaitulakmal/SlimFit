@@ -28,7 +28,6 @@ import {
   notificationSettings,
   workouts,
   fastingLogs,
-  glowScores,
   notificationLog,
 } from '../db/schema';
 import {
@@ -240,7 +239,6 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     await db.delete(mealPresets);
     await db.delete(nixCache);
     await db.delete(notificationSettings);
-    await db.delete(glowScores);
     await db.delete(notificationLog);
     await db.delete(userProfile);
     set({ profile: null, isLoaded: true });

@@ -110,16 +110,6 @@ const tables = [
     is_active INTEGER NOT NULL DEFAULT 0,
     completed_at TEXT
   )`,
-  `CREATE TABLE IF NOT EXISTS glow_scores (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    date_str TEXT NOT NULL UNIQUE,
-    score INTEGER NOT NULL,
-    logging_score INTEGER NOT NULL DEFAULT 0,
-    water_score INTEGER NOT NULL DEFAULT 0,
-    weigh_in_score INTEGER NOT NULL DEFAULT 0,
-    activity_score INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL
-  )`,
   `CREATE TABLE IF NOT EXISTS notification_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     type TEXT NOT NULL,
