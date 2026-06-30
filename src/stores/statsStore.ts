@@ -13,10 +13,11 @@
  */
 
 import { create } from 'zustand';
-import { eq, gte, desc } from 'drizzle-orm';
+import { eq, gte, asc, desc } from 'drizzle-orm';
 import { db } from '../db';
 import { streaks, badges, foodLogs, weightLogs, waterLogs } from '../db/schema';
 import { colors } from '../constants/theme';
+import { useProfileStore } from './profileStore';
 
 // ---------------------------------------------------------------------------
 // Badge definitions
@@ -28,17 +29,27 @@ export interface BadgeDef {
   color: string;
   titleKey: string;
   descKey: string;
+  /** Milestones get a full-screen celebration instead of a small toast. */
+  isMilestone?: boolean;
 }
 
 export const BADGE_DEFS: BadgeDef[] = [
-  { id: 'first_food',    icon: 'restaurant',    color: colors.primary,  titleKey: 'badge.first_food',    descKey: 'badge.first_food_desc' },
-  { id: 'first_weight',  icon: 'scale',         color: colors.skyBlue,  titleKey: 'badge.first_weight',  descKey: 'badge.first_weight_desc' },
-  { id: 'first_water',   icon: 'water',         color: colors.skyBlue,  titleKey: 'badge.first_water',   descKey: 'badge.first_water_desc' },
-  { id: 'streak_3',      icon: 'flame',         color: colors.amber,    titleKey: 'badge.streak_3',      descKey: 'badge.streak_3_desc' },
-  { id: 'streak_7',      icon: 'flame',         color: colors.coral,    titleKey: 'badge.streak_7',      descKey: 'badge.streak_7_desc' },
-  { id: 'streak_30',     icon: 'trophy',        color: colors.purple,   titleKey: 'badge.streak_30',     descKey: 'badge.streak_30_desc' },
-  { id: 'half_way',      icon: 'trending-down', color: colors.primary,  titleKey: 'badge.half_way',      descKey: 'badge.half_way_desc' },
-  { id: 'goal_reached',  icon: 'trophy',        color: colors.amber,    titleKey: 'badge.goal_reached',  descKey: 'badge.goal_reached_desc' },
+  { id: 'first_food',     icon: 'restaurant',    color: colors.primary,  titleKey: 'badge.first_food',     descKey: 'badge.first_food_desc' },
+  { id: 'first_weight',   icon: 'scale',         color: colors.skyBlue,  titleKey: 'badge.first_weight',   descKey: 'badge.first_weight_desc' },
+  { id: 'first_water',    icon: 'water',         color: colors.skyBlue,  titleKey: 'badge.first_water',    descKey: 'badge.first_water_desc' },
+  { id: 'streak_3',       icon: 'flame',         color: colors.amber,    titleKey: 'badge.streak_3',       descKey: 'badge.streak_3_desc' },
+  { id: 'streak_7',       icon: 'flame',         color: colors.coral,    titleKey: 'badge.streak_7',       descKey: 'badge.streak_7_desc' },
+  { id: 'streak_30',      icon: 'trophy',        color: colors.purple,   titleKey: 'badge.streak_30',      descKey: 'badge.streak_30_desc' },
+  { id: 'water_streak_7', icon: 'water',         color: colors.skyBlue,  titleKey: 'badge.water_streak_7', descKey: 'badge.water_streak_7_desc' },
+  { id: 'weight_streak_7', icon: 'scale',        color: colors.skyBlue,  titleKey: 'badge.weight_streak_7', descKey: 'badge.weight_streak_7_desc' },
+  { id: 'weight_streak_30', icon: 'trophy',      color: colors.purple,   titleKey: 'badge.weight_streak_30', descKey: 'badge.weight_streak_30_desc' },
+  { id: 'early_bird',     icon: 'sunny',         color: colors.amber,    titleKey: 'badge.early_bird',     descKey: 'badge.early_bird_desc' },
+  { id: 'comeback_kid',   icon: 'refresh',       color: colors.coral,    titleKey: 'badge.comeback_kid',   descKey: 'badge.comeback_kid_desc' },
+  { id: 'lost_1kg',       icon: 'trending-down', color: colors.primary,  titleKey: 'badge.lost_1kg',       descKey: 'badge.lost_1kg_desc', isMilestone: true },
+  { id: 'lost_3kg',       icon: 'trending-down', color: colors.primary,  titleKey: 'badge.lost_3kg',       descKey: 'badge.lost_3kg_desc', isMilestone: true },
+  { id: 'lost_5kg',       icon: 'trending-down', color: colors.primary,  titleKey: 'badge.lost_5kg',       descKey: 'badge.lost_5kg_desc', isMilestone: true },
+  { id: 'half_way',       icon: 'trending-down', color: colors.primary,  titleKey: 'badge.half_way',       descKey: 'badge.half_way_desc', isMilestone: true },
+  { id: 'goal_reached',   icon: 'trophy',        color: colors.amber,    titleKey: 'badge.goal_reached',   descKey: 'badge.goal_reached_desc', isMilestone: true },
 ];
 
 // ---------------------------------------------------------------------------
@@ -150,6 +161,51 @@ export const useStatsStore = create<StatsState>((set, get) => ({
     if (foodStreak >= 7) await unlock('streak_7');
     if (foodStreak >= 30) await unlock('streak_30');
 
+    // water/weigh-in streak badges
+    const waterStreak = streakMap['water']?.current ?? 0;
+    if (waterStreak >= 7) await unlock('water_streak_7');
+    const weightStreak = streakMap['weight']?.current ?? 0;
+    if (weightStreak >= 7) await unlock('weight_streak_7');
+    if (weightStreak >= 30) await unlock('weight_streak_30');
+
+    // early_bird: 5+ breakfasts logged before 8am (all-time)
+    const earlyBreakfasts = (await db.select().from(foodLogs).where(eq(foodLogs.mealType, 'breakfast'))).filter(
+      (f) => new Date(f.loggedAt).getHours() < 8
+    );
+    if (earlyBreakfasts.length >= 5) await unlock('early_bird');
+
+    // comeback_kid: returned to logging after a 4+ day gap
+    const distinctDates = [...new Set((await db.select().from(foodLogs)).map((f) => f.dateStr))].sort();
+    if (distinctDates.length >= 2) {
+      const latest = distinctDates[distinctDates.length - 1];
+      const prior = distinctDates[distinctDates.length - 2];
+      const gapDays = Math.round(
+        (new Date(latest + 'T00:00:00').getTime() - new Date(prior + 'T00:00:00').getTime()) / 86_400_000
+      );
+      const todayD = todayStr();
+      const yesterdayD = offsetDateStr(todayD, -1);
+      if (gapDays >= 4 && (latest === todayD || latest === yesterdayD)) await unlock('comeback_kid');
+    }
+
+    // Weight-loss milestones — based on the very first vs. most recent weigh-in
+    const allWeightLogsAsc = await db.select().from(weightLogs).orderBy(asc(weightLogs.dateStr));
+    if (allWeightLogsAsc.length >= 2) {
+      const startWeight = allWeightLogsAsc[0].weightKg;
+      const currentWeight = allWeightLogsAsc[allWeightLogsAsc.length - 1].weightKg;
+      const lostSoFar = startWeight - currentWeight;
+
+      if (lostSoFar >= 1) await unlock('lost_1kg');
+      if (lostSoFar >= 3) await unlock('lost_3kg');
+      if (lostSoFar >= 5) await unlock('lost_5kg');
+
+      const targetWeightKg = useProfileStore.getState().profile?.targetWeightKg;
+      if (targetWeightKg != null && startWeight > targetWeightKg) {
+        const totalToLose = startWeight - targetWeightKg;
+        if (lostSoFar / totalToLose >= 0.5) await unlock('half_way');
+        if (currentWeight <= targetWeightKg) await unlock('goal_reached');
+      }
+    }
+
     set({
       streakMap,
       unlockedBadgeIds: [...unlockedSet],
@@ -184,3 +240,12 @@ export const useStatsStore = create<StatsState>((set, get) => ({
     }
   },
 }));
+
+/** Mini reward: a status emoji unlocked by consistency, shown next to the user's name. */
+export function getFlairEmoji(unlockedBadgeIds: string[]): string | null {
+  const has = (id: string) => unlockedBadgeIds.includes(id);
+  if (has('goal_reached')) return '👑';
+  if (has('streak_30') || has('weight_streak_30')) return '🏆';
+  if (has('streak_7') || has('water_streak_7') || has('weight_streak_7')) return '🔥';
+  return null;
+}

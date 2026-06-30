@@ -19,6 +19,13 @@ export const userProfile = sqliteTable('user_profile', {
   onboardingCompleted: integer('onboarding_completed', { mode: 'boolean' })
     .default(false)
     .notNull(),
+  // Cycle tracking (optional, off by default)
+  cycleTrackingEnabled: integer('cycle_tracking_enabled', { mode: 'boolean' })
+    .default(false)
+    .notNull(),
+  avgCycleLengthDays: integer('avg_cycle_length_days').default(28).notNull(),
+  avgPeriodLengthDays: integer('avg_period_length_days').default(5).notNull(),
+  lastPeriodStart: text('last_period_start'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 });
@@ -165,3 +172,56 @@ export const fastingLogs = sqliteTable('fasting_logs', {
 });
 export type FastingLog = typeof fastingLogs.$inferSelect;
 export type NewFastingLog = typeof fastingLogs.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Cycle logs — one row per day a flow/symptom entry is recorded
+// ---------------------------------------------------------------------------
+export const cycleLogs = sqliteTable('cycle_logs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull().unique(),
+  flow: text('flow', { enum: ['spotting', 'light', 'medium', 'heavy'] }).notNull(),
+  symptoms: text('symptoms'), // JSON string array, e.g. '["cramps","bloating"]'
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+export type CycleLog = typeof cycleLogs.$inferSelect;
+export type NewCycleLog = typeof cycleLogs.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Glow Score — daily composite consistency score snapshot
+// ---------------------------------------------------------------------------
+export const glowScores = sqliteTable('glow_scores', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull().unique(),
+  score: integer('score').notNull(),
+  loggingScore: integer('logging_score').notNull().default(0),
+  waterScore: integer('water_score').notNull().default(0),
+  weighInScore: integer('weigh_in_score').notNull().default(0),
+  activityScore: integer('activity_score').notNull().default(0),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+export type GlowScore = typeof glowScores.$inferSelect;
+export type NewGlowScore = typeof glowScores.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Notification send log — powers per-day frequency capping/suppression
+// ---------------------------------------------------------------------------
+export const notificationLog = sqliteTable('notification_log', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  type: text('type').notNull(),
+  dateStr: text('date_str').notNull(),
+  sentAt: text('sent_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+export type NotificationLogRow = typeof notificationLog.$inferSelect;
+
+// ---------------------------------------------------------------------------
+// Transformation photos — progress photos tied to a date/weight
+// ---------------------------------------------------------------------------
+export const transformationPhotos = sqliteTable('transformation_photos', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull(),
+  photoUri: text('photo_uri').notNull(),
+  weightKg: real('weight_kg'),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+export type TransformationPhoto = typeof transformationPhotos.$inferSelect;
+export type NewTransformationPhoto = typeof transformationPhotos.$inferInsert;

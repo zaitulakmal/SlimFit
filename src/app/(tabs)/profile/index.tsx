@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import {
   PencilSimple, Check, XCircle,
   Fire, Drop, Scales, ForkKnife, Trophy, TrendDown,
-  SignOut, Warning,
+  SignOut, Warning, Sun, ArrowClockwise, Calendar, Camera,
 } from 'phosphor-react-native';
 import Constants from 'expo-constants';
 
@@ -39,7 +39,7 @@ import {
 import { useProfileStore } from '../../../stores/profileStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useNotificationStore } from '../../../stores/notificationStore';
-import { useStatsStore, BADGE_DEFS } from '../../../stores/statsStore';
+import { useStatsStore, BADGE_DEFS, getFlairEmoji } from '../../../stores/statsStore';
 import { useProStore } from '../../../stores/proStore';
 import type { NotifType } from '../../../services/notifications';
 
@@ -56,6 +56,8 @@ function PhosphorIcon({ name, size, color }: { name: string; size: number; color
     case 'restaurant':    return <ForkKnife {...p} />;
     case 'trophy':        return <Trophy {...p} />;
     case 'trending-down': return <TrendDown {...p} />;
+    case 'sunny':         return <Sun {...p} />;
+    case 'refresh':       return <ArrowClockwise {...p} />;
     default:              return <Fire {...p} />;
   }
 }
@@ -377,6 +379,9 @@ export default function ProfileScreen() {
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <Text style={[s.userName, { marginBottom: 0 }]}>{profile.name || '—'}</Text>
+              {getFlairEmoji(unlockedBadgeIds) && (
+                <Text style={{ fontSize: 18 }}>{getFlairEmoji(unlockedBadgeIds)}</Text>
+              )}
               {isPro && (
                 <View style={{ backgroundColor: '#F0C808', borderRadius: 99, paddingHorizontal: 8, paddingVertical: 3 }}>
                   <Text style={{ fontSize: 11, fontWeight: '800', color: '#1A2B5C' }}>PRO</Text>
@@ -510,12 +515,25 @@ export default function ProfileScreen() {
             <Text style={s.settingLbl}>{t('profile.language_label')}</Text>
             <LanguageToggle current={profile.language} onChange={lang => setLanguage(lang)} />
           </View>
+          <TouchableOpacity style={s.linkRow} onPress={() => router.push('/transformation')}>
+            <Camera size={18} color={C.textSecondary} weight="bold" />
+            <Text style={s.linkRowText}>Transformation Timeline</Text>
+          </TouchableOpacity>
+          {profile.gender === 'female' && (
+            <TouchableOpacity style={s.linkRow} onPress={() => router.push('/cycle-tracking')}>
+              <Calendar size={18} color={C.textSecondary} weight="bold" />
+              <Text style={s.linkRowText}>Cycle Tracking</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* ── Reminders ── */}
         <Text style={s.sec}>{t('notif.section')}</Text>
         <View style={s.card}>
-          {(['breakfast', 'lunch', 'dinner', 'water', 'weigh_in'] as NotifType[]).map(type => {
+          {([
+            'breakfast', 'lunch', 'dinner', 'water', 'weigh_in',
+            'exercise', 'streak_protection', 'weekly_report', 'motivation',
+          ] as NotifType[]).map(type => {
             const ns = notifSettings?.[type];
             if (!ns) return null;
             return (
@@ -656,6 +674,8 @@ const s = StyleSheet.create({
   // Settings
   settingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
   settingLbl: { fontSize: 14, fontWeight: '500', color: C.textPrimary },
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 14, borderTopWidth: 1, borderTopColor: C.border },
+  linkRowText: { fontSize: 14, fontWeight: '500', color: C.textPrimary },
 
   // About
   aboutRow: { alignItems: 'center', gap: 6, marginTop: 24, marginBottom: 8, paddingHorizontal: 16 },

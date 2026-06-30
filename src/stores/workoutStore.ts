@@ -42,6 +42,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const loggedAt = new Date().toISOString();
     await db.insert(workouts).values({ ...entry, loggedAt });
     await get().loadToday(entry.dateStr);
+    try {
+      const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+      await reconcileTodayNotifications();
+    } catch {}
   },
 
   deleteWorkout: async (id) => {

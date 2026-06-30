@@ -14,6 +14,7 @@ import { colors, spacing, typography } from '../../../constants/theme';
 import { useFoodStore } from '../../../stores/foodStore';
 import { MALAYSIAN_FOODS } from '../../../data/malaysian-foods';
 import { detectFoodFromBase64, DetectedFood, DetectionError } from '../../../services/visionAI';
+import { addCommunityFood } from '../../../services/communityFoods';
 
 const RAW_FOOD_CATEGORIES = ['raw', 'dairy', 'fruit'];
 const rawFoods = MALAYSIAN_FOODS.filter(f => RAW_FOOD_CATEGORIES.includes(f.category));
@@ -113,6 +114,19 @@ export default function FoodCaptureScreen() {
         source: 'ai',
         dateStr: currentDateStr,
       });
+      // High-confidence AI detections get cached into the shared community
+      // database so the next photo of the same dish skips the vision API.
+      if (food.confidence === 'high') {
+        addCommunityFood({
+          foodName: food.foodName,
+          calories: food.calories,
+          proteinG: food.proteinG,
+          carbsG: food.carbsG,
+          fatG: food.fatG,
+          servingQty: food.servingQty,
+          servingUnit: food.servingUnit,
+        });
+      }
       router.back();
     } catch {
       Alert.alert('Error', 'Failed to save food');

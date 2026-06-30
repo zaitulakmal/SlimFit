@@ -30,6 +30,7 @@ import { useFoodStore } from '../../../stores/foodStore';
 import { searchLocalFoods, type LocalFood } from '../../../data/malaysian-foods';
 import { searchFoodsNix, type NixFood } from '../../../services/nutritionix';
 import { searchFoodsOFF, type OFFFood } from '../../../services/openFoodFacts';
+import { searchCommunityFoods, addCommunityFood, type CommunityFood } from '../../../services/communityFoods';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -92,6 +93,20 @@ function offToItem(f: OFFFood, idx: number): FoodItem {
   };
 }
 
+function communityToItem(f: CommunityFood): FoodItem {
+  return {
+    id: `community-${f.id}`,
+    foodName: f.foodName,
+    calories: f.calories,
+    proteinG: f.proteinG,
+    carbsG: f.carbsG,
+    fatG: f.fatG,
+    servingQty: f.servingQty,
+    servingUnit: f.servingUnit,
+    source: 'community',
+  };
+}
+
 export default function FoodSearchScreen() {
   const { t } = useTranslation();
   const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
@@ -129,16 +144,18 @@ export default function FoodSearchScreen() {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       const local = searchLocalFoods(query).map(localToItem);
-      const [nixResults, offResults] = await Promise.all([
+      const [communityResults, nixResults, offResults] = await Promise.all([
+        searchCommunityFoods(query),
         searchFoodsNix(query),
         searchFoodsOFF(query),
       ]);
+      const community = communityResults.map(communityToItem);
       const nix = nixResults.map(nixToItem);
       const off = offResults.map(offToItem);
-      // Local first, then Nutritionix, then Open Food Facts — dedupe by name
+      // Local seed first, then the growing community cache, then Nutritionix, then Open Food Facts — dedupe by name
       const seen = new Set(local.map((f) => f.foodName.toLowerCase()));
       const merged = [...local];
-      for (const f of [...nix, ...off]) {
+      for (const f of [...community, ...nix, ...off]) {
         if (!seen.has(f.foodName.toLowerCase())) {
           seen.add(f.foodName.toLowerCase());
           merged.push(f);
@@ -190,8 +207,7 @@ export default function FoodSearchScreen() {
       return;
     }
     if (!mealType) return;
-    await logFood({
-      mealType,
+    const manualFood = {
       foodName: manualName.trim(),
       calories: parseFloat(manualCalories) || 0,
       proteinG: parseFloat(manualProtein) || 0,
@@ -199,9 +215,16 @@ export default function FoodSearchScreen() {
       fatG: parseFloat(manualFat) || 0,
       servingQty: 1,
       servingUnit: 'serving',
+    };
+    await logFood({
+      mealType,
+      ...manualFood,
       source: 'manual',
       dateStr: currentDateStr,
     });
+    // Best-effort: grow the shared community food cache so the next person
+    // searching this dish finds it instantly instead of typing it in again.
+    addCommunityFood(manualFood);
     setShowManualModal(false);
     router.back();
   };

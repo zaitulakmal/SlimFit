@@ -15,6 +15,19 @@ function todayStr(): string {
   return new Date().toISOString().split('T')[0];
 }
 
+async function onWaterGoalProgress(totalMl: number, goalMl: number): Promise<void> {
+  if (totalMl >= goalMl) {
+    try {
+      const { useStatsStore } = await import('./statsStore');
+      await useStatsStore.getState().updateStreak('water', todayStr());
+    } catch {}
+  }
+  try {
+    const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+    await reconcileTodayNotifications();
+  } catch {}
+}
+
 interface WaterStore {
   today: WaterLog | null;
   isLoaded: boolean;
@@ -63,6 +76,7 @@ export const useWaterStore = create<WaterStore>((set, get) => ({
         .set({ totalMl: newTotal })
         .where(eq(waterLogs.id, current.id));
       set({ today: { ...current, totalMl: newTotal } });
+      await onWaterGoalProgress(newTotal, current.goalMl);
     } catch (err) {
       console.error('[waterStore] addWater error:', err);
     }

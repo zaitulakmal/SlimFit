@@ -66,6 +66,10 @@ export const useFoodStore = create<FoodState>((set, get) => ({
       const { useStatsStore } = await import('./statsStore');
       await useStatsStore.getState().updateStreak('food', dateStr);
     } catch {}
+    try {
+      const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+      await reconcileTodayNotifications();
+    } catch {}
   },
 
   deleteFood: async (id) => {

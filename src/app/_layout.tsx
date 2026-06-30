@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, AppState } from 'react-native';
 import { Slot, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useProfileStore } from '../stores/profileStore';
 import { useAuthStore } from '../stores/authStore';
 import { useProStore } from '../stores/proStore';
+import { reconcileTodayNotifications, scheduleWeeklyReport } from '../services/notificationEngine';
 import '../i18n';
 
 SplashScreen.preventAutoHideAsync();
@@ -35,6 +36,19 @@ export default function RootLayout() {
       })
       .finally(() => SplashScreen.hideAsync());
   }, [authLoaded]);
+
+  // Re-check notification conditions whenever the app comes to the foreground
+  useEffect(() => {
+    if (!isReady) return;
+    reconcileTodayNotifications().catch(() => {});
+    scheduleWeeklyReport().catch(() => {});
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        reconcileTodayNotifications().catch(() => {});
+      }
+    });
+    return () => sub.remove();
+  }, [isReady]);
 
   // Navigate when auth state changes
   useEffect(() => {
