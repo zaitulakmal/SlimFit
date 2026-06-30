@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Shared, crowd-sourced food nutrition cache. Anyone can read; only
+    // signed-in users can add new entries; no edits or deletes, so the
+    // database only ever grows and can't be tampered with after creation.
+    match /foods/{foodId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.foodName is string
+        && request.resource.data.nameLower is string
+        && request.resource.data.calories is number
+        && request.resource.data.calories > 0;
+      allow update, delete: if false;
+    }
+  }
+}

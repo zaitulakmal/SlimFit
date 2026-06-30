@@ -7,18 +7,9 @@ import {
   NOTIF_DEFAULTS,
   requestNotificationPermission,
   initNotificationChannel,
-  scheduleNotification,
   cancelNotification,
 } from '../services/notifications';
-
-// Title / body strings per type (raw strings — i18n called at render)
-const NOTIF_CONTENT: Record<NotifType, { title: string; body: string }> = {
-  breakfast: { title: 'Breakfast Reminder', body: "Log your breakfast to stay on track!" },
-  lunch: { title: 'Lunch Reminder', body: "Don't forget to log your lunch!" },
-  dinner: { title: 'Dinner Reminder', body: "Log your dinner for today." },
-  water: { title: 'Water Reminder', body: "Stay hydrated — log your water intake!" },
-  weigh_in: { title: 'Daily Weigh-In', body: "Start your day by logging your weight." },
-};
+import { reconcileTodayNotifications, scheduleWeeklyReport } from '../services/notificationEngine';
 
 type SettingsMap = Record<NotifType, NotificationSetting>;
 
@@ -33,7 +24,17 @@ interface NotificationState {
   requestPermission: () => Promise<boolean>;
 }
 
-const ALL_TYPES: NotifType[] = ['breakfast', 'lunch', 'dinner', 'water', 'weigh_in'];
+const ALL_TYPES: NotifType[] = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'water',
+  'weigh_in',
+  'exercise',
+  'streak_protection',
+  'weekly_report',
+  'motivation',
+];
 
 async function ensureRows(): Promise<void> {
   for (const type of ALL_TYPES) {
@@ -77,9 +78,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         return;
       }
       set({ permissionGranted: true });
-      const s = settings[type];
-      const content = NOTIF_CONTENT[type];
-      await scheduleNotification(type, s.hour, s.minute, content.title, content.body);
     } else {
       await cancelNotification(type);
     }
@@ -90,6 +88,14 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       .where(eq(notificationSettings.type, type));
 
     await get().loadSettings();
+
+    if (enabled) {
+      if (type === 'weekly_report') {
+        await scheduleWeeklyReport();
+      } else {
+        await reconcileTodayNotifications();
+      }
+    }
   },
 
   updateTime: async (type, hour, minute) => {
@@ -98,14 +104,16 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       .set({ hour, minute })
       .where(eq(notificationSettings.type, type));
 
-    // Re-schedule if currently enabled
+    await get().loadSettings();
+
     const settings = get().settings;
     if (settings?.[type]?.enabled) {
-      const content = NOTIF_CONTENT[type];
-      await scheduleNotification(type, hour, minute, content.title, content.body);
+      if (type === 'weekly_report') {
+        await scheduleWeeklyReport();
+      } else {
+        await reconcileTodayNotifications();
+      }
     }
-
-    await get().loadSettings();
   },
 
   requestPermission: async () => {

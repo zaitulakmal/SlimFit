@@ -39,15 +39,24 @@ import {
   ArrowRight,
   Lightning,
   PlusCircle,
+  Calendar,
+  Camera,
+  ChartLineUp,
 } from 'phosphor-react-native';
 
 import { useProfileStore } from '../../stores/profileStore';
 import { useWeightStore } from '../../stores/weightStore';
 import { useWaterStore } from '../../stores/waterStore';
 import { useFoodStore } from '../../stores/foodStore';
-import { useStatsStore } from '../../stores/statsStore';
+import { useStatsStore, BADGE_DEFS, type BadgeDef } from '../../stores/statsStore';
 import { useWorkoutStore } from '../../stores/workoutStore';
 import { useFastingStore } from '../../stores/fastingStore';
+import { useGlowScoreStore } from '../../stores/glowScoreStore';
+import { projectGoalDate, type GoalProjection } from '../../services/goalProjection';
+import GlowScoreCard from '../../components/ui/GlowScoreCard';
+import GoalCountdownCard from '../../components/ui/GoalCountdownCard';
+import CelebrationModal from '../../components/ui/CelebrationModal';
+import BadgeToast from '../../components/ui/BadgeToast';
 
 const { width: W, height: H } = Dimensions.get('window');
 const RF = (size: number) => Math.round(size * (W / 390));
@@ -662,16 +671,27 @@ export default function HomeScreen() {
   };
 
   const foodStreak = Number(streakMap['food']?.current) || 0;
+  const glowToday = useGlowScoreStore((s) => s.today);
 
   const [calorieProgress, setCalorieProgress] = useState(0);
   const [waterProgress,   setWaterProgress]   = useState(0);
+  const [milestoneQueue, setMilestoneQueue] = useState<BadgeDef[]>([]);
+  const [toastQueue, setToastQueue] = useState<BadgeDef[]>([]);
 
   useFocusEffect(
     useCallback(() => {
       useWeightStore.getState().loadLogs();
       useWaterStore.getState().loadToday();
       useFoodStore.getState().loadDayLogs();
-      useStatsStore.getState().loadStats();
+      useStatsStore.getState().loadStats().then((newlyUnlocked) => {
+        if (newlyUnlocked.length === 0) return;
+        const defs = newlyUnlocked
+          .map((id) => BADGE_DEFS.find((b) => b.id === id))
+          .filter(Boolean) as BadgeDef[];
+        setMilestoneQueue((q) => [...q, ...defs.filter((d) => d.isMilestone)]);
+        setToastQueue((q) => [...q, ...defs.filter((d) => !d.isMilestone)]);
+      });
+      useGlowScoreStore.getState().loadAndCompute();
       useWorkoutStore.getState().loadToday();
       useFastingStore.getState().loadToday();
 
@@ -725,6 +745,12 @@ export default function HomeScreen() {
   const achieved       = Math.abs(startWeight - currentWeight);
   const goalProgress   = totalNeeded > 0 ? Math.min(achieved / totalNeeded, 1) : 0;
 
+  const goalProjection: GoalProjection | null = projectGoalDate(
+    weightLogs.map((w) => ({ dateStr: w.dateStr, weightKg: w.weightKg })),
+    targetWeight,
+    new Date().toISOString().split('T')[0]
+  );
+
   const name = profile.name || '';
 
   // Macro daily targets
@@ -736,6 +762,7 @@ export default function HomeScreen() {
     ml >= 1000 ? `${(ml / 1000).toFixed(1)}L` : `${ml}ml`;
 
   return (
+    <>
     <ScrollView
       style={s.root}
       contentContainerStyle={s.content}
@@ -864,6 +891,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Animated.View>
 
+        {/* Glow Score + Goal Countdown */}
+        <Animated.View entering={FadeInUp.delay(160).springify()} style={{ gap: 12, marginBottom: 16 }}>
+          <GlowScoreCard breakdown={glowToday} />
+          <GoalCountdownCard projection={goalProjection} />
+        </Animated.View>
+
         {/* Quick Actions — matching Figma */}
         <Animated.View entering={FadeInUp.delay(180).springify()} style={s.sectionLabel}>
           <Text style={s.sectionTitle}>Quick Actions</Text>
@@ -910,9 +943,55 @@ export default function HomeScreen() {
           onPress={() => router.push('/activity-hidden')}
           index={1}
         />
+        <ExploreCard
+          title="Weekly Report"
+          subtitle="See how this week went"
+          icon={<ChartLineUp size={26} weight="fill" color="#42A5F5" />}
+          iconBg="#E3F2FD"
+          accentColor="#42A5F5"
+          onPress={() => router.push('/weekly-report')}
+          index={2}
+        />
+        <ExploreCard
+          title="Transformation"
+          subtitle="Your visual progress timeline"
+          icon={<Camera size={26} weight="fill" color="#AB47BC" />}
+          iconBg="#F3E5F5"
+          accentColor="#AB47BC"
+          onPress={() => router.push('/transformation')}
+          index={3}
+        />
+        {profile.gender === 'female' && (
+          <ExploreCard
+            title="Cycle Tracking"
+            subtitle="Phase-aware reminders"
+            icon={<Calendar size={26} weight="fill" color="#EC407A" />}
+            iconBg="#FCE4EC"
+            accentColor="#EC407A"
+            onPress={() => router.push('/cycle-tracking')}
+            index={4}
+          />
+        )}
         <View style={{ height: 100 }} />
       </View>
     </ScrollView>
+
+    {milestoneQueue[0] && (
+      <CelebrationModal
+        visible
+        title={t(milestoneQueue[0].titleKey)}
+        subtitle={t(milestoneQueue[0].descKey)}
+        onClose={() => setMilestoneQueue((q) => q.slice(1))}
+      />
+    )}
+    {toastQueue[0] && (
+      <BadgeToast
+        badge={toastQueue[0]}
+        title={t(toastQueue[0].titleKey)}
+        onDone={() => setToastQueue((q) => q.slice(1))}
+      />
+    )}
+    </>
   );
 }
 

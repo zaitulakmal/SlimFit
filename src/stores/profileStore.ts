@@ -28,6 +28,10 @@ import {
   notificationSettings,
   workouts,
   fastingLogs,
+  cycleLogs,
+  glowScores,
+  notificationLog,
+  transformationPhotos,
 } from '../db/schema';
 import {
   calculateTDEE,
@@ -60,11 +64,23 @@ export interface ProfileData {
   bmi: number | null;
   language: string;
   onboardingCompleted: boolean;
+  cycleTrackingEnabled: boolean;
+  avgCycleLengthDays: number;
+  avgPeriodLengthDays: number;
+  lastPeriodStart: string | null;
 }
 
 export type ProfileInput = Omit<
   ProfileData,
-  'id' | 'tdee' | 'calorieTarget' | 'bmi' | 'onboardingCompleted'
+  | 'id'
+  | 'tdee'
+  | 'calorieTarget'
+  | 'bmi'
+  | 'onboardingCompleted'
+  | 'cycleTrackingEnabled'
+  | 'avgCycleLengthDays'
+  | 'avgPeriodLengthDays'
+  | 'lastPeriodStart'
 >;
 
 interface ProfileStore {
@@ -75,6 +91,12 @@ interface ProfileStore {
   updateProfile: (data: Partial<ProfileInput>) => Promise<void>;
   setLanguage: (lang: string) => Promise<void>;
   resetProfile: () => Promise<void>;
+  updateCycleSettings: (data: {
+    cycleTrackingEnabled?: boolean;
+    avgCycleLengthDays?: number;
+    avgPeriodLengthDays?: number;
+    lastPeriodStart?: string | null;
+  }) => Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
@@ -109,6 +131,10 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           bmi: row.bmi,
           language: row.language,
           onboardingCompleted: row.onboardingCompleted,
+          cycleTrackingEnabled: row.cycleTrackingEnabled,
+          avgCycleLengthDays: row.avgCycleLengthDays,
+          avgPeriodLengthDays: row.avgPeriodLengthDays,
+          lastPeriodStart: row.lastPeriodStart ?? null,
         };
         set({ profile, isLoaded: true });
         // Sync i18n with persisted language (D-10)
@@ -170,6 +196,10 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           calorieTarget,
           bmi,
           onboardingCompleted: true,
+          cycleTrackingEnabled: false,
+          avgCycleLengthDays: 28,
+          avgPeriodLengthDays: 5,
+          lastPeriodStart: null,
         },
       });
     } catch (err) {
@@ -234,8 +264,27 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     await db.delete(mealPresets);
     await db.delete(nixCache);
     await db.delete(notificationSettings);
+    await db.delete(cycleLogs);
+    await db.delete(glowScores);
+    await db.delete(notificationLog);
+    await db.delete(transformationPhotos);
     await db.delete(userProfile);
     set({ profile: null, isLoaded: true });
+  },
+
+  updateCycleSettings: async (data) => {
+    const current = get().profile;
+    if (!current?.id) return;
+    try {
+      await db
+        .update(userProfile)
+        .set({ ...data, updatedAt: new Date().toISOString() })
+        .where(eq(userProfile.id, current.id));
+      set({ profile: { ...current, ...data } });
+    } catch (err) {
+      console.error('[profileStore] updateCycleSettings error:', err);
+      throw err;
+    }
   },
 
   setLanguage: async (lang: string) => {
