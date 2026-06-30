@@ -42,7 +42,7 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#1B2B45",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
