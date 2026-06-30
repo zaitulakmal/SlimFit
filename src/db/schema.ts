@@ -167,22 +167,6 @@ export type FastingLog = typeof fastingLogs.$inferSelect;
 export type NewFastingLog = typeof fastingLogs.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Glow Score — daily composite consistency score snapshot
-// ---------------------------------------------------------------------------
-export const glowScores = sqliteTable('glow_scores', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  dateStr: text('date_str').notNull().unique(),
-  score: integer('score').notNull(),
-  loggingScore: integer('logging_score').notNull().default(0),
-  waterScore: integer('water_score').notNull().default(0),
-  weighInScore: integer('weigh_in_score').notNull().default(0),
-  activityScore: integer('activity_score').notNull().default(0),
-  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
-});
-export type GlowScore = typeof glowScores.$inferSelect;
-export type NewGlowScore = typeof glowScores.$inferInsert;
-
-// ---------------------------------------------------------------------------
 // Notification send log — powers per-day frequency capping/suppression
 // ---------------------------------------------------------------------------
 export const notificationLog = sqliteTable('notification_log', {
