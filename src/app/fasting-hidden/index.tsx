@@ -47,8 +47,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { pastelColors } from '../../constants/pastel-theme';
 import { colors } from '../../constants/theme-new';
 import { useFastingStore } from '../../stores/fastingStore';
-import { useProStore } from '../../stores/proStore';
-import { ProOnlyScreen } from '../../components/ui/LockedFeature';
+import AdBanner from '../../components/ui/AdBanner';
+import { maybeShowInterstitial } from '../../services/ads';
 
 const { width: W, height: H } = Dimensions.get('window');
 const RF = (n: number) => Math.round(n * (W / 390));
@@ -332,6 +332,8 @@ function FastingScreenContent() {
     }, []),
   );
 
+  useEffect(() => { maybeShowInterstitial(); }, []);
+
   const isFasting = store.isFasting();
   const progress = store.getProgress();
   const elapsedMin = store.getElapsedMinutes();
@@ -459,6 +461,7 @@ function FastingScreenContent() {
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
+      <AdBanner />
     </View>
   );
 }
@@ -674,7 +677,5 @@ const styles = StyleSheet.create({
 
 
 export default function FastingScreen() {
-  const isPro = useProStore((s) => s.isPro);
-  if (!isPro) return <ProOnlyScreen />;
   return <FastingScreenContent />;
 }

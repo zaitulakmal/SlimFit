@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Alert, Modal,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Fire, Clock, CheckCircle, Trash, X, Heart, Barbell, Leaf, Football, Lightning, Info, List } from 'phosphor-react-native';
+import { Fire, Clock, CheckCircle, Trash, X, Heart, Barbell, Leaf, Football, Lightning, Info, List, CaretLeft } from 'phosphor-react-native';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,12 +15,12 @@ import { useWorkoutStore } from '../../stores/workoutStore';
 import { useProfileStore } from '../../stores/profileStore';
 import { WORKOUT_TYPES, calcCaloriesBurned, type WorkoutType } from '../../data/workout-types';
 import BottomNav from '../../components/BottomNav';
+import AdBanner from '../../components/ui/AdBanner';
+import { maybeShowInterstitial } from '../../services/ads';
 
 const { width: W } = Dimensions.get('window');
 const C = pastelColors;
 import { Dimensions } from 'react-native';
-import { useProStore } from '../../stores/proStore';
-import { ProOnlyScreen } from '../../components/ui/LockedFeature';
 
 function WorkoutIcon({ category, size, color }: { category: string; size: number; color: string }) {
   const props = { size, color, weight: 'regular' as const };
@@ -115,6 +115,8 @@ function ActivityScreenContent() {
     }, [])
   );
 
+  useEffect(() => { maybeShowInterstitial(); }, []);
+
   const weightKg = profile?.weightKg ?? 70;
 
   const handleLog = async () => {
@@ -151,6 +153,9 @@ function ActivityScreenContent() {
   return (
     <View style={s.root}>
       <ScrollView style={s.scrollView} contentContainerStyle={[s.content, { paddingTop: insets.top + 20, paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
+          <CaretLeft size={22} color={C.textPrimary} weight="bold" />
+        </TouchableOpacity>
         <Text style={s.screenTitle}>Activity</Text>
 
         {/* Summary card */}
@@ -286,6 +291,7 @@ function ActivityScreenContent() {
         onClose={() => setShowInstructions(false)}
       />
 
+      <AdBanner />
       <BottomNav />
     </View>
   );
@@ -296,6 +302,11 @@ const s = StyleSheet.create({
   scrollView: { flex: 1 },
   content: { padding: 20 },
   screenTitle: { fontSize: 28, fontWeight: '800', color: C.textPrimary, marginBottom: 20 },
+  backBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: C.white, marginBottom: 12,
+  },
   
   summaryCard: {
     flexDirection: 'row',
@@ -482,7 +493,5 @@ const s = StyleSheet.create({
 });
 
 export default function ActivityScreen() {
-  const isPro = useProStore((s) => s.isPro);
-  if (!isPro) return <ProOnlyScreen />;
   return <ActivityScreenContent />;
 }

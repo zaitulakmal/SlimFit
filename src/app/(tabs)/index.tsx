@@ -39,8 +39,6 @@ import {
   ArrowRight,
   Lightning,
   PlusCircle,
-  Calendar,
-  Camera,
   ChartLineUp,
 } from 'phosphor-react-native';
 
@@ -55,6 +53,7 @@ import { useGlowScoreStore } from '../../stores/glowScoreStore';
 import { projectGoalDate, type GoalProjection } from '../../services/goalProjection';
 import GlowScoreCard from '../../components/ui/GlowScoreCard';
 import GoalCountdownCard from '../../components/ui/GoalCountdownCard';
+import AdBanner from '../../components/ui/AdBanner';
 import CelebrationModal from '../../components/ui/CelebrationModal';
 import BadgeToast from '../../components/ui/BadgeToast';
 
@@ -952,26 +951,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/weekly-report')}
           index={2}
         />
-        <ExploreCard
-          title="Transformation"
-          subtitle="Your visual progress timeline"
-          icon={<Camera size={26} weight="fill" color="#AB47BC" />}
-          iconBg="#F3E5F5"
-          accentColor="#AB47BC"
-          onPress={() => router.push('/transformation')}
-          index={3}
-        />
-        {profile.gender === 'female' && (
-          <ExploreCard
-            title="Cycle Tracking"
-            subtitle="Phase-aware reminders"
-            icon={<Calendar size={26} weight="fill" color="#EC407A" />}
-            iconBg="#FCE4EC"
-            accentColor="#EC407A"
-            onPress={() => router.push('/cycle-tracking')}
-            index={4}
-          />
-        )}
+        <AdBanner />
         <View style={{ height: 100 }} />
       </View>
     </ScrollView>

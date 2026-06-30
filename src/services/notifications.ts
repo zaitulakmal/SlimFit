@@ -12,6 +12,7 @@
  *   breakfast          07:30  no breakfast logged yet
  *   lunch              12:30  no lunch logged yet
  *   dinner             19:00  no dinner logged yet
+ *   snack              15:30  no snack logged yet
  *   water              09:00  behind today's water pace
  *   weigh_in           07:00  no weigh-in today
  *   exercise           18:00  no activity logged today
@@ -27,6 +28,7 @@ export type NotifType =
   | 'breakfast'
   | 'lunch'
   | 'dinner'
+  | 'snack'
   | 'water'
   | 'weigh_in'
   | 'exercise'
@@ -38,6 +40,7 @@ export const NOTIF_DEFAULTS: Record<NotifType, { hour: number; minute: number }>
   breakfast: { hour: 7, minute: 30 },
   lunch: { hour: 12, minute: 30 },
   dinner: { hour: 19, minute: 0 },
+  snack: { hour: 15, minute: 30 },
   water: { hour: 9, minute: 0 },
   weigh_in: { hour: 7, minute: 0 },
   exercise: { hour: 18, minute: 0 },

@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import {
   PencilSimple, Check, XCircle,
   Fire, Drop, Scales, ForkKnife, Trophy, TrendDown,
-  SignOut, Warning, Sun, ArrowClockwise, Calendar, Camera,
+  SignOut, Warning, Sun, ArrowClockwise,
 } from 'phosphor-react-native';
 import Constants from 'expo-constants';
 
@@ -40,7 +40,6 @@ import { useProfileStore } from '../../../stores/profileStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useNotificationStore } from '../../../stores/notificationStore';
 import { useStatsStore, BADGE_DEFS, getFlairEmoji } from '../../../stores/statsStore';
-import { useProStore } from '../../../stores/proStore';
 import type { NotifType } from '../../../services/notifications';
 
 const W = Dimensions.get('window').width;
@@ -248,7 +247,6 @@ export default function ProfileScreen() {
 
   const { settings: notifSettings, loadSettings, toggleNotification, updateTime } = useNotificationStore();
   const { streakMap, unlockedBadgeIds, weeklyCalories, loadStats } = useStatsStore();
-  const isPro = useProStore((s) => s.isPro);
   const [timePickerFor, setTimePickerFor] = useState<NotifType | null>(null);
 
   useFocusEffect(useCallback(() => { loadSettings(); loadStats(); }, []));
@@ -382,20 +380,7 @@ export default function ProfileScreen() {
               {getFlairEmoji(unlockedBadgeIds) && (
                 <Text style={{ fontSize: 18 }}>{getFlairEmoji(unlockedBadgeIds)}</Text>
               )}
-              {isPro && (
-                <View style={{ backgroundColor: '#F0C808', borderRadius: 99, paddingHorizontal: 8, paddingVertical: 3 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#1A2B5C' }}>PRO</Text>
-                </View>
-              )}
             </View>
-            {!isPro && (
-              <Pressable
-                onPress={() => router.push('/paywall')}
-                style={{ backgroundColor: 'rgba(240,200,8,0.18)', borderRadius: 99, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 8, borderWidth: 1, borderColor: 'rgba(240,200,8,0.35)' }}
-              >
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#F0C808' }}>⭐ Upgrade to Pro — RM 9.99</Text>
-              </Pressable>
-            )}
             <View style={[s.bmiChip, { backgroundColor: chipCol + '22', borderColor: chipCol + '55' }]}>
               <View style={[s.bmiDot, { backgroundColor: chipCol }]} />
               <Text style={[s.bmiText, { color: chipCol }]}>{t(`profile.bmi_${bmiCat}`)}</Text>
@@ -515,23 +500,13 @@ export default function ProfileScreen() {
             <Text style={s.settingLbl}>{t('profile.language_label')}</Text>
             <LanguageToggle current={profile.language} onChange={lang => setLanguage(lang)} />
           </View>
-          <TouchableOpacity style={s.linkRow} onPress={() => router.push('/transformation')}>
-            <Camera size={18} color={C.textSecondary} weight="bold" />
-            <Text style={s.linkRowText}>Transformation Timeline</Text>
-          </TouchableOpacity>
-          {profile.gender === 'female' && (
-            <TouchableOpacity style={s.linkRow} onPress={() => router.push('/cycle-tracking')}>
-              <Calendar size={18} color={C.textSecondary} weight="bold" />
-              <Text style={s.linkRowText}>Cycle Tracking</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {/* ── Reminders ── */}
         <Text style={s.sec}>{t('notif.section')}</Text>
         <View style={s.card}>
           {([
-            'breakfast', 'lunch', 'dinner', 'water', 'weigh_in',
+            'breakfast', 'lunch', 'dinner', 'snack', 'water', 'weigh_in',
             'exercise', 'streak_protection', 'weekly_report', 'motivation',
           ] as NotifType[]).map(type => {
             const ns = notifSettings?.[type];

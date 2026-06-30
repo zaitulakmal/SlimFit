@@ -3,7 +3,7 @@
  * Clean weight tracking with animated chart and progress
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,14 +25,14 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { CheckCircle, ArrowRight, Trash, TrendDown, TrendUp, Camera, Barcode, X, Plus, Keyboard } from 'phosphor-react-native';
+import { CheckCircle, ArrowRight, Trash, TrendDown, TrendUp, Camera, Barcode, X, Plus, Keyboard, CaretLeft } from 'phosphor-react-native';
 import Svg, { Polyline, Circle, Line, Text as SvgText, Rect, Defs, LinearGradient, Stop, Ellipse, Path, G } from 'react-native-svg';
 import { colors, spacing, radius, shadow, typography } from '../../constants/theme-new';
 import { useWeightStore } from '../../stores/weightStore';
 import { useProfileStore } from '../../stores/profileStore';
 import { calculateBMI, getBMICategory } from '../../constants/tdee';
-import { useProStore } from '../../stores/proStore';
-import { ProOnlyScreen } from '../../components/ui/LockedFeature';
+import AdBanner from '../../components/ui/AdBanner';
+import { maybeShowInterstitial } from '../../services/ads';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHART_WIDTH = SCREEN_WIDTH - spacing.md * 2;
@@ -212,6 +212,8 @@ function WeightScreenContent() {
     }, [])
   );
 
+  useEffect(() => { maybeShowInterstitial(); }, []);
+
   const handleLog = async () => {
     const kg = parseFloat(inputWeight);
     if (isNaN(kg) || kg < 20 || kg > 300) {
@@ -252,6 +254,9 @@ function WeightScreenContent() {
       >
         {/* Header */}
         <Animated.View entering={FadeInDown.springify()} style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <CaretLeft size={22} color={COLORS.text} weight="bold" />
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Progress</Text>
           <Text style={styles.headerSubtitle}>Track your weight journey</Text>
         </Animated.View>
@@ -422,6 +427,7 @@ function WeightScreenContent() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      <AdBanner />
     </View>
   );
 }
@@ -438,6 +444,15 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: spacing.xl,
     paddingBottom: spacing.lg,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    marginBottom: spacing.sm,
   },
   headerTitle: {
     fontSize: 28,
@@ -679,7 +694,5 @@ const styles = StyleSheet.create({
 });
 
 export default function WeightScreen() {
-  const isPro = useProStore((s) => s.isPro);
-  if (!isPro) return <ProOnlyScreen />;
   return <WeightScreenContent />;
 }
