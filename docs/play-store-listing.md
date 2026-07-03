@@ -1,7 +1,7 @@
 # Slimora — Google Play Store Listing
 
-## App Name
-Slimora – Calorie & Weight Tracker
+## App Name (30 chars max)
+Slimora: Calorie & Weight (26 chars)
 
 ---
 

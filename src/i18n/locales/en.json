@@ -160,7 +160,8 @@
     "weekly_report": "Weekly Progress Report",
     "motivation": "Motivation Boosts",
     "permission_denied": "Please enable notifications in your device settings.",
-    "time_label": "Time"
+    "time_label": "Time",
+    "daily_motivation": "Daily Motivation"
   },
   "stats": {
     "streaks": "Streaks",

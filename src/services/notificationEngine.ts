@@ -27,8 +27,10 @@ import {
   type NotifType,
   scheduleOneShotToday,
   scheduleWeekly,
+  scheduleDaily,
   cancelNotification,
 } from './notifications';
+import { quoteForToday } from './motivationQuotes';
 
 const MAX_DAILY_DYNAMIC = 4;
 const MOTIVATION_COOLDOWN_DAYS = 5;
@@ -312,6 +314,26 @@ async function detectEngagementDip(): Promise<boolean> {
   // Only flag a dip if the user was previously engaged (>=3 of last 5 baseline days)
   // and has gone fully quiet for the most recent day being checked (yesterday).
   return baselineActive >= 3 && recentActive === 0 && !activeDates.has(today);
+}
+
+/**
+ * Daily motivation quote — a repeating daily notification (default 08:00)
+ * whose message rotates by day-of-year (always English). Re-invoked on
+ * every app foreground so the content stays fresh; if the app stays closed,
+ * the last-scheduled quote keeps firing daily (guaranteed delivery).
+ */
+export async function scheduleDailyMotivation(): Promise<void> {
+  const settingsRows = await db
+    .select()
+    .from(notificationSettings)
+    .where(eq(notificationSettings.type, 'daily_motivation'));
+  const setting = settingsRows[0];
+  if (!setting?.enabled) {
+    await cancelNotification('daily_motivation');
+    return;
+  }
+  const quote = quoteForToday();
+  await scheduleDaily('daily_motivation', setting.hour, setting.minute, quote.title, quote.body);
 }
 
 export async function scheduleWeeklyReport(): Promise<void> {

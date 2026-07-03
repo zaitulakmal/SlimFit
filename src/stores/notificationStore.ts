@@ -9,7 +9,11 @@ import {
   initNotificationChannel,
   cancelNotification,
 } from '../services/notifications';
-import { reconcileTodayNotifications, scheduleWeeklyReport } from '../services/notificationEngine';
+import {
+  reconcileTodayNotifications,
+  scheduleWeeklyReport,
+  scheduleDailyMotivation,
+} from '../services/notificationEngine';
 
 type SettingsMap = Record<NotifType, NotificationSetting>;
 
@@ -35,6 +39,17 @@ const ALL_TYPES: NotifType[] = [
   'streak_protection',
   'weekly_report',
   'motivation',
+  'daily_motivation',
+];
+
+// Reminders that are on by default (opt-out) rather than opt-in.
+const DEFAULT_ON: NotifType[] = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snack',
+  'motivation',
+  'daily_motivation',
 ];
 
 async function ensureRows(): Promise<void> {
@@ -47,7 +62,7 @@ async function ensureRows(): Promise<void> {
       const def = NOTIF_DEFAULTS[type];
       await db.insert(notificationSettings).values({
         type,
-        enabled: false,
+        enabled: DEFAULT_ON.includes(type),
         hour: def.hour,
         minute: def.minute,
       });
@@ -93,6 +108,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     if (enabled) {
       if (type === 'weekly_report') {
         await scheduleWeeklyReport();
+      } else if (type === 'daily_motivation') {
+        await scheduleDailyMotivation();
       } else {
         await reconcileTodayNotifications();
       }
@@ -111,6 +128,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     if (settings?.[type]?.enabled) {
       if (type === 'weekly_report') {
         await scheduleWeeklyReport();
+      } else if (type === 'daily_motivation') {
+        await scheduleDailyMotivation();
       } else {
         await reconcileTodayNotifications();
       }

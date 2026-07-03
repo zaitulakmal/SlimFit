@@ -508,6 +508,7 @@ export default function ProfileScreen() {
           {([
             'breakfast', 'lunch', 'dinner', 'snack', 'water', 'weigh_in',
             'exercise', 'streak_protection', 'weekly_report', 'motivation',
+            'daily_motivation',
           ] as NotifType[]).map(type => {
             const ns = notifSettings?.[type];
             if (!ns) return null;
