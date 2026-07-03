@@ -74,6 +74,13 @@ import {
   type BMICategory,
 } from '../../constants/tdee';
 import { useProfileStore } from '../../stores/profileStore';
+import { useNotificationStore } from '../../stores/notificationStore';
+import { requestNotificationPermission, initNotificationChannel } from '../../services/notifications';
+import {
+  reconcileTodayNotifications,
+  scheduleWeeklyReport,
+  scheduleDailyMotivation,
+} from '../../services/notificationEngine';
 import StepProgress from '../../components/onboarding/StepProgress';
 import ActivityCard from '../../components/onboarding/ActivityCard';
 
@@ -344,6 +351,21 @@ export default function OnboardingScreen() {
         deadline: null,
         language: 'en',
       });
+
+      // Ask for notification permission now so the default-on reminders
+      // (breakfast/lunch/dinner/snack/motivation) can actually fire. Best-effort:
+      // a failure here shouldn't block onboarding since the profile already saved.
+      try {
+        await useNotificationStore.getState().loadSettings();
+        const granted = await requestNotificationPermission();
+        await initNotificationChannel();
+        if (granted) {
+          await reconcileTodayNotifications();
+          await scheduleWeeklyReport();
+          await scheduleDailyMotivation();
+        }
+      } catch {}
+
       router.replace('/(tabs)');
     } catch {
       Alert.alert('Error', t('common.error_save'));

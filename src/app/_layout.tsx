@@ -5,7 +5,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import mobileAds from 'react-native-google-mobile-ads';
 import { useProfileStore } from '../stores/profileStore';
 import { useAuthStore } from '../stores/authStore';
-import { reconcileTodayNotifications, scheduleWeeklyReport } from '../services/notificationEngine';
+import {
+  reconcileTodayNotifications,
+  scheduleWeeklyReport,
+  scheduleDailyMotivation,
+} from '../services/notificationEngine';
 import { preloadInterstitial } from '../services/ads';
 import '../i18n';
 
@@ -49,9 +53,11 @@ export default function RootLayout() {
     if (!isReady) return;
     reconcileTodayNotifications().catch(() => {});
     scheduleWeeklyReport().catch(() => {});
+    scheduleDailyMotivation().catch(() => {});
     const sub = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
         reconcileTodayNotifications().catch(() => {});
+        scheduleDailyMotivation().catch(() => {});
       }
     });
     return () => sub.remove();

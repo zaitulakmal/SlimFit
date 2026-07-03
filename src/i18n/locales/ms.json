@@ -160,7 +160,8 @@
     "weekly_report": "Laporan Mingguan",
     "motivation": "Galakan Motivasi",
     "permission_denied": "Sila aktifkan notifikasi dalam tetapan peranti anda.",
-    "time_label": "Masa"
+    "time_label": "Masa",
+    "daily_motivation": "Motivasi Harian"
   },
   "stats": {
     "streaks": "Konsistensi",

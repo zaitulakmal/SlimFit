@@ -34,7 +34,8 @@ export type NotifType =
   | 'exercise'
   | 'streak_protection'
   | 'weekly_report'
-  | 'motivation';
+  | 'motivation'
+  | 'daily_motivation';
 
 export const NOTIF_DEFAULTS: Record<NotifType, { hour: number; minute: number }> = {
   breakfast: { hour: 7, minute: 30 },
@@ -47,6 +48,7 @@ export const NOTIF_DEFAULTS: Record<NotifType, { hour: number; minute: number }>
   streak_protection: { hour: 20, minute: 30 },
   weekly_report: { hour: 18, minute: 0 },
   motivation: { hour: 19, minute: 0 },
+  daily_motivation: { hour: 8, minute: 0 },
 };
 
 // Set foreground notification behavior once at app start
@@ -115,6 +117,34 @@ export async function scheduleOneShotToday(
     },
   });
   return true;
+}
+
+/**
+ * Schedules a recurring daily notification at hour:minute (e.g. the daily
+ * motivation quote). Fires every day even if the app stays closed; callers
+ * re-invoke this on app foreground to rotate the message content.
+ */
+export async function scheduleDaily(
+  type: NotifType,
+  hour: number,
+  minute: number,
+  title: string,
+  body: string
+): Promise<void> {
+  await cancelNotification(type);
+  await Notifications.scheduleNotificationAsync({
+    identifier: identifierFor(type),
+    content: {
+      title,
+      body,
+      ...(Platform.OS === 'android' && { channelId: 'reminders' }),
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour,
+      minute,
+    },
+  });
 }
 
 /** Schedules a recurring weekly notification (e.g. the Sunday progress report). */
