@@ -1,12 +1,16 @@
 /**
  * Notification service — wraps expo-notifications.
  *
- * Every notification type below is scheduled as a one-shot "today" (or
- * "this week" for weekly_report) trigger, not a blind repeating daily
- * alarm. The notificationEngine decides each time the app foregrounds
- * (or right after a relevant log action) whether a type's condition is
- * still unmet — if the user already did the thing, the pending
- * notification for today is cancelled instead of firing anyway.
+ * Meal reminders (breakfast/lunch/dinner/snack) are scheduled as a rolling
+ * window of one-shot triggers covering the next MEAL_WINDOW_DAYS days, so
+ * they keep firing even if the user never reopens the app. Each reconcile
+ * (app foreground or a relevant log action) refreshes the window and skips
+ * today's slot when the meal is already logged or the time has passed.
+ *
+ * The condition-based types (water/weigh_in/exercise/streak_protection/
+ * motivation) stay one-shot "today" triggers — their conditions can only be
+ * evaluated live. weekly_report and daily_motivation use OS repeating
+ * triggers and always fire.
  *
  * Notification types and their default send time:
  *   breakfast          07:30  no breakfast logged yet
@@ -82,6 +86,63 @@ export async function initNotificationChannel(): Promise<void> {
 
 function identifierFor(type: NotifType): string {
   return `slimtrack-${type}`;
+}
+
+/**
+ * How many days ahead meal reminders are pre-scheduled. 4 meals × 7 days =
+ * 28 pending notifications, comfortably under iOS's 64-notification cap
+ * alongside the other one-shot/repeating types.
+ */
+export const MEAL_WINDOW_DAYS = 7;
+
+/**
+ * Schedules a rolling window of one-shot reminders: one per day for the next
+ * MEAL_WINDOW_DAYS days at hour:minute. Unlike scheduleOneShotToday, delivery
+ * does not depend on the app being reopened each day — if the user never
+ * comes back this week, every day's reminder still fires. Each reconcile
+ * refreshes the window (re-extending it back to full length) and sets
+ * skipToday when today's occurrence is already satisfied or past due.
+ */
+export async function scheduleDailyWindow(
+  type: NotifType,
+  hour: number,
+  minute: number,
+  title: string,
+  body: string,
+  skipToday: boolean
+): Promise<void> {
+  const now = new Date();
+  for (let offset = 0; offset < MEAL_WINDOW_DAYS; offset++) {
+    const id = `${identifierFor(type)}-d${offset}`;
+    await Notifications.cancelScheduledNotificationAsync(id);
+
+    const fireAt = new Date(now);
+    fireAt.setDate(fireAt.getDate() + offset);
+    fireAt.setHours(hour, minute, 0, 0);
+    if (fireAt.getTime() <= now.getTime()) continue;
+    if (offset === 0 && skipToday) continue;
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: id,
+      content: {
+        title,
+        body,
+        ...(Platform.OS === 'android' && { channelId: 'reminders' }),
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: fireAt,
+      },
+    });
+  }
+}
+
+/** Cancels a type's rolling window plus its legacy single-shot identifier. */
+export async function cancelDailyWindow(type: NotifType): Promise<void> {
+  for (let offset = 0; offset < MEAL_WINDOW_DAYS; offset++) {
+    await Notifications.cancelScheduledNotificationAsync(`${identifierFor(type)}-d${offset}`);
+  }
+  await cancelNotification(type);
 }
 
 /**
