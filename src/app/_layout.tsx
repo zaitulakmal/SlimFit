@@ -10,6 +10,8 @@ import {
   scheduleWeeklyReport,
   scheduleDailyMotivation,
 } from '../services/notificationEngine';
+import { requestNotificationPermission, initNotificationChannel } from '../services/notifications';
+import { useNotificationStore } from '../stores/notificationStore';
 import { preloadInterstitial } from '../services/ads';
 import '../i18n';
 
@@ -51,9 +53,20 @@ export default function RootLayout() {
   // Re-check notification conditions whenever the app comes to the foreground
   useEffect(() => {
     if (!isReady) return;
-    reconcileTodayNotifications().catch(() => {});
-    scheduleWeeklyReport().catch(() => {});
-    scheduleDailyMotivation().catch(() => {});
+    (async () => {
+      // Onboarded users never revisit onboarding, so this is their only
+      // chance to see the OS permission prompt (no-op once granted/denied).
+      if (profile?.onboardingCompleted) {
+        const granted = await requestNotificationPermission();
+        if (granted) await initNotificationChannel();
+      }
+      // Ensures settings rows exist and applies the one-time default-on
+      // migration before the engine reads them.
+      await useNotificationStore.getState().loadSettings();
+      await reconcileTodayNotifications();
+      await scheduleWeeklyReport();
+      await scheduleDailyMotivation();
+    })().catch(() => {});
     const sub = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
         reconcileTodayNotifications().catch(() => {});

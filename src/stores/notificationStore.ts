@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { eq } from 'drizzle-orm';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from '../db';
 import { notificationSettings, type NotificationSetting } from '../db/schema';
 import {
@@ -7,7 +8,7 @@ import {
   NOTIF_DEFAULTS,
   requestNotificationPermission,
   initNotificationChannel,
-  cancelNotification,
+  cancelDailyWindow,
 } from '../services/notifications';
 import {
   reconcileTodayNotifications,
@@ -52,6 +53,11 @@ const DEFAULT_ON: NotifType[] = [
   'daily_motivation',
 ];
 
+// One-time flip for users who installed before the DEFAULT_ON set existed —
+// their rows were created with enabled=false and ensureRows never touches
+// existing rows, so the new defaults would otherwise never reach them.
+const DEFAULT_ON_MIGRATION_KEY = 'slimtrack:notif-default-on-v1';
+
 async function ensureRows(): Promise<void> {
   for (const type of ALL_TYPES) {
     const existing = await db
@@ -67,6 +73,17 @@ async function ensureRows(): Promise<void> {
         minute: def.minute,
       });
     }
+  }
+
+  const migrated = await AsyncStorage.getItem(DEFAULT_ON_MIGRATION_KEY);
+  if (!migrated) {
+    for (const type of DEFAULT_ON) {
+      await db
+        .update(notificationSettings)
+        .set({ enabled: true })
+        .where(eq(notificationSettings.type, type));
+    }
+    await AsyncStorage.setItem(DEFAULT_ON_MIGRATION_KEY, 'true');
   }
 }
 
@@ -95,7 +112,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       }
       set({ permissionGranted: true });
     } else {
-      await cancelNotification(type);
+      await cancelDailyWindow(type);
     }
 
     await db

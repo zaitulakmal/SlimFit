@@ -28,6 +28,8 @@ import {
   scheduleOneShotToday,
   scheduleWeekly,
   scheduleDaily,
+  scheduleDailyWindow,
+  cancelDailyWindow,
   cancelNotification,
 } from './notifications';
 import { quoteForToday } from './motivationQuotes';
@@ -120,7 +122,10 @@ export async function reconcileTodayNotifications(): Promise<void> {
 
   const candidates: Candidate[] = [];
 
-  // --- Meal reminders (personalized time when there's enough history) ---
+  // --- Meal reminders: rolling multi-day window (personalized time when
+  // there's enough history). Scheduled outside the daily candidate cap —
+  // they are the guaranteed backbone that still fires when the app stays
+  // closed; today's slot is skipped once the meal is logged or past due.
   const mealLogged = (m: 'breakfast' | 'lunch' | 'dinner' | 'snack') => todayFood.some((f) => f.mealType === m);
   const mealCopy: Record<'breakfast' | 'lunch' | 'dinner' | 'snack', { title: string; body: string }> = {
     breakfast: { title: 'Breakfast Reminder', body: 'Log your breakfast to stay on track!' },
@@ -130,20 +135,19 @@ export async function reconcileTodayNotifications(): Promise<void> {
   };
   for (const meal of ['breakfast', 'lunch', 'dinner', 'snack'] as const) {
     if (!isEnabled(meal)) {
-      await cancelNotification(meal);
-      continue;
-    }
-    if (mealLogged(meal)) {
-      await cancelNotification(meal);
+      await cancelDailyWindow(meal);
       continue;
     }
     const personalized = await personalizedMealTime(meal);
     const { hour, minute } = personalized ?? timeFor(meal);
-    if (minutesPassed(hour, minute)) {
-      await cancelNotification(meal);
-      continue;
+    const skipToday = mealLogged(meal) || minutesPassed(hour, minute);
+    // Drop any legacy single-shot id scheduled by pre-window app versions
+    // so it can't fire alongside today's -d0 slot after an upgrade.
+    await cancelNotification(meal);
+    await scheduleDailyWindow(meal, hour, minute, mealCopy[meal].title, mealCopy[meal].body, skipToday);
+    if (!skipToday) {
+      await markSentToday(meal);
     }
-    candidates.push({ type: meal, hour, minute, ...mealCopy[meal], priority: 60 });
   }
 
   // --- Water reminder: behind today's pace ---
