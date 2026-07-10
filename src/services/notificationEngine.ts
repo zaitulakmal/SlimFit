@@ -25,6 +25,7 @@ import {
 } from '../db/schema';
 import {
   type NotifType,
+  WATER_SLOTS_PER_DAY,
   scheduleOneShotToday,
   scheduleWeekly,
   scheduleDaily,
@@ -150,31 +151,31 @@ export async function reconcileTodayNotifications(): Promise<void> {
     }
   }
 
-  // --- Water reminder: behind today's pace ---
+  // --- Water reminders: MyFitnessPal-style fixed slots through the day
+  // (base time + every 3 hours, WATER_SLOTS_PER_DAY total), each a rolling
+  // multi-day window so they fire without the app being reopened. Today's
+  // remaining slots are skipped once the daily goal is reached.
   if (isEnabled('water')) {
     const water = todayWater[0];
     const goal = water?.goalMl ?? 2000;
     const have = water?.totalMl ?? 0;
-    // Expected pace: roughly linear from 8am to 8pm
-    const dayStartMin = 8 * 60;
-    const dayEndMin = 20 * 60;
-    const pace = Math.min(1, Math.max(0, (nowMinutes - dayStartMin) / (dayEndMin - dayStartMin)));
-    const behindPace = have < goal * pace * 0.8; // 20% slack before nagging
-    const { hour, minute } = timeFor('water');
-    if (behindPace && have < goal && !minutesPassed(20, 0)) {
-      candidates.push({
-        type: 'water',
-        hour: Math.max(hour, now.getHours()),
-        minute: nowMinutes > hour * 60 + minute ? now.getMinutes() : minute,
-        title: 'Water Reminder',
-        body: `You're at ${have}/${goal}ml — quick sip break?`,
-        priority: 40,
-      });
-    } else {
-      await cancelNotification('water');
+    const goalMet = have >= goal;
+    const { hour: baseHour, minute: baseMinute } = timeFor('water');
+    const waterCopy = [
+      { title: 'Water Reminder 💧', body: 'Start hydrating — log your first glass of the day!' },
+      { title: 'Hydration Check 💧', body: 'Halfway through the day — keep the water coming!' },
+      { title: 'Water Break 💧', body: 'Almost there — a glass now helps you hit your daily goal.' },
+    ];
+    // Drop any legacy single-shot id scheduled by pre-window app versions.
+    await cancelNotification('water');
+    for (let slot = 0; slot < WATER_SLOTS_PER_DAY; slot++) {
+      const hour = Math.min(baseHour + slot * 3, 21);
+      const skipToday = goalMet || minutesPassed(hour, baseMinute);
+      const copy = waterCopy[slot] ?? waterCopy[0];
+      await scheduleDailyWindow('water', hour, baseMinute, copy.title, copy.body, skipToday, `s${slot}`);
     }
   } else {
-    await cancelNotification('water');
+    await cancelDailyWindow('water');
   }
 
   // --- Weigh-in ---
