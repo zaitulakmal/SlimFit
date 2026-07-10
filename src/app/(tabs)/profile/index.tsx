@@ -6,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -38,9 +37,7 @@ import {
 } from '../../../constants/tdee';
 import { useProfileStore } from '../../../stores/profileStore';
 import { useAuthStore } from '../../../stores/authStore';
-import { useNotificationStore } from '../../../stores/notificationStore';
 import { useStatsStore, BADGE_DEFS, getFlairEmoji } from '../../../stores/statsStore';
-import type { NotifType } from '../../../services/notifications';
 
 const W = Dimensions.get('window').width;
 
@@ -173,68 +170,6 @@ const row = StyleSheet.create({
   chipTxtOn: { color: C.navy },
 });
 
-// ─── Notification row ─────────────────────────────────────────────────────────
-
-function NotifRow({ type, label, enabled, hour, minute, onToggle, onTimePress }: {
-  type: NotifType; label: string; enabled: boolean; hour: number; minute: number;
-  onToggle: (v: boolean) => void; onTimePress: () => void;
-}) {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return (
-    <View style={notif.row}>
-      <View style={{ flex: 1 }}>
-        <Text style={notif.label}>{label}</Text>
-        <TouchableOpacity onPress={onTimePress} disabled={!enabled}>
-          <Text style={[notif.time, !enabled && { color: C.border }]}>{pad(hour)}:{pad(minute)}</Text>
-        </TouchableOpacity>
-      </View>
-      <Switch value={enabled} onValueChange={onToggle}
-        trackColor={{ false: C.border, true: C.navy }} thumbColor={C.white} />
-    </View>
-  );
-}
-
-const notif = StyleSheet.create({
-  row:   { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border },
-  label: { fontSize: 14, fontWeight: '500', color: C.textPrimary },
-  time:  { fontSize: 12, fontWeight: '700', color: C.navy, marginTop: 2 },
-});
-
-// ─── Time picker ──────────────────────────────────────────────────────────────
-
-function TimePicker({ hour, minute, onSave, onClose }: { hour: number; minute: number; onSave: (h: number, m: number) => void; onClose: () => void }) {
-  const { t } = useTranslation();
-  const [h, setH] = useState(String(hour));
-  const [m, setM] = useState(String(minute).padStart(2, '0'));
-  const save = () => { onSave(Math.min(Math.max(parseInt(h) || 0, 0), 23), Math.min(Math.max(parseInt(m) || 0, 0), 59)); };
-  return (
-    <View style={tp.backdrop}>
-      <View style={tp.modal}>
-        <Text style={tp.title}>{t('notif.time_label')}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <TextInput style={tp.input} value={h} onChangeText={setH} keyboardType="numeric" maxLength={2} selectTextOnFocus />
-          <Text style={tp.colon}>:</Text>
-          <TextInput style={tp.input} value={m} onChangeText={setM} keyboardType="numeric" maxLength={2} selectTextOnFocus />
-        </View>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <TouchableOpacity onPress={onClose} style={tp.cancel}><Text style={{ color: C.textSecondary, fontWeight: '600' }}>{t('common.cancel')}</Text></TouchableOpacity>
-          <TouchableOpacity onPress={save} style={tp.save}><Text style={{ color: '#FFFFFF', fontWeight: '700' }}>{t('profile.edit_save')}</Text></TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-const tp = StyleSheet.create({
-  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
-  modal:  { backgroundColor: C.white, borderRadius: 20, padding: 24, width: 260, gap: 20 },
-  title:  { fontSize: 16, fontWeight: '700', color: C.textPrimary, textAlign: 'center' },
-  input:  { fontSize: 28, fontWeight: '800', color: C.navy, borderWidth: 1.5, borderColor: C.border, borderRadius: 12, width: 68, textAlign: 'center', paddingVertical: 8 },
-  colon:  { fontSize: 28, fontWeight: '800', color: C.textPrimary },
-  cancel: { flex: 1, padding: 12, alignItems: 'center', borderRadius: 12, backgroundColor: C.background },
-  save:   { flex: 1, padding: 12, alignItems: 'center', borderRadius: 12, backgroundColor: C.navy },
-});
-
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
@@ -245,11 +180,9 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [editing, setEditing] = useState<FieldKey | null>(null);
 
-  const { settings: notifSettings, loadSettings, toggleNotification, updateTime } = useNotificationStore();
   const { streakMap, unlockedBadgeIds, weeklyCalories, loadStats } = useStatsStore();
-  const [timePickerFor, setTimePickerFor] = useState<NotifType | null>(null);
 
-  useFocusEffect(useCallback(() => { loadSettings(); loadStats(); }, []));
+  useFocusEffect(useCallback(() => { loadStats(); }, []));
 
   const handleFieldSave = useCallback(async (key: FieldKey, rawValue: string) => {
     const v = rawValue.trim();
@@ -502,25 +435,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* ── Reminders ── */}
-        <Text style={s.sec}>{t('notif.section')}</Text>
-        <View style={s.card}>
-          {([
-            'breakfast', 'lunch', 'dinner', 'snack', 'water', 'weigh_in',
-            'exercise', 'streak_protection', 'weekly_report', 'motivation',
-            'daily_motivation',
-          ] as NotifType[]).map(type => {
-            const ns = notifSettings?.[type];
-            if (!ns) return null;
-            return (
-              <NotifRow key={type} type={type} label={t(`notif.${type}`)}
-                enabled={ns.enabled} hour={ns.hour} minute={ns.minute}
-                onToggle={val => toggleNotification(type, val).catch(() => Alert.alert('', t('notif.permission_denied')))}
-                onTimePress={() => setTimePickerFor(type)} />
-            );
-          })}
-        </View>
-
         {/* ── About ── */}
         <View style={s.aboutRow}>
           {Constants.expoConfig?.version && (
@@ -554,13 +468,6 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
-      {timePickerFor && notifSettings?.[timePickerFor] && (
-        <TimePicker
-          hour={notifSettings[timePickerFor].hour}
-          minute={notifSettings[timePickerFor].minute}
-          onClose={() => setTimePickerFor(null)}
-          onSave={(h, m) => { updateTime(timePickerFor, h, m); setTimePickerFor(null); }} />
-      )}
     </View>
   );
 }
