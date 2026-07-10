@@ -49,6 +49,7 @@ const DEFAULT_ON: NotifType[] = [
   'lunch',
   'dinner',
   'snack',
+  'water',
   'motivation',
   'daily_motivation',
 ];
@@ -57,6 +58,7 @@ const DEFAULT_ON: NotifType[] = [
 // their rows were created with enabled=false and ensureRows never touches
 // existing rows, so the new defaults would otherwise never reach them.
 const DEFAULT_ON_MIGRATION_KEY = 'slimtrack:notif-default-on-v1';
+const WATER_ON_MIGRATION_KEY = 'slimtrack:notif-default-on-v2-water';
 
 async function ensureRows(): Promise<void> {
   for (const type of ALL_TYPES) {
@@ -84,6 +86,16 @@ async function ensureRows(): Promise<void> {
         .where(eq(notificationSettings.type, type));
     }
     await AsyncStorage.setItem(DEFAULT_ON_MIGRATION_KEY, 'true');
+  }
+
+  // v2: water joined the default-on set after v1 already ran for some users.
+  const migratedV2 = await AsyncStorage.getItem(WATER_ON_MIGRATION_KEY);
+  if (!migratedV2) {
+    await db
+      .update(notificationSettings)
+      .set({ enabled: true })
+      .where(eq(notificationSettings.type, 'water'));
+    await AsyncStorage.setItem(WATER_ON_MIGRATION_KEY, 'true');
   }
 }
 

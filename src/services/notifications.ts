@@ -89,11 +89,14 @@ function identifierFor(type: NotifType): string {
 }
 
 /**
- * How many days ahead meal reminders are pre-scheduled. 4 meals × 7 days =
- * 28 pending notifications, comfortably under iOS's 64-notification cap
- * alongside the other one-shot/repeating types.
+ * How many days ahead meal/water reminders are pre-scheduled. 4 meals × 7
+ * days + 3 water slots × 7 days = 49 pending notifications, still under
+ * iOS's 64-notification cap alongside the other one-shot/repeating types.
  */
 export const MEAL_WINDOW_DAYS = 7;
+
+/** Water reminders fire this many times per day, 3 hours apart. */
+export const WATER_SLOTS_PER_DAY = 3;
 
 /**
  * Schedules a rolling window of one-shot reminders: one per day for the next
@@ -109,11 +112,12 @@ export async function scheduleDailyWindow(
   minute: number,
   title: string,
   body: string,
-  skipToday: boolean
+  skipToday: boolean,
+  idSuffix = ''
 ): Promise<void> {
   const now = new Date();
   for (let offset = 0; offset < MEAL_WINDOW_DAYS; offset++) {
-    const id = `${identifierFor(type)}-d${offset}`;
+    const id = `${identifierFor(type)}${idSuffix ? `-${idSuffix}` : ''}-d${offset}`;
     await Notifications.cancelScheduledNotificationAsync(id);
 
     const fireAt = new Date(now);
@@ -141,6 +145,10 @@ export async function scheduleDailyWindow(
 export async function cancelDailyWindow(type: NotifType): Promise<void> {
   for (let offset = 0; offset < MEAL_WINDOW_DAYS; offset++) {
     await Notifications.cancelScheduledNotificationAsync(`${identifierFor(type)}-d${offset}`);
+    // Per-slot windows (water uses one window per daily slot)
+    for (let slot = 0; slot < WATER_SLOTS_PER_DAY; slot++) {
+      await Notifications.cancelScheduledNotificationAsync(`${identifierFor(type)}-s${slot}-d${offset}`);
+    }
   }
   await cancelNotification(type);
 }
