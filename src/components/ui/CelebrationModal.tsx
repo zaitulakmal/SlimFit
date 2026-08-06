@@ -10,6 +10,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { colors, typography, spacing, radius } from '../../constants/theme-new';
+import { Mascot } from '../art/Mascot';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const CONFETTI_COLORS = [colors.primary, colors.accent, '#4CAF50', '#42A5F5', '#AB47BC'];
@@ -48,7 +49,6 @@ function ConfettiPiece({ index }: { index: number }) {
 
 interface CelebrationModalProps {
   visible: boolean;
-  emoji?: string;
   title: string;
   subtitle: string;
   ctaLabel?: string;
@@ -57,7 +57,6 @@ interface CelebrationModalProps {
 
 export default function CelebrationModal({
   visible,
-  emoji = '🎉',
   title,
   subtitle,
   ctaLabel = 'Keep Going',
@@ -80,7 +79,9 @@ export default function CelebrationModal({
       <View style={styles.backdrop}>
         {visible && Array.from({ length: 24 }).map((_, i) => <ConfettiPiece key={i} index={i} />)}
         <Animated.View style={[styles.card, cardStyle]}>
-          <Text style={styles.emoji}>{emoji}</Text>
+          <View style={styles.art}>
+            <Mascot size={96} mood="cheer" />
+          </View>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
           <Pressable style={styles.button} onPress={onClose}>
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  emoji: { fontSize: 56, marginBottom: spacing.xs },
+  art: { marginBottom: spacing.xs },
   title: { ...typography.heading, color: colors.text, textAlign: 'center' },
   subtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing.md },
   button: {

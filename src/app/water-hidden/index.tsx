@@ -7,43 +7,22 @@ import { useFocusEffect } from 'expo-router';
 import Animated, {
   FadeInDown, FadeInUp,
   useAnimatedProps, useSharedValue,
-  withSpring, withTiming, Easing,
-  useAnimatedStyle, interpolate,
+  withTiming, Easing,
 } from 'react-native-reanimated';
-import Svg, { Path, Rect, ClipPath, Defs, G, Circle as SvgCircle, Stop, RadialGradient } from 'react-native-svg';
-import { Minus, Plus, Drop, CheckCircle, X } from 'phosphor-react-native';
+import Svg, { Path, Rect, ClipPath, Defs, G, Circle as SvgCircle, Stop, RadialGradient, LinearGradient } from 'react-native-svg';
+import { Minus, Plus, Drop, CheckCircle, Target, DropHalf } from 'phosphor-react-native';
 
-import { colors } from '../../constants/theme-new';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { cute, cuteShadow, radius, withAlpha } from '@/theme/cute';
 import { useWaterStore } from '../../stores/waterStore';
 import BottomNav from '../../components/BottomNav';
 
 const { width: W } = Dimensions.get('window');
-const C = colors;
+const SKY = cute.sky;
+const MINT = cute.mint;
 
 const STEP_ML = 250;
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
-
-function HeaderDecoration() {
-  return (
-    <Svg width={W} height={200} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 200`}>
-      <Defs>
-        <RadialGradient id="waterHeaderGrad" cx="50%" cy="0%" r="100%">
-          <Stop offset="0%" stopColor="#4CAF50" />
-          <Stop offset="100%" stopColor="#1B5E20" />
-        </RadialGradient>
-      </Defs>
-      <Rect width={W} height={200} fill="url(#waterHeaderGrad)" />
-      
-      {/* Water drops decoration */}
-      <SvgCircle cx={W * 0.15} cy={50} r={20} fill="#FFFFFF" opacity={0.2} />
-      <SvgCircle cx={W * 0.8} cy={30} r={15} fill="#FFFFFF" opacity={0.15} />
-      <SvgCircle cx={W * 0.5} cy={180} r={30} fill="#FFFFFF" opacity={0.1} />
-      
-      {/* Wavy bottom */}
-      <Path d={`M0,175 Q${W * 0.3},200 ${W * 0.5},185 Q${W * 0.7},170 ${W},190 L${W},200 L0,200 Z`} fill={C.background} />
-    </Svg>
-  );
-}
 
 function WaterBottleLarge({ progress }: { progress: number }) {
   const GW = 200, GH = 320;
@@ -56,7 +35,6 @@ function WaterBottleLarge({ progress }: { progress: number }) {
     });
   }, [progress]);
 
-  // Bottle shape: cap(top) → neck → shoulder → body → base
   // Body: x=60..140, y=90..290
   const bodyX = 60, bodyW = 80, bodyY = 90, bodyH = 200;
   const maxFill = bodyH - 4;
@@ -67,9 +45,8 @@ function WaterBottleLarge({ progress }: { progress: number }) {
   }));
 
   const isGoalMet = progress >= 1;
-  const fillColor = isGoalMet ? '#4CAF50' : '#42A5F5';
+  const fillColor = isGoalMet ? MINT : SKY;
 
-  // Bottle outline path
   const bottlePath = `
     M 90,10 L 110,10
     L 110,20 Q 118,22 120,32
@@ -92,25 +69,25 @@ function WaterBottleLarge({ progress }: { progress: number }) {
         <ClipPath id="bottleClipLarge">
           <Path d={clipPath} />
         </ClipPath>
+        <LinearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <Stop offset="0%" stopColor={withAlpha(fillColor, 0.95)} />
+          <Stop offset="100%" stopColor={withAlpha(fillColor, 0.7)} />
+        </LinearGradient>
       </Defs>
 
-      {/* Bottle body background */}
-      <Path d={bottlePath} fill={`${fillColor}15`} stroke={fillColor} strokeWidth={3} strokeLinejoin="round" />
+      <Path d={bottlePath} fill={withAlpha(fillColor, 0.12)} stroke={fillColor} strokeWidth={3} strokeLinejoin="round" />
 
-      {/* Water fill */}
       <G clipPath="url(#bottleClipLarge)">
         <AnimatedRect
           x={60} width={80}
-          fill={fillColor}
-          opacity={0.75}
+          fill="url(#waterGrad)"
+          opacity={0.85}
           animatedProps={fillProps}
         />
-        {/* Shine */}
-        <Rect x={68} y={95} width={10} height={160} rx={5} fill="rgba(255,255,255,0.4)" />
-        <Rect x={82} y={95} width={5} height={110} rx={3} fill="rgba(255,255,255,0.2)" />
+        <Rect x={68} y={95} width={10} height={160} rx={5} fill="rgba(255,255,255,0.45)" />
+        <Rect x={82} y={95} width={5} height={110} rx={3} fill="rgba(255,255,255,0.25)" />
       </G>
 
-      {/* Cap */}
       <Rect x={88} y={6} width={24} height={16} rx={5} fill={fillColor} />
       <Rect x={92} y={2} width={16} height={8} rx={3} fill={fillColor} opacity={0.7} />
     </Svg>
@@ -118,6 +95,7 @@ function WaterBottleLarge({ progress }: { progress: number }) {
 }
 
 export default function WaterScreen() {
+  const insets = useSafeAreaInsets();
   const { today, addWater, removeWater, setGoal, loadToday } = useWaterStore();
   const [showGoalPicker, setShowGoalPicker] = useState(false);
 
@@ -138,12 +116,10 @@ export default function WaterScreen() {
 
   return (
     <View style={s.root}>
-      <View style={s.header}>
-        <HeaderDecoration />
-        
+      <View style={[s.header, { paddingTop: insets.top + 10 }]}>
         <View style={s.headerContent}>
           <Text style={s.title}>Water</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={s.goalBtn}
             onPress={() => setShowGoalPicker(!showGoalPicker)}
           >
@@ -153,13 +129,11 @@ export default function WaterScreen() {
       </View>
 
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-        {/* Main glass */}
         <View style={s.glassContainer}>
           <WaterBottleLarge progress={progress} />
-          
           {isGoalMet && (
             <Animated.View entering={FadeInDown} style={s.completeBadge}>
-              <CheckCircle size={20} weight="fill" color={C.white} />
+              <CheckCircle size={20} weight="fill" color="#FFFFFF" />
               <Text style={s.completeText}>Goal reached!</Text>
             </Animated.View>
           )}
@@ -167,35 +141,45 @@ export default function WaterScreen() {
 
         {/* Stats */}
         <View style={s.statsRow}>
-          <View style={[s.statCard, { backgroundColor: C.cardBlue }]}>
-            <Drop size={24} weight="fill" color={C.blue} />
-            <Text style={s.statValue}>{totalMl}ml</Text>
+          <View style={[s.statCard, { backgroundColor: withAlpha(SKY, 0.12) }]}>
+            <Drop size={24} weight="fill" color={SKY} />
+            <Text style={[s.statValue, { color: cute.ink }]}>{totalMl}ml</Text>
             <Text style={s.statLabel}>Consumed</Text>
           </View>
-          <View style={[s.statCard, { backgroundColor: C.cardMint }]}>
-            <Text style={s.statEmoji}>🎯</Text>
-            <Text style={s.statValue}>{goalMl}ml</Text>
+          <View style={[s.statCard, { backgroundColor: withAlpha(cute.butter, 0.18) }]}>
+            <Target size={24} weight="fill" color={cute.warn} />
+            <Text style={[s.statValue, { color: cute.ink }]}>{goalMl}ml</Text>
             <Text style={s.statLabel}>Goal</Text>
           </View>
-          <View style={[s.statCard, { backgroundColor: C.cardYellow }]}>
-            <Text style={s.statEmoji}>💧</Text>
-            <Text style={s.statValue}>{Math.max(goalMl - totalMl, 0)}ml</Text>
+          <View style={[s.statCard, { backgroundColor: withAlpha(MINT, 0.16) }]}>
+            <DropHalf size={24} weight="fill" color={MINT} />
+            <Text style={[s.statValue, { color: cute.ink }]}>{Math.max(goalMl - totalMl, 0)}ml</Text>
             <Text style={s.statLabel}>Remaining</Text>
           </View>
         </View>
 
-        {/* Quick add buttons */}
+        {/* Big cute "add a glass" button */}
+        <TouchableOpacity
+          style={[s.addGlassBtn, { backgroundColor: SKY }]}
+          onPress={() => handleAdd(STEP_ML)}
+          activeOpacity={0.85}
+        >
+          <Plus size={26} weight="bold" color="#FFFFFF" />
+          <Text style={s.addGlassText}>Add a glass (+250ml)</Text>
+        </TouchableOpacity>
+
+        {/* Quick add pills */}
         <View style={s.quickAdd}>
-          <Text style={s.sectionTitle}>Quick Add</Text>
+          <Text style={[s.sectionTitle, { color: cute.ink }]}>Quick Add</Text>
           <View style={s.quickBtns}>
             {[250, 500, 750].map((ml) => (
               <TouchableOpacity
                 key={ml}
-                style={[s.quickBtn, { backgroundColor: C.cardBlue }]}
+                style={[s.quickBtn, { backgroundColor: withAlpha(SKY, 0.14), borderColor: withAlpha(SKY, 0.4) }]}
                 onPress={() => handleAdd(ml)}
               >
-                <Plus size={18} weight="bold" color={C.blue} />
-                <Text style={[s.quickBtnText, { color: C.blue }]}>+{ml}ml</Text>
+                <Plus size={16} weight="bold" color={SKY} />
+                <Text style={[s.quickBtnText, { color: SKY }]}>+{ml}ml</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -203,30 +187,30 @@ export default function WaterScreen() {
 
         {/* Custom amount */}
         <View style={s.customSection}>
-          <Text style={s.sectionTitle}>Custom Amount</Text>
+          <Text style={[s.sectionTitle, { color: cute.ink }]}>Adjust</Text>
           <View style={s.customBtns}>
             <TouchableOpacity
-              style={[s.customBtn, { borderColor: C.border }]}
+              style={[s.customBtn, { borderColor: withAlpha(cute.ink, 0.25) }]}
               onPress={handleRemove}
             >
-              <Minus size={20} weight="bold" color={C.coral} />
-              <Text style={s.customBtnText}>250ml</Text>
+              <Minus size={20} weight="bold" color={cute.inkSoft} />
+              <Text style={[s.customBtnText, { color: cute.ink }]}>-250ml</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[s.customBtn, { backgroundColor: C.primary, borderColor: C.primary }]}
+              style={[s.customBtn, { backgroundColor: SKY, borderColor: SKY }]}
               onPress={() => handleAdd(250)}
             >
-              <Plus size={20} weight="bold" color={C.white} />
-              <Text style={[s.customBtnText, { color: C.white }]}>250ml</Text>
+              <Plus size={20} weight="bold" color="#FFFFFF" />
+              <Text style={[s.customBtnText, { color: '#FFFFFF' }]}>+250ml</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Glass progress */}
         <View style={s.glassProgress}>
-          <Text style={s.glassLabel}>{glasses} of {goalGlasses} glasses</Text>
-          <View style={s.glassBar}>
-            <View style={[s.glassFill, { width: `${Math.min(progress * 100, 100)}%` }]} />
+          <Text style={[s.glassLabel, { color: cute.inkSoft }]}>{glasses} of {goalGlasses} glasses</Text>
+          <View style={[s.glassBar, { backgroundColor: withAlpha(SKY, 0.18) }]}>
+            <View style={[s.glassFill, { width: `${Math.min(progress * 100, 100)}%`, backgroundColor: SKY }]} />
           </View>
         </View>
       </ScrollView>
@@ -236,14 +220,15 @@ export default function WaterScreen() {
   );
 }
 
+function RF(v: number) { return Math.round(v); }
+
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.background },
+  root: { flex: 1, backgroundColor: cute.cream },
   header: {
+    // paddingTop comes from the safe-area inset (applied inline).
     position: 'relative',
-    paddingTop: 50,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
-    overflow: 'hidden',
+    paddingBottom: 14,
+    paddingHorizontal: 18,
   },
   headerContent: {
     flexDirection: 'row',
@@ -251,33 +236,39 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     zIndex: 1,
   },
-  title: { fontSize: 28, fontWeight: '800', color: C.white },
+  title: { fontSize: 28, fontWeight: '800', color: cute.ink },
   goalBtn: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: withAlpha(cute.water, 0.16),
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
   },
-  goalBtnText: { fontSize: 14, fontWeight: '600', color: C.white },
-  
-  content: { padding: 20, paddingBottom: 100 },
-  
+  goalBtnText: { fontSize: 14, fontWeight: '600', color: cute.water },
+
+  content: { paddingHorizontal: 18, paddingTop: 8, paddingBottom: 100 },
+
   glassContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+    backgroundColor: cute.card,
+    borderRadius: radius.xl,
+    paddingVertical: 20,
+    borderWidth: 1,
+    borderColor: cute.line,
+    ...cuteShadow.md,
   },
   completeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: C.primary,
+    backgroundColor: MINT,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
     marginTop: -10,
   },
-  completeText: { fontSize: 14, fontWeight: '700', color: C.white },
-  
+  completeText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
+
   statsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -285,17 +276,29 @@ const s = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: 14,
     alignItems: 'center',
     gap: 6,
+    ...cuteShadow.sm,
   },
-  statValue: { fontSize: 18, fontWeight: '800', color: C.textPrimary },
-  statLabel: { fontSize: 11, fontWeight: '600', color: C.textSecondary },
-  statEmoji: { fontSize: 20 },
-  
-  quickAdd: { marginBottom: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: C.textPrimary, marginBottom: 12 },
+  statValue: { fontSize: 18, fontWeight: '800' },
+  statLabel: { fontSize: 11, fontWeight: '600', color: cute.inkSoft },
+
+  addGlassBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    height: 58,
+    borderRadius: radius.lg,
+    marginBottom: 24,
+    ...cuteShadow.md,
+  },
+  addGlassText: { fontSize: 17, fontWeight: '800', color: '#FFFFFF' },
+
+  quickAdd: { marginBottom: 20 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 12 },
   quickBtns: { flexDirection: 'row', gap: 10 },
   quickBtn: {
     flex: 1,
@@ -304,10 +307,11 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
   },
   quickBtnText: { fontSize: 15, fontWeight: '700' },
-  
+
   customSection: { marginBottom: 24 },
   customBtns: { flexDirection: 'row', gap: 12 },
   customBtn: {
@@ -317,22 +321,20 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 2,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
   },
-  customBtnText: { fontSize: 15, fontWeight: '700', color: C.textPrimary },
-  
+  customBtnText: { fontSize: 15, fontWeight: '700' },
+
   glassProgress: { marginBottom: 20 },
-  glassLabel: { fontSize: 14, fontWeight: '600', color: C.textSecondary, textAlign: 'center', marginBottom: 8 },
+  glassLabel: { fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
   glassBar: {
-    height: 8,
-    backgroundColor: C.border,
-    borderRadius: 4,
+    height: 10,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   glassFill: {
     height: '100%',
-    backgroundColor: C.blue,
-    borderRadius: 4,
+    borderRadius: 5,
   },
 });

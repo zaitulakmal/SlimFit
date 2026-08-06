@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
-import { CaretLeft, ShareNetwork } from 'phosphor-react-native';
+import { CaretLeft, ShareNetwork, ChartBar } from 'phosphor-react-native';
 import { colors, typography, spacing, radius, shadow } from '../constants/theme-new';
 import { useStatsStore } from '../stores/statsStore';
 import { buildWeeklyReport, weeklyReportShareText, type WeeklyReportSummary } from '../services/weeklyReport';
@@ -39,7 +39,9 @@ export default function WeeklyReportScreen() {
       {summary && (
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <View style={s.heroCard}>
-            <Text style={s.heroEmoji}>📊</Text>
+            <View style={s.heroIcon}>
+              <ChartBar size={30} weight="fill" color={colors.primary} />
+            </View>
             <Text style={s.heroTitle}>Your week at a glance</Text>
           </View>
 
@@ -95,7 +97,11 @@ const s = StyleSheet.create({
   headerTitle: { ...typography.title, color: C.text },
   content: { padding: spacing.md, paddingBottom: spacing['2xl'], gap: spacing.md },
   heroCard: { alignItems: 'center', paddingVertical: spacing.md },
-  heroEmoji: { fontSize: 40 },
+  heroIcon: {
+    width: 60, height: 60, borderRadius: 22,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.primary + '1A',
+  },
   heroTitle: { ...typography.subtitle, color: C.text, marginTop: spacing.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   tile: {

@@ -18,17 +18,19 @@ export interface DetectionResult {
   errorDetail?: string;
 }
 
-// Groq — free 7,000 req/day, vision support (primary)
-// Get key: console.groq.com → API Keys → Create
+// Groq — this account's model catalogue (GET /v1/models) no longer lists any
+// image-capable model; llama-4-scout was retired and returns model_not_found.
+// Leaving a model id here just buys a guaranteed 404 before the fallback runs,
+// so vision goes straight to OpenRouter. Put an id back here if Groq ships a
+// vision model again.
+const GROQ_VISION_MODEL = '';
 const GROQ_KEY = process.env.EXPO_PUBLIC_GROQ_KEY || '';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
 
-// OpenRouter — fallback
+// OpenRouter — the vision path. Both ids verified present and image-capable.
 const OPENROUTER_KEY = process.env.EXPO_PUBLIC_OPENROUTER_KEY || '';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODELS = [
-  'google/gemma-3-27b-it:free',
   'google/gemma-4-31b-it:free',
   'nvidia/nemotron-nano-12b-v2-vl:free',
 ];
@@ -156,9 +158,9 @@ async function tryProvider(url: string, key: string, model: string, base64: stri
 }
 
 export async function detectFoodFromBase64(base64: string): Promise<DetectionResult> {
-  // 1. Try Groq (primary — free 7k req/day, fast vision)
-  if (GROQ_KEY) {
-    const result = await tryProvider(GROQ_URL, GROQ_KEY, GROQ_MODEL, base64);
+  // 1. Groq, only if a vision-capable model is configured (see GROQ_VISION_MODEL).
+  if (GROQ_KEY && GROQ_VISION_MODEL) {
+    const result = await tryProvider(GROQ_URL, GROQ_KEY, GROQ_VISION_MODEL, base64);
     if (result.foods !== null || result.error === 'no_food' || result.error === 'network_error') {
       return result;
     }

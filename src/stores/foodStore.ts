@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../db';
 import {
   foodLogs,
@@ -30,6 +30,7 @@ interface FoodState {
   loadPresets: () => Promise<void>;
   getTotals: () => FoodTotals;
   getMealLogs: (mealType: string) => FoodLog[];
+  getRecentFoods: (limit?: number) => Promise<FoodLog[]>;
 }
 
 function todayStr() {
@@ -102,5 +103,24 @@ export const useFoodStore = create<FoodState>((set, get) => ({
 
   getMealLogs: (mealType) => {
     return get().dayLogs.filter((l) => l.mealType === mealType);
+  },
+
+  getRecentFoods: async (limit = 15) => {
+    const rows = await db
+      .select()
+      .from(foodLogs)
+      .orderBy(desc(foodLogs.loggedAt))
+      .limit(100);
+    const seen = new Set<string>();
+    const unique: FoodLog[] = [];
+    for (const row of rows) {
+      const key = row.foodName.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(row);
+        if (unique.length >= limit) break;
+      }
+    }
+    return unique;
   },
 }));

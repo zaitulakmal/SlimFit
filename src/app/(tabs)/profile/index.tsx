@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
 import {
   Alert,
-  Dimensions,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,29 +15,26 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import Svg, {
-  Rect, Circle as SvgCircle, Defs, LinearGradient, Stop, Path,
-} from 'react-native-svg';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   PencilSimple, Check, XCircle,
-  Fire, Drop, Scales, ForkKnife, Trophy, TrendDown,
-  SignOut, Warning, Sun, ArrowClockwise,
+  Fire, Drop, Scales, ForkKnife, Trophy, TrendDown, Crown, UserCircle,
+  SignOut, Warning, Sun, ArrowClockwise, Ruler, ArrowRight,
 } from 'phosphor-react-native';
 import Constants from 'expo-constants';
 
 import { pastelColors as C, pastelSpacing as spacing } from '../../../constants/pastel-theme';
+import { cute, radius, cuteShadow, withAlpha } from '@/theme/cute';
+import { Mascot } from '@/components/art/Mascot';
 import {
   getBMICategory, calculateCalorieTarget,
   type BMICategory, type ActivityLevel, type Gender, type GoalType,
 } from '../../../constants/tdee';
 import { useProfileStore } from '../../../stores/profileStore';
 import { useAuthStore } from '../../../stores/authStore';
-import { useStatsStore, BADGE_DEFS, getFlairEmoji } from '../../../stores/statsStore';
-
-const W = Dimensions.get('window').width;
+import { useStatsStore, BADGE_DEFS, getFlairIcon } from '../../../stores/statsStore';
 
 // ─── Icons ──────────────────────────────────────────────────────────────────
 
@@ -54,6 +49,7 @@ function PhosphorIcon({ name, size, color }: { name: string; size: number; color
     case 'trending-down': return <TrendDown {...p} />;
     case 'sunny':         return <Sun {...p} />;
     case 'refresh':       return <ArrowClockwise {...p} />;
+    case 'crown':         return <Crown {...p} />;
     default:              return <Fire {...p} />;
   }
 }
@@ -202,7 +198,7 @@ export default function ProfileScreen() {
 
   if (!profile) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.background }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDFBF7' }}>
         <Text style={{ color: C.textSecondary }}>{t('home.empty_state')}</Text>
       </View>
     );
@@ -210,7 +206,9 @@ export default function ProfileScreen() {
 
   const bmiCat   = profile.bmi ? getBMICategory(profile.bmi) : 'normal';
   const chipCol  = bmiColor(bmiCat);
-  const initials = profile.name ? profile.name.trim().charAt(0).toUpperCase() : '?';
+  // null → we show a user icon rather than a bare "?".
+  const initials = profile.name ? profile.name.trim().charAt(0).toUpperCase() : null;
+  const flairIcon = getFlairIcon(unlockedBadgeIds);
 
   const actLabels: Record<ActivityLevel, string> = {
     sedentary: t('onboarding.activity_sedentary'),
@@ -227,93 +225,41 @@ export default function ProfileScreen() {
   const maxCal = Math.max(...weeklyCalories.map(d => d.calories), tdee, 500);
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.background }}>
+    <View style={{ flex: 1, backgroundColor: '#FDFBF7' }}>
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 48 }}>
 
         {/* ── Header ── */}
-        <View style={s.header}>
-          <Svg width={W} height={220 + insets.top} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} ${220 + insets.top}`}>
-            <Defs>
-              <LinearGradient id="profGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor="#1A2B5C" />
-                <Stop offset="100%" stopColor="#243470" />
-              </LinearGradient>
-            </Defs>
-            <Rect width={W} height={220 + insets.top} fill="url(#profGrad)" />
-
-            {/* Ambient glows */}
-            <SvgCircle cx={W * 0.85} cy={0}              r={110} fill="#FFFFFF" opacity={0.03} />
-            <SvgCircle cx={W * 0.1}  cy={220 + insets.top} r={90} fill="#F0C808" opacity={0.06} />
-
-            {/* ── Trophy — top right */}
-            <Path
-              d={`M${W - 62},${insets.top + 18} L${W - 30},${insets.top + 18} L${W - 30},${insets.top + 46} Q${W - 30},${insets.top + 60} ${W - 46},${insets.top + 60} Q${W - 62},${insets.top + 60} ${W - 62},${insets.top + 46} Z`}
-              fill="#F0C808" opacity={0.85}
-            />
-            {/* trophy handles */}
-            <Path d={`M${W - 62},${insets.top + 28} Q${W - 74},${insets.top + 28} ${W - 74},${insets.top + 42} Q${W - 74},${insets.top + 52} ${W - 62},${insets.top + 52}`} stroke="#F0C808" strokeWidth={3} fill="none" opacity={0.7} />
-            <Path d={`M${W - 30},${insets.top + 28} Q${W - 18},${insets.top + 28} ${W - 18},${insets.top + 42} Q${W - 18},${insets.top + 52} ${W - 30},${insets.top + 52}`} stroke="#F0C808" strokeWidth={3} fill="none" opacity={0.7} />
-            {/* trophy base */}
-            <Rect x={W - 58} y={insets.top + 60} width={24} height={5} rx={2} fill="#F0C808" opacity={0.7} />
-            <Rect x={W - 64} y={insets.top + 65} width={36} height={5} rx={2} fill="#F0C808" opacity={0.6} />
-            {/* star inside trophy */}
-            <SvgCircle cx={W - 46} cy={insets.top + 38} r={6} fill="rgba(255,255,255,0.4)" />
-
-            {/* ── Apple — top left */}
-            <SvgCircle cx={38} cy={insets.top + 52} r={26} fill="#C41E3A" opacity={0.88} />
-            <SvgCircle cx={38} cy={insets.top + 52} r={18} fill="#E84060" opacity={0.4} />
-            <SvgCircle cx={30} cy={insets.top + 42} r={5}  fill="rgba(255,255,255,0.3)" />
-            <Rect x={36} y={insets.top + 24} width={4} height={10} rx={2} fill="#34D399" opacity={0.9} />
-            <Path d={`M36,${insets.top + 26} Q44,${insets.top + 18} 50,${insets.top + 24}`} stroke="#34D399" strokeWidth={2.5} fill="none" opacity={0.9} />
-
-            {/* ── Heart — right side mid */}
-            <Path
-              d={`M${W - 26},${insets.top + 110} C${W - 26},${insets.top + 104} ${W - 20},${insets.top + 100} ${W - 14},${insets.top + 104} C${W - 8},${insets.top + 100} ${W - 2},${insets.top + 104} ${W - 2},${insets.top + 110} C${W - 2},${insets.top + 118} ${W - 14},${insets.top + 126} ${W - 14},${insets.top + 126} C${W - 14},${insets.top + 126} ${W - 26},${insets.top + 118} ${W - 26},${insets.top + 110} Z`}
-              fill="#FF6B8A" opacity={0.8}
-            />
-
-            {/* ── Flame — left side mid */}
-            <Path
-              d={`M26,${insets.top + 150} C20,${insets.top + 136} 28,${insets.top + 128} 26,${insets.top + 118} C30,${insets.top + 124} 34,${insets.top + 128} 32,${insets.top + 120} C38,${insets.top + 128} 40,${insets.top + 140} 34,${insets.top + 150} C32,${insets.top + 156} 28,${insets.top + 156} 26,${insets.top + 150} Z`}
-              fill="#FB923C" opacity={0.8}
-            />
-            <Path
-              d={`M28,${insets.top + 148} C25,${insets.top + 140} 29,${insets.top + 135} 28,${insets.top + 130} C31,${insets.top + 134} 32,${insets.top + 142} 30,${insets.top + 148} Z`}
-              fill="#FDE68A" opacity={0.7}
-            />
-
-            {/* ── Water drop — bottom left area */}
-            <Path
-              d={`M${W - 38},${insets.top + 148} Q${W - 50},${insets.top + 158} ${W - 38},${insets.top + 172} Q${W - 26},${insets.top + 158} ${W - 38},${insets.top + 148} Z`}
-              fill="#7EC8E3" opacity={0.75}
-            />
-            <SvgCircle cx={W - 42} cy={insets.top + 157} r={3} fill="rgba(255,255,255,0.5)" />
-
-            {/* Sparkle dots */}
-            <SvgCircle cx={W * 0.38} cy={insets.top + 30}  r={3} fill="#F0C808" opacity={0.55} />
-            <SvgCircle cx={W * 0.55} cy={insets.top + 18}  r={2} fill="#FFFFFF" opacity={0.3} />
-            <SvgCircle cx={W * 0.65} cy={insets.top + 90}  r={2} fill="#F0C808" opacity={0.4} />
-            <SvgCircle cx={18}       cy={insets.top + 95}  r={3} fill="#FFFFFF" opacity={0.15} />
-            <SvgCircle cx={W * 0.42} cy={insets.top + 155} r={2} fill="#FFFFFF" opacity={0.2} />
-
-            {/* Wavy bottom */}
-            <Path d={`M0,${195 + insets.top} Q${W * 0.25},${215 + insets.top} ${W * 0.5},${202 + insets.top} Q${W * 0.75},${188 + insets.top} ${W},${208 + insets.top} L${W},${220 + insets.top} L0,${220 + insets.top} Z`} fill={C.background} />
-          </Svg>
-
-          <View style={[s.headerContent, { paddingTop: insets.top + 24 }]}>
-            {/* Avatar */}
-            <View style={s.avatarRing}>
-              <View style={s.avatarCircle}>
-                <Text style={s.avatarLetter}>{initials}</Text>
+        <View style={[s.header, { paddingTop: insets.top + 12 }]}>
+          <View style={s.headerContent}>
+            {/* Avatar + buddy */}
+            <View style={s.avatarRow}>
+              <View style={s.avatarRing}>
+                <View style={s.avatarCircle}>
+                  {initials ? (
+                    <Text style={s.avatarLetter}>{initials}</Text>
+                  ) : (
+                    <UserCircle size={46} weight="fill" color={cute.coralDeep} />
+                  )}
+                </View>
               </View>
+              <Mascot size={64} mood={(streakMap['food']?.current ?? 0) >= 3 ? 'cheer' : 'happy'} />
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <Text style={[s.userName, { marginBottom: 0 }]}>{profile.name || '—'}</Text>
-              {getFlairEmoji(unlockedBadgeIds) && (
-                <Text style={{ fontSize: 18 }}>{getFlairEmoji(unlockedBadgeIds)}</Text>
+
+            <View style={s.nameRow}>
+              <Text
+                style={[s.userName, { marginBottom: 0 }, !profile.name && s.userNameEmpty]}
+                numberOfLines={1}
+              >
+                {profile.name || t('profile.name_placeholder')}
+              </Text>
+              {flairIcon && (
+                <View style={s.flairPill}>
+                  <PhosphorIcon name={flairIcon} size={14} color={cute.coralDeep} />
+                </View>
               )}
             </View>
+
             <View style={[s.bmiChip, { backgroundColor: chipCol + '22', borderColor: chipCol + '55' }]}>
               <View style={[s.bmiDot, { backgroundColor: chipCol }]} />
               <Text style={[s.bmiText, { color: chipCol }]}>{t(`profile.bmi_${bmiCat}`)}</Text>
@@ -402,6 +348,19 @@ export default function ProfileScreen() {
           })}
         </View>
 
+        {/* ── Tools ── */}
+        <Text style={s.sec}>Tools</Text>
+        <TouchableOpacity style={s.toolCard} onPress={() => router.push('/measurements-hidden' as any)} activeOpacity={0.85}>
+          <View style={[s.toolIcon, { backgroundColor: '#FFF0F1' }]}>
+            <Ruler size={22} weight="fill" color="#FF6B8A" />
+          </View>
+          <View style={s.toolText}>
+            <Text style={s.toolTitle}>Body Measurements</Text>
+            <Text style={s.toolSub}>Track waist, hips, chest & more</Text>
+          </View>
+          <ArrowRight size={18} color={C.textTertiary} weight="bold" />
+        </TouchableOpacity>
+
         {/* ── Profile Details ── */}
         <Text style={s.sec}>{t('profile.section_details')}</Text>
         <View style={s.card}>
@@ -461,7 +420,7 @@ export default function ProfileScreen() {
               'Sign Out', 'Are you sure?',
               [{ text: 'Cancel', style: 'cancel' },
                { text: 'Sign Out', style: 'destructive', onPress: () => logout() }])}>
-              <SignOut size={18} weight="fill" color="#DC2626" />
+              <SignOut size={18} weight="fill" color="#FF6B6B" />
               <Text style={s.signOutTxt}>Sign Out</Text>
             </TouchableOpacity>
           )}
@@ -475,21 +434,40 @@ export default function ProfileScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  // Header
-  header: { backgroundColor: '#1A2B5C', height: 220, overflow: 'hidden' },
-  headerContent: { alignItems: 'center', paddingBottom: 24 },
+  // Header — height comes from its content (measured via onLayout), so a long
+  // name or a wrapped BMI label can never be clipped.
+  header: { backgroundColor: 'transparent', paddingBottom: 8, paddingHorizontal: 16 },
+  headerContent: {
+    alignItems: 'center',
+    backgroundColor: cute.card,
+    borderRadius: radius.xl,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: cute.line,
+    ...cuteShadow.md,
+  },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 6 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  flairPill: {
+    width: 24, height: 24, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: withAlpha(cute.coral, 0.16),
+  },
   avatarRing: {
-    width: 96, height: 96, borderRadius: 48,
-    borderWidth: 3, borderColor: 'rgba(255,255,255,0.25)',
+    width: 92, height: 92, borderRadius: 46,
+    borderWidth: 3, borderColor: withAlpha(cute.coral, 0.3),
     alignItems: 'center', justifyContent: 'center', marginBottom: 10,
+    backgroundColor: withAlpha(cute.coral, 0.1),
   },
   avatarCircle: {
-    width: 86, height: 86, borderRadius: 43,
-    backgroundColor: '#F0C808',
+    width: 84, height: 84, borderRadius: 42,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarLetter: { fontSize: 36, fontWeight: '900', color: '#1A2B5C' },
-  userName: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.3, marginBottom: 8 },
+  avatarLetter: { fontSize: 36, fontWeight: '900', color: cute.coralDeep },
+  userName: { fontSize: 20, fontWeight: '800', color: cute.ink, letterSpacing: -0.3, marginBottom: 8 },
+  userNameEmpty: { fontWeight: '600', color: cute.inkSoft },
   bmiChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 12, paddingVertical: 5,
@@ -502,11 +480,11 @@ const s = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginTop: 16, marginBottom: 6 },
   statCard: {
     flex: 1, backgroundColor: C.white, borderRadius: 18, padding: 14, alignItems: 'center',
-    shadowColor: '#1A2B5C', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
+    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
   },
-  statVal:  { fontSize: 18, fontWeight: '800', color: C.textPrimary },
-  statUnit: { fontSize: 11, fontWeight: '600', color: C.textSecondary },
-  statLbl:  { fontSize: 11, fontWeight: '600', color: C.textSecondary, marginTop: 3 },
+  statVal:  { fontSize: 22, fontWeight: '900', color: C.textPrimary, letterSpacing: -0.5 },
+  statUnit: { fontSize: 12, fontWeight: '600', color: C.textSecondary },
+  statLbl:  { fontSize: 11, fontWeight: '600', color: C.textSecondary, marginTop: 4 },
 
   // Section label
   sec: {
@@ -519,7 +497,7 @@ const s = StyleSheet.create({
   card: {
     backgroundColor: C.white, borderRadius: 18,
     paddingHorizontal: 16, marginHorizontal: 16, marginBottom: 4,
-    shadowColor: '#1A2B5C', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2,
+    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2,
   },
 
   // Weekly chart
@@ -535,7 +513,7 @@ const s = StyleSheet.create({
   streakRow:  { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 4 },
   streakCard: {
     flex: 1, backgroundColor: C.white, borderRadius: 18, padding: 14, alignItems: 'center', gap: 4,
-    shadowColor: '#1A2B5C', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   streakIconBg: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   streakNum:  { fontSize: 22, fontWeight: '900' },
@@ -547,12 +525,33 @@ const s = StyleSheet.create({
   badgeCard: {
     width: '47%', backgroundColor: C.white, borderRadius: 16, padding: 14,
     alignItems: 'center', gap: 6,
-    shadowColor: '#1A2B5C', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 1,
+    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 1,
   },
   badgeLocked:  { backgroundColor: C.background },
   badgeIconBg:  { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   badgeTitle:   { fontSize: 13, fontWeight: '700', color: C.textPrimary, textAlign: 'center' },
   badgeDesc:    { fontSize: 11, fontWeight: '500', color: C.textSecondary, textAlign: 'center' },
+
+  // Tools nav card
+  toolCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: C.white,
+    borderRadius: 18,
+    padding: 14,
+    marginHorizontal: 16,
+    marginBottom: 4,
+    gap: 12,
+    shadowColor: '#3D2C3E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  toolIcon: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  toolText: { flex: 1 },
+  toolTitle: { fontSize: 15, fontWeight: '700', color: C.textPrimary },
+  toolSub: { fontSize: 12, fontWeight: '500', color: C.textSecondary, marginTop: 2 },
 
   // Settings
   settingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
@@ -576,5 +575,5 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     paddingVertical: 14, borderRadius: 14, backgroundColor: '#FEF2F2',
   },
-  signOutTxt: { fontSize: 14, fontWeight: '700', color: '#DC2626' },
+  signOutTxt: { fontSize: 14, fontWeight: '700', color: '#FF6B6B' },
 });

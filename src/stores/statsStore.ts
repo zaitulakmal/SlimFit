@@ -241,11 +241,13 @@ export const useStatsStore = create<StatsState>((set, get) => ({
   },
 }));
 
-/** Mini reward: a status emoji unlocked by consistency, shown next to the user's name. */
-export function getFlairEmoji(unlockedBadgeIds: string[]): string | null {
+export type FlairIcon = 'crown' | 'trophy' | 'flame';
+
+/** Mini reward unlocked by consistency, shown next to the user's name as an icon. */
+export function getFlairIcon(unlockedBadgeIds: string[]): FlairIcon | null {
   const has = (id: string) => unlockedBadgeIds.includes(id);
-  if (has('goal_reached')) return '👑';
-  if (has('streak_30') || has('weight_streak_30')) return '🏆';
-  if (has('streak_7') || has('water_streak_7') || has('weight_streak_7')) return '🔥';
+  if (has('goal_reached')) return 'crown';
+  if (has('streak_30') || has('weight_streak_30')) return 'trophy';
+  if (has('streak_7') || has('water_streak_7') || has('weight_streak_7')) return 'flame';
   return null;
 }

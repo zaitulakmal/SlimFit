@@ -15,18 +15,19 @@ import { useAuthStore } from '../stores/authStore';
 
 const { width: W } = Dimensions.get('window');
 
-// ─── Colours ────────────────────────────────────────────────────────────────
-const BG      = '#F6FFF0';   // very light green
-const GREEN1  = '#56AB2F';
-const GREEN2  = '#A8E063';
-const BOWL_DARK  = '#D4A96A';
-const BOWL_LIGHT = '#F0C97A';
-const TOMATO  = '#E53935';
-const TOMATO2 = '#EF9A9A';
-const LEAF1   = '#43A047';
-const LEAF2   = '#66BB6A';
-const LEAF3   = '#A5D6A7';
-const PURPLE  = '#7B1FA2';
+// ─── Colours (Slimora cute palette) ──────────────────────────────────────────
+const BG      = '#FFF7F2';   // soft cream
+const CORAL1  = '#FF8FA3';
+const CORAL2  = '#FFB1A8';
+const BOWL_DARK  = '#F0C97A';
+const BOWL_LIGHT = '#FFE3A3';
+const TOMATO  = '#FF6B8A';
+const TOMATO2 = '#FFB1A8';
+const LEAF1   = '#7BD7B0';
+const LEAF2   = '#9FE3C4';
+const LEAF3   = '#C7EFDD';
+const PURPLE  = '#B7A6F0';
+const SKY     = '#7FC8F8';
 const WHITE   = '#FFFFFF';
 
 // ─── Static salad SVG ───────────────────────────────────────────────────────
@@ -35,8 +36,8 @@ function SaladBowl() {
     <Svg width={220} height={220} viewBox="0 0 220 220">
       <Defs>
         <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor={GREEN1} />
-          <Stop offset="100%" stopColor={GREEN2} />
+          <Stop offset="0%" stopColor={CORAL1} />
+          <Stop offset="100%" stopColor={CORAL2} />
         </LinearGradient>
         <LinearGradient id="bowlGrad" x1="0%" y1="0%" x2="0%" y2="100%">
           <Stop offset="0%" stopColor={BOWL_LIGHT} />
@@ -215,16 +216,16 @@ export default function SplashScreen() {
       <Svg width={W} height="100%" style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 900`}>
         <Defs>
           <LinearGradient id="splashBg" x1="0%" y1="0%" x2="30%" y2="100%">
-            <Stop offset="0%"   stopColor="#E8F5E9" />
-            <Stop offset="60%"  stopColor="#F6FFF0" />
-            <Stop offset="100%" stopColor="#DCEDC8" />
+            <Stop offset="0%"   stopColor="#FFE9EC" />
+            <Stop offset="55%"  stopColor="#FFF7F2" />
+            <Stop offset="100%" stopColor="#E6F6EE" />
           </LinearGradient>
         </Defs>
         <Path d={`M0,0 L${W},0 L${W},900 L0,900 Z`} fill="url(#splashBg)" />
         {/* Decorative circles */}
-        <SvgCircle cx={W * 0.9} cy={80}  r={70}  fill={GREEN2} opacity={0.18} />
-        <SvgCircle cx={W * 0.1} cy={700} r={90}  fill={GREEN1} opacity={0.12} />
-        <SvgCircle cx={W * 0.5} cy={820} r={110} fill={GREEN2} opacity={0.10} />
+        <SvgCircle cx={W * 0.9} cy={80}  r={70}  fill={CORAL2} opacity={0.18} />
+        <SvgCircle cx={W * 0.1} cy={700} r={90}  fill={LEAF1} opacity={0.14} />
+        <SvgCircle cx={W * 0.5} cy={820} r={110} fill={SKY} opacity={0.12} />
       </Svg>
 
       {/* Floating leaves */}
@@ -246,7 +247,7 @@ export default function SplashScreen() {
 
       {/* Tagline */}
       <Animated.Text style={[s.tagline, tagStyle]}>
-        Eat fresh, feel great 🥗
+        Eat fresh, feel great
       </Animated.Text>
 
       {/* Loading dots */}
@@ -298,7 +299,7 @@ const s = StyleSheet.create({
     backgroundColor: '#C5E1A5',
   },
   dotActive: {
-    backgroundColor: GREEN1,
+    backgroundColor: CORAL1,
     width: 24,
     borderRadius: 4,
   },

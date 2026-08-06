@@ -120,7 +120,8 @@
     "reset_action": "Delete Everything",
     "reset_error": "Failed to reset. Please try again.",
     "edit_save": "Save",
-    "edit_cancel": "Cancel"
+    "edit_cancel": "Cancel",
+    "name_placeholder": "Add your name"
   },
   "food": {
     "meal_breakfast": "Breakfast",

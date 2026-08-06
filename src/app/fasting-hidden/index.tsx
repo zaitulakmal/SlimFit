@@ -57,18 +57,18 @@ const RFV = (n: number) => Math.round(n * (H / 780));
 const C = colors;
 
 const PLANS = [
-  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#A6171C', desc: 'Most popular' },
-  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#F1C045', desc: 'Deeper burn' },
+  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#FF6B8A', desc: 'Most popular' },
+  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#FFC53D', desc: 'Deeper burn' },
   { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FF9800', desc: 'Warrior diet' },
 ];
 
 // ── fat-burn stages by fasting hour ─────────────────────────────────────────
 function getFatBurnStage(elapsedHours: number) {
-  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#A6171C' };
-  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#F1C045' };
+  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#FF6B8A' };
+  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#FFC53D' };
   if (elapsedHours < 12) return { label: 'Ketosis Starting',   pct: 0.50, color: '#FF9800' };
   if (elapsedHours < 16) return { label: 'Fat Burning',         pct: 0.75, color: '#4CAF50' };
-  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#A6171C' };
+  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#FF6B8A' };
 }
 
 // ── Circular fasting clock ───────────────────────────────────────────────────

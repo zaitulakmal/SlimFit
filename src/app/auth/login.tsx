@@ -16,19 +16,20 @@ import Svg, {
   Defs, LinearGradient, Stop,
 } from 'react-native-svg';
 import { useAuthStore } from '../../stores/authStore';
-import { colors, spacing } from '../../constants/theme';
+import { colors, spacing } from '../../constants/theme-new';
 
 const { width: W, height: H } = Dimensions.get('window');
 
-const GREEN1 = '#56AB2F';
-const GREEN2 = '#A8E063';
-const BOWL_DARK  = '#D4A96A';
-const BOWL_LIGHT = '#F0C97A';
-const TOMATO  = '#E53935';
-const TOMATO2 = '#EF9A9A';
-const LEAF1 = '#43A047';
-const LEAF2 = '#66BB6A';
-const LEAF3 = '#A5D6A7';
+const CORAL1 = '#FF8FA3';
+const CORAL2 = '#FFB1A8';
+const BOWL_DARK  = '#F0C97A';
+const BOWL_LIGHT = '#FFE3A3';
+const TOMATO  = '#FF6B8A';
+const TOMATO2 = '#FFB1A8';
+const LEAF1 = '#7BD7B0';
+const LEAF2 = '#9FE3C4';
+const LEAF3 = '#C7EFDD';
+const SKY   = '#7FC8F8';
 const WHITE = '#FFFFFF';
 
 function SaladBowl() {
@@ -150,8 +151,8 @@ export default function LoginScreen() {
         <Svg style={StyleSheet.absoluteFillObject} width={W} height={H * 0.45}>
           <Defs>
             <LinearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={GREEN1} />
-              <Stop offset="100%" stopColor={GREEN2} />
+              <Stop offset="0%" stopColor={CORAL1} />
+              <Stop offset="100%" stopColor={CORAL2} />
             </LinearGradient>
           </Defs>
           <Path
@@ -231,7 +232,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <View style={s.footer}>
-              <Text style={s.footerText}>Don't have an account? </Text>
+              <Text style={s.footerText}>Don&apos;t have an account? </Text>
               <TouchableOpacity onPress={() => router.replace('/auth/register')}>
                 <Text style={s.footerLink}>Sign Up</Text>
               </TouchableOpacity>
@@ -244,7 +245,7 @@ export default function LoginScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F6FFF0' },
+  root: { flex: 1, backgroundColor: '#FFF7F2' },
 
   // Header
   headerBg: {
@@ -291,11 +292,11 @@ const s = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   errorBox: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#FFE8EE',
     borderRadius: 10,
     padding: spacing.md,
   },
-  errorText: { color: '#DC2626', fontSize: 14 },
+  errorText: { color: '#FF6B6B', fontSize: 14 },
   inputGroup: { gap: 6 },
   label: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
   input: {
@@ -309,7 +310,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.background,
   },
   btn: {
-    backgroundColor: GREEN1,
+    backgroundColor: CORAL1,
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: 'center',
@@ -323,5 +324,5 @@ const s = StyleSheet.create({
     marginTop: spacing.xs,
   },
   footerText: { fontSize: 14, color: colors.textSecondary },
-  footerLink: { fontSize: 14, color: GREEN1, fontWeight: '700' },
+  footerLink: { fontSize: 14, color: CORAL1, fontWeight: '700' },
 });

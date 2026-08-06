@@ -184,7 +184,7 @@ function ActivityScreenContent() {
         {/* Today's workouts */}
         {todayWorkouts.length > 0 && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>Today's Workouts</Text>
+            <Text style={s.sectionTitle}>Today&apos;s Workouts</Text>
             {todayWorkouts.map((w) => {
               const def = WORKOUT_TYPES.find((x) => x.id === w.activityType);
               return (

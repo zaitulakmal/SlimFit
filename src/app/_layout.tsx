@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, AppState } from 'react-native';
 import { Slot, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import mobileAds from 'react-native-google-mobile-ads';
+let mobileAds: (() => { initialize: () => Promise<any> }) | null = null;
+try {
+  mobileAds = require('react-native-google-mobile-ads').default;
+} catch {}
 import { useProfileStore } from '../stores/profileStore';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -25,8 +28,9 @@ export default function RootLayout() {
   const isReady = authLoaded && profileLoaded;
   const prevUser = useRef<typeof user>(undefined);
 
-  // Init Google Mobile Ads SDK once at app start
+  // Init Google Mobile Ads SDK once at app start (no-op in Expo Go)
   useEffect(() => {
+    if (!mobileAds) return;
     mobileAds()
       .initialize()
       .then(() => preloadInterstitial())

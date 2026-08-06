@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import Animated, {
   FadeInDown,
   FadeInUp,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -42,30 +43,32 @@ const PAD = { top: 16, bottom: 24, left: 40, right: 16 };
 type Range = 7 | 30 | 90;
 
 const COLORS = {
-  primary: '#A6171C',
-  secondary: '#D6D0C5',
-  accent: '#F1C045',
-  background: '#FDF8F0',
+  primary: '#FF6B8A',
+  secondary: '#F2E7E2',
+  accent: '#FFC53D',
+  background: '#FFF8F3',
   white: '#FFFFFF',
   text: '#4A4A4A',
   textSub: '#7A7A7A',
   border: '#E8E4DE',
 };
 
+// Created once at module scope — building it inside render makes a brand new
+// component type every pass, which remounts the circle and kills the animation.
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
 function ProgressRing({ progress, size = 100, strokeWidth = 10 }: { progress: number; size?: number; strokeWidth?: number }) {
   const animatedProgress = useSharedValue(0);
-  
+
   useFocusEffect(
     useCallback(() => {
       animatedProgress.value = withTiming(Math.min(progress, 1), { duration: 1200 });
-    }, [progress])
+    }, [progress, animatedProgress])
   );
-  
+
   const r = (size - strokeWidth) / 2;
   const circ = 2 * Math.PI * r;
-  
-  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-  
+
   const animatedProps = useAnimatedProps(() => {
     const offset = circ * (1 - animatedProgress.value);
     return { strokeDashoffset: offset };
@@ -322,7 +325,7 @@ function WeightScreenContent() {
             onPress={() => setShowInput(!showInput)}
           >
             <View style={[styles.quickBtnIcon, { backgroundColor: '#FCE4EC' }]}>
-              <Keyboard size={24} color="#A6171C" weight="bold" />
+              <Keyboard size={24} color="#FF6B8A" weight="bold" />
             </View>
             <Text style={styles.quickBtnLabel}>Manual</Text>
             <Text style={styles.quickBtnSub}>Type</Text>
