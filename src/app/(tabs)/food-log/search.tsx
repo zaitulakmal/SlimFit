@@ -111,16 +111,36 @@ export default function FoodSearchScreen() {
   const { t } = useTranslation();
   const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
   const insets = useSafeAreaInsets();
-  const { logFood, currentDateStr } = useFoodStore();
+  const { logFood, currentDateStr, getRecentFoods } = useFoodStore();
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<FoodItem[]>(() =>
     searchLocalFoods('').map(localToItem)
   );
+  const [recentFoods, setRecentFoods] = useState<FoodItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<FoodItem | null>(null);
   const [qty, setQty] = useState('1');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    getRecentFoods(12).then((logs) =>
+      setRecentFoods(
+        logs.map((l) => ({
+          id: `recent-${l.id}`,
+          foodName: l.foodName,
+          brandName: l.brandName ?? undefined,
+          calories: l.calories,
+          proteinG: l.proteinG,
+          carbsG: l.carbsG,
+          fatG: l.fatG,
+          servingQty: l.servingQty,
+          servingUnit: l.servingUnit,
+          source: l.source,
+        }))
+      )
+    );
+  }, []);
 
   const addScale = useSharedValue(1);
 
@@ -285,7 +305,7 @@ export default function FoodSearchScreen() {
             autoFocus
             returnKeyType="search"
           />
-          {loading && <ActivityIndicator size="small" color="#F0C808" />}
+          {loading && <ActivityIndicator size="small" color="#FFC53D" />}
         </View>
       </View>
 
@@ -326,7 +346,26 @@ export default function FoodSearchScreen() {
         )}
         ListHeaderComponent={
           !query.trim() ? (
-            <Text style={s.listHeader}>{t('food.popular_malaysian')}</Text>
+            <View>
+              {recentFoods.length > 0 && (
+                <View style={s.recentSection}>
+                  <Text style={s.listHeader}>Recently Logged</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.recentChips}>
+                    {recentFoods.map((item) => (
+                      <Pressable
+                        key={item.id}
+                        style={s.recentChip}
+                        onPress={() => handleSelect(item)}
+                      >
+                        <Text style={s.recentChipName} numberOfLines={1}>{item.foodName}</Text>
+                        <Text style={s.recentChipCal}>{Math.round(item.calories)} kcal</Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+              <Text style={s.listHeader}>{t('food.popular_malaysian')}</Text>
+            </View>
           ) : null
         }
         ListEmptyComponent={
@@ -475,7 +514,7 @@ export default function FoodSearchScreen() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   navySection: {
-    backgroundColor: '#1A2B5C',
+    backgroundColor: '#3D2C3E',
     paddingBottom: 16,
   },
   header: {
@@ -514,12 +553,12 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.35)',
   },
   bottomSheet: {
-    backgroundColor: '#F0C808',
+    backgroundColor: '#FFC53D',
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: 24,
     paddingBottom: 44,
-    shadowColor: '#1A2B5C',
+    shadowColor: '#3D2C3E',
     shadowOffset: { width: 0, height: -6 },
     shadowOpacity: 0.18,
     shadowRadius: 20,
@@ -533,7 +572,7 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   sheetTopRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 16 },
-  sheetTitle: { fontSize: 22, fontWeight: '900', color: '#1A2B5C', letterSpacing: -0.5 },
+  sheetTitle: { fontSize: 22, fontWeight: '900', color: '#3D2C3E', letterSpacing: -0.5 },
   sheetBrand: { fontSize: 12, fontWeight: '500', color: 'rgba(26,43,92,0.6)', marginTop: 2 },
   sheetClose: { padding: 4, marginTop: 2 },
   nutritionGrid: { flexDirection: 'row', gap: 8, marginBottom: 20 },
@@ -542,7 +581,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.35)',
     borderRadius: 16, padding: 12,
   },
-  nutritionValue: { fontSize: 18, fontWeight: '900', color: '#1A2B5C' },
+  nutritionValue: { fontSize: 18, fontWeight: '900', color: '#3D2C3E' },
   nutritionUnit: { fontSize: 11, fontWeight: '600' },
   nutritionLabel: { fontSize: 10, fontWeight: '600', color: 'rgba(26,43,92,0.65)', marginTop: 2 },
   servingRow: {
@@ -566,7 +605,7 @@ const s = StyleSheet.create({
   },
   qtyInput: {
     ...typography.body,
-    color: '#1A2B5C',
+    color: '#3D2C3E',
     minWidth: 36,
     textAlign: 'center',
     padding: 0,
@@ -584,7 +623,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1A2B5C',
+    backgroundColor: '#3D2C3E',
     borderRadius: 18,
     paddingVertical: 16,
     width: '100%',
@@ -610,7 +649,7 @@ const s = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: colors.white,
     borderRadius: 16,
-    shadowColor: '#1A2B5C',
+    shadowColor: '#3D2C3E',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -619,11 +658,11 @@ const s = StyleSheet.create({
   },
   resultRowSelected: {
     borderWidth: 2,
-    borderColor: '#F0C808',
+    borderColor: '#FFC53D',
     backgroundColor: '#FFFBF0',
   },
   resultInfo: { flex: 1 },
-  resultName: { fontSize: 15, fontWeight: '700', color: '#1A2B5C' },
+  resultName: { fontSize: 15, fontWeight: '700', color: '#3D2C3E' },
   resultBrand: { ...typography.label, color: colors.textSecondary },
   resultSub: { fontSize: 12, fontWeight: '500', color: colors.textSecondary, marginTop: 2 },
   macroPills: { gap: 2, alignItems: 'flex-end' },
@@ -637,7 +676,7 @@ const s = StyleSheet.create({
   emptyText: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },
   manualEntryBtn: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    backgroundColor: '#F1C045', paddingHorizontal: spacing.xl,
+    backgroundColor: '#FFC53D', paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md, borderRadius: 12, marginTop: spacing.sm,
   },
   manualEntryBtnText: { ...typography.body, fontWeight: '700', color: '#4A4A4A' },
@@ -660,7 +699,25 @@ const s = StyleSheet.create({
   inputHalf: { flex: 1 },
   addManualBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
-    backgroundColor: '#F1C045', borderRadius: 12, paddingVertical: spacing.md, marginTop: spacing.md,
+    backgroundColor: '#FFC53D', borderRadius: 12, paddingVertical: spacing.md, marginTop: spacing.md,
   },
   addManualBtnText: { ...typography.body, fontWeight: '700', color: '#4A4A4A' },
+  recentSection: { paddingBottom: 4 },
+  recentChips: { paddingHorizontal: spacing.md, paddingBottom: 10, gap: 8 },
+  recentChip: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    maxWidth: 160,
+    shadowColor: '#3D2C3E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#EDE8DF',
+  },
+  recentChipName: { fontSize: 13, fontWeight: '700', color: '#3D2C3E', marginBottom: 2 },
+  recentChipCal: { fontSize: 11, fontWeight: '600', color: '#9AA3C0' },
 });

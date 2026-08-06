@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import { Fire } from 'phosphor-react-native';
 import { colors, typography, spacing, radius } from '../../constants/theme-new';
 
 interface StreakBadgeProps {
@@ -92,9 +93,9 @@ export default function StreakBadge({
         containerStyle,
       ]}
     >
-      <Animated.Text style={[flameStyle, { fontSize: s.emoji, textAlign: 'center' }]}>
-        🔥
-      </Animated.Text>
+      <Animated.View style={flameStyle}>
+        <Fire size={s.emoji} weight="fill" color={color} />
+      </Animated.View>
       <View style={styles.textContainer}>
         <Text style={[styles.value, { fontSize: s.value, color }]}>
           {streak}

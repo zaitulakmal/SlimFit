@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Dimensions,
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -23,13 +22,16 @@ import {
   Trash,
 } from 'phosphor-react-native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { pastelColors, pastelSpacing, pastelRadius, mealColors } from '../../../constants/pastel-theme';
+import { cute, radius, cuteShadow, withAlpha } from '@/theme/cute';
+import { FoodApple, FoodBroccoli, FoodEgg, FoodCarrot } from '@/components/art/Foodies';
 import { useFoodStore } from '../../../stores/foodStore';
 import { useProfileStore } from '../../../stores/profileStore';
 import { calculateCalorieTarget } from '../../../constants/tdee';
 import type { GoalType } from '../../../constants/tdee';
 
-const { width: W } = Dimensions.get('window');
+const RF = (v: number) => Math.round(v);
 const C = pastelColors;
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
@@ -61,27 +63,14 @@ function offsetDate(dateStr: string, days: number) {
   return d.toISOString().split('T')[0];
 }
 
-function HeaderDecoration() {
-  return (
-    <Svg width={W} height={220} style={StyleSheet.absoluteFill} viewBox={`0 0 ${W} 220`}>
-      <Defs>
-        <LinearGradient id="navyHeaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#1A2B5C" />
-          <Stop offset="100%" stopColor="#243470" />
-        </LinearGradient>
-      </Defs>
-      <Rect width={W} height={220} fill="url(#navyHeaderGrad)" />
-
-      <SvgCircle cx={W * 0.85} cy={-10} r={100} fill="#FFFFFF" opacity={0.04} />
-      <SvgCircle cx={W * 0.10} cy={230} r={80}  fill="#F0C808" opacity={0.06} />
-      <SvgCircle cx={W - 24}   cy={100} r={5}   fill="#F0C808" opacity={0.45} />
-      <SvgCircle cx={W - 14}   cy={118} r={3}   fill="#FFFFFF" opacity={0.20} />
-      <SvgCircle cx={28}       cy={140} r={6}   fill="#FFFFFF" opacity={0.12} />
-
-      {/* Wavy bottom into cream bg */}
-      <Path d={`M0,195 Q${W * 0.25},215 ${W * 0.5},202 Q${W * 0.75},188 ${W},208 L${W},220 L0,220 Z`} fill={C.background} />
-    </Svg>
-  );
+function MealCharacter({ meal, size }: { meal: string; size: number }) {
+  switch (meal) {
+    case 'breakfast': return <FoodEgg size={size} />;
+    case 'lunch': return <FoodApple size={size} />;
+    case 'dinner': return <FoodBroccoli size={size} />;
+    case 'snack': return <FoodCarrot size={size} />;
+    default: return <FoodApple size={size} />;
+  }
 }
 
 function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
@@ -93,12 +82,12 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
   const offset = circ * (1 - pct);
   const center = size / 2;
   const isOver = consumed > tdee && tdee > 0;
-  const ringColor = isOver ? '#FF6B6B' : '#F0C808';
+  const ringColor = isOver ? '#FF6B6B' : '#FFC53D';
 
   return (
     <View style={{ width: size, height: size }}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <SvgCircle cx={center} cy={center} r={r} stroke="rgba(255,255,255,0.18)" strokeWidth={strokeWidth} fill="none" />
+        <SvgCircle cx={center} cy={center} r={r} stroke={cute.line} strokeWidth={strokeWidth} fill="none" />
         <SvgCircle
           cx={center} cy={center} r={r}
           stroke={ringColor} strokeWidth={strokeWidth} fill="none"
@@ -109,10 +98,10 @@ function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
         />
       </Svg>
       <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-        <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: cute.ink }}>
           {Math.round(consumed)}
         </Text>
-        <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.65)', fontWeight: '600' }}>kcal</Text>
+        <Text style={{ fontSize: 9, color: cute.inkSoft, fontWeight: '600' }}>kcal</Text>
       </View>
     </View>
   );
@@ -123,10 +112,10 @@ function InlineMacro({ label, value, target, color }: { label: string; value: nu
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-        <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.65)' }}>{label}</Text>
-        <Text style={{ fontSize: 10, fontWeight: '700', color: '#FFFFFF' }}>{Math.round(value)}g</Text>
+        <Text style={{ fontSize: 10, fontWeight: '600', color: cute.inkSoft }}>{label}</Text>
+        <Text style={{ fontSize: 10, fontWeight: '700', color: cute.ink }}>{Math.round(value)}g</Text>
       </View>
-      <View style={{ height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' }}>
+      <View style={{ height: 5, borderRadius: 3, backgroundColor: cute.line, overflow: 'hidden' }}>
         <View style={{ height: 5, borderRadius: 3, backgroundColor: color, width: `${pct}%` }} />
       </View>
     </View>
@@ -135,6 +124,7 @@ function InlineMacro({ label, value, target, color }: { label: string; value: nu
 
 export default function FoodLogScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { dayLogs, currentDateStr, loadDayLogs, deleteFood, getTotals, getMealLogs } = useFoodStore();
   const profile = useProfileStore((s) => s.profile);
 
@@ -175,12 +165,10 @@ export default function FoodLogScreen() {
   return (
     <View style={s.root}>
       {/* Header */}
-      <View style={s.header}>
-        <HeaderDecoration />
-
+      <View style={[s.header, { paddingTop: insets.top + 8 }]}>
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.dateNav}>
           <TouchableOpacity onPress={() => navigateDate(-1)} style={s.navBtn}>
-            <CaretLeft size={22} weight="bold" color="rgba(255,255,255,0.9)" />
+            <CaretLeft size={22} weight="bold" color={cute.ink} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => loadDayLogs(todayStr())} style={s.datePill}>
             <Text style={s.dateText}>{formatDate(currentDateStr)}</Text>
@@ -193,17 +181,17 @@ export default function FoodLogScreen() {
             <CaretRight
               size={22}
               weight="bold"
-              color={currentDateStr >= todayStr() ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)'}
+              color={currentDateStr >= todayStr() ? cute.inkFaint : cute.ink}
             />
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(60).springify()} style={s.summaryRow}>
+        <Animated.View entering={FadeInDown.delay(60).springify()} style={s.summaryCard}>
           <CalorieRing consumed={totals.calories} tdee={tdee} />
           <View style={s.summaryRight}>
             {tdee > 0 && (
               <View style={s.budgetRow}>
-                <Text style={[s.budgetValue, { color: isOver ? '#FF6B6B' : '#FFFFFF' }]}>
+                <Text style={[s.budgetValue, { color: isOver ? cute.danger : cute.ink }]}>
                   {isOver ? `+${Math.round(totals.calories - tdee)}` : remaining}
                 </Text>
                 <Text style={s.budgetLabel}> kcal {isOver ? 'over' : 'left'}</Text>
@@ -246,8 +234,8 @@ export default function FoodLogScreen() {
               <View style={[s.mealCard, { flex: 1 }]}>
                 <View style={[s.mealHeader, { backgroundColor: meta.bg }]}>
                   <View style={s.mealTitleRow}>
-                    <View style={[s.mealIconBg, { backgroundColor: `${meta.color}20` }]}>
-                      <MealIcon meal={meal} size={18} color={meta.color} />
+                    <View style={[s.mealIconBg, { backgroundColor: withAlpha(meta.color, 0.16) }]}>
+                      <MealCharacter meal={meal} size={26} />
                     </View>
                     <Text style={[s.mealTitle, { color: meta.color }]}>
                       {t(`food.meal_${meal}`)}
@@ -276,16 +264,21 @@ export default function FoodLogScreen() {
                   <View>
                     {mealLogs.map((log, logIdx) => (
                       <View key={log.id} style={[s.foodRow, logIdx > 0 && s.foodRowBorder]}>
+                        <View style={[s.foodCalBadge, { backgroundColor: `${meta.color}12` }]}>
+                          <Text style={[s.foodCalBadgeText, { color: meta.color }]}>
+                            {Math.round(Number(log.calories))}
+                          </Text>
+                          <Text style={[s.foodCalUnit, { color: meta.color }]}>kcal</Text>
+                        </View>
                         <View style={s.foodInfo}>
                           <Text style={s.foodName} numberOfLines={1}>{log.foodName}</Text>
                           {log.brandName && (
                             <Text style={s.brandName} numberOfLines={1}>{log.brandName}</Text>
                           )}
                           <View style={s.foodMacroRow}>
-                            <Text style={s.macroPill}>{Math.round(Number(log.calories))} kcal</Text>
                             <Text style={[s.macroPill, { color: C.coral }]}>P {Math.round(Number(log.proteinG))}g</Text>
-                            <Text style={[s.macroPill, { color: C.blue }]}>C {Math.round(Number(log.carbsG))}g</Text>
-                            <Text style={[s.macroPill, { color: C.amber }]}>F {Math.round(Number(log.fatG))}g</Text>
+                            <Text style={[s.macroPill, { color: '#7B5B00' }]}>C {Math.round(Number(log.carbsG))}g</Text>
+                            <Text style={[s.macroPill, { color: '#C05A1B' }]}>F {Math.round(Number(log.fatG))}g</Text>
                           </View>
                         </View>
                         <TouchableOpacity
@@ -310,32 +303,41 @@ export default function FoodLogScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.background },
+  root: { flex: 1, backgroundColor: '#FDFBF7' },
 
   header: {
-    backgroundColor: '#1A2B5C',
-    paddingTop: 52,
-    paddingBottom: 36,
-    paddingHorizontal: 20,
-    overflow: 'hidden',
+    // paddingTop comes from the safe-area inset so the date row clears the notch.
+    backgroundColor: 'transparent',
+    paddingBottom: 8,
+    paddingHorizontal: 18,
   },
 
   dateNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   navBtn:   { padding: 6 },
   datePill: { flex: 1, alignItems: 'center' },
-  dateText: { fontSize: 17, fontWeight: '700', color: '#FFFFFF', letterSpacing: -0.2 },
+  dateText: { fontSize: 17, fontWeight: '700', color: cute.ink, letterSpacing: -0.2 },
 
-  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  summaryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    backgroundColor: cute.card,
+    borderRadius: radius.xl,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: cute.line,
+    ...cuteShadow.md,
+  },
   summaryRight: { flex: 1, gap: 10 },
 
   budgetRow: { flexDirection: 'row', alignItems: 'baseline' },
   budgetValue: { fontSize: 26, fontWeight: '800', letterSpacing: -0.4 },
-  budgetLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.7)' },
+  budgetLabel: { fontSize: 13, fontWeight: '600', color: cute.inkSoft },
 
   macrosCol: { gap: 8 },
 
@@ -349,14 +351,12 @@ const s = StyleSheet.create({
   timelineLine: { width: 2, flex: 1, marginTop: 4 },
 
   mealCard: {
-    backgroundColor: C.surface,
-    borderRadius: 24,
+    backgroundColor: cute.card,
+    borderRadius: radius.lg,
     overflow: 'hidden',
-    shadowColor: '#1A2B5C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: cute.line,
+    ...cuteShadow.sm,
   },
   mealHeader: {
     flexDirection: 'row',
@@ -384,9 +384,19 @@ const s = StyleSheet.create({
   },
   foodRowBorder: { borderTopWidth: 1, borderTopColor: C.border },
   foodInfo:  { flex: 1 },
-  foodName:  { fontSize: 14, fontWeight: '600', color: C.textPrimary, marginBottom: 2 },
-  brandName: { fontSize: 12, fontWeight: '500', color: C.textSecondary, marginBottom: 4 },
+  foodName:  { fontSize: 14, fontWeight: '600', color: cute.ink, marginBottom: 2 },
+  brandName: { fontSize: 12, fontWeight: '500', color: cute.inkSoft, marginBottom: 4 },
   foodMacroRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  macroPill: { fontSize: 11, fontWeight: '600', color: C.textSecondary },
+  macroPill: { fontSize: 11, fontWeight: '600' },
   deleteBtn: { padding: 6 },
+  foodCalBadge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    minWidth: 52,
+  },
+  foodCalBadgeText: { fontSize: 14, fontWeight: '900', lineHeight: 16 },
+  foodCalUnit: { fontSize: 9, fontWeight: '700', marginTop: 1 },
 });

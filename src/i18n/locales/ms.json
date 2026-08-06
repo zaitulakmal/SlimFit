@@ -120,7 +120,8 @@
     "reset_action": "Padam Semua",
     "reset_error": "Gagal set semula. Sila cuba lagi.",
     "edit_save": "Simpan",
-    "edit_cancel": "Batal"
+    "edit_cancel": "Batal",
+    "name_placeholder": "Tambah nama anda"
   },
   "food": {
     "meal_breakfast": "Sarapan",

@@ -116,6 +116,16 @@ const tables = [
     date_str TEXT NOT NULL,
     sent_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS body_measurements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    date_str TEXT NOT NULL,
+    waist_cm REAL,
+    hips_cm REAL,
+    chest_cm REAL,
+    arms_cm REAL,
+    neck_cm REAL,
+    logged_at TEXT NOT NULL DEFAULT ''
+  )`,
 ];
 
 for (const sql of tables) {
@@ -126,15 +136,36 @@ for (const sql of tables) {
   }
 }
 
-// Migrations for existing installs
-const migrations = [
-  `ALTER TABLE user_profile ADD COLUMN goal_type TEXT DEFAULT 'lose_weight'`,
-];
-for (const sql of migrations) {
+// Migrations for existing installs.
+//
+// SQLite has no "ADD COLUMN IF NOT EXISTS", so we check the table shape first.
+// Previously this just ran the ALTER inside a try/catch: once the column
+// existed, every single app launch threw and console.warn'd, which surfaced as
+// a LogBox warning toast over the UI on startup.
+function hasColumn(table: string, column: string): boolean {
   try {
-    client.execSync(sql);
+    const rows = client.getAllSync<{ name: string }>(`PRAGMA table_info(${table})`);
+    return rows.some((r) => r.name === column);
   } catch {
-    // Column already exists — safe to ignore
+    return false;
+  }
+}
+
+const migrations = [
+  {
+    table: 'user_profile',
+    column: 'goal_type',
+    sql: `ALTER TABLE user_profile ADD COLUMN goal_type TEXT DEFAULT 'lose_weight'`,
+  },
+];
+
+for (const m of migrations) {
+  if (hasColumn(m.table, m.column)) continue;
+  try {
+    client.execSync(m.sql);
+  } catch (e) {
+    // A genuine failure now — the column really was missing and the ALTER blew up.
+    console.warn(`[DB] migration failed (${m.table}.${m.column}):`, e);
   }
 }
 

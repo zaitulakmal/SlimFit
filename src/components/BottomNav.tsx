@@ -2,12 +2,12 @@ import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { House, ForkKnife, UserCircle } from 'phosphor-react-native';
 
-const ACTIVE   = '#A6171C';    // Deep Red
-const INACTIVE = '#A0A0A0';   // Light Gray
-const INDICATOR = '#F1C045';  // Golden Yellow
+const ACTIVE   = '#FF8FA3';    // cute coral
+const INACTIVE = '#9AA0AB';   // soft gray
+const INDICATOR = '#7BD7B0';  // cute mint
 
 interface BottomNavProps {
-  active?: 'home' | 'food' | 'profile';
+  active?: 'home' | 'food' | 'profile' | 'water' | 'weight' | 'fasting' | 'activity' | 'recipes' | 'grocery' | 'measurements';
 }
 
 export default function BottomNav({ active }: BottomNavProps) {
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderTopWidth: 1,
     borderTopColor: '#EAE5DC',
-    shadowColor: '#A6171C',
+    shadowColor: '#FF6B8A',
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -3 },

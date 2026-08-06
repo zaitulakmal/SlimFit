@@ -2,11 +2,11 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { ForkKnifeIcon, HouseIcon, UserCircleIcon } from 'phosphor-react-native';
 import { useTranslation } from 'react-i18next';
+import { cute, withAlpha } from '@/theme/cute';
 
-const ACTIVE   = '#208AEF';
-const INACTIVE = '#94A3B8';
-const WHITE    = '#FFFFFF';
-const NAVY     = '#1A2B5C';
+const ACTIVE   = cute.coralDeep;
+const INACTIVE = cute.inkFaint;
+const WHITE    = cute.card;
 
 function TabIcon({
   icon: Icon,
@@ -37,8 +37,8 @@ export default function TabLayout() {
           height: Platform.OS === 'ios' ? 82 : 68,
           paddingBottom: Platform.OS === 'ios' ? 20 : 8,
           paddingTop: 8,
-          shadowColor: NAVY,
-          shadowOpacity: 0.10,
+          shadowColor: '#E0A6A0',
+          shadowOpacity: 0.14,
           shadowRadius: 20,
           shadowOffset: { width: 0, height: -4 },
           elevation: 20,
@@ -92,6 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconActive: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: withAlpha(cute.coral, 0.16),
   },
 });
