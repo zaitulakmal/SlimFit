@@ -30,7 +30,7 @@
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "package": "com.zaitul.slimora",
-      "versionCode": 30
+      "versionCode": 31
     },
     "web": {
       "output": "static",
