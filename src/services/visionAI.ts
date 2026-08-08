@@ -30,9 +30,13 @@ const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 // OpenRouter — the vision path. Both ids verified present and image-capable.
 const OPENROUTER_KEY = process.env.EXPO_PUBLIC_OPENROUTER_KEY || '';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+// Order matters: each failed model costs a full round-trip before the next is
+// tried. gemma-4-31b-it:free is currently rate-limited upstream (HTTP 429 from
+// Google AI Studio) and nemotron answers reliably, so nemotron goes first and
+// gemma stays as the backup.
 const OPENROUTER_MODELS = [
-  'google/gemma-4-31b-it:free',
   'nvidia/nemotron-nano-12b-v2-vl:free',
+  'google/gemma-4-31b-it:free',
 ];
 
 const PROMPT = `You are an expert nutritionist specialising in Malaysian and Southeast Asian cuisine.

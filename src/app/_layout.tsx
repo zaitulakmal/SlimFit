@@ -119,5 +119,5 @@ export default function RootLayout() {
 const s = StyleSheet.create({
   center: { flex: 1, backgroundColor: '#fff' },
   errTitle: { fontSize: 18, fontWeight: '700', color: '#FF6B6B', marginBottom: 12 },
-  errMsg: { fontSize: 12, color: '#6B7280', textAlign: 'center' },
+  errMsg: { fontSize: 12, color: '#6E5C6E', textAlign: 'center' },
 });

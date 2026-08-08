@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { House, ForkKnife, UserCircle } from 'phosphor-react-native';
 
 const ACTIVE   = '#FF8FA3';    // cute coral
-const INACTIVE = '#9AA0AB';   // soft gray
+const INACTIVE = '#A99BA8';   // soft gray
 const INDICATOR = '#7BD7B0';  // cute mint
 
 interface BottomNavProps {
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     borderTopWidth: 1,
-    borderTopColor: '#EAE5DC',
+    borderTopColor: '#F2E7E2',
     shadowColor: '#FF6B8A',
     shadowOpacity: 0.08,
     shadowRadius: 12,

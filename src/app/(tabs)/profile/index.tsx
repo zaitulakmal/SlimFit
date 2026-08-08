@@ -26,7 +26,7 @@ import {
 import Constants from 'expo-constants';
 
 import { pastelColors as C, pastelSpacing as spacing } from '../../../constants/pastel-theme';
-import { cute, radius, cuteShadow, withAlpha } from '@/theme/cute';
+import { cute, radius, cuteShadow, withAlpha, cardTints, cardBorder, cardTintOrder } from '@/theme/cute';
 import { Mascot } from '@/components/art/Mascot';
 import {
   getBMICategory, calculateCalorieTarget,
@@ -161,7 +161,7 @@ const row = StyleSheet.create({
   saveBtn: { backgroundColor: C.navy, borderRadius: 8, padding: 6 },
   chips: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip:   { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: C.border, backgroundColor: C.white },
-  chipOn: { borderColor: C.navy, backgroundColor: '#EEF1F9' },
+  chipOn: { borderColor: C.navy, backgroundColor: '#FDEDE9' },
   chipTxt:   { fontSize: 12, fontWeight: '600', color: C.textSecondary },
   chipTxtOn: { color: C.navy },
 });
@@ -198,7 +198,7 @@ export default function ProfileScreen() {
 
   if (!profile) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDFBF7' }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FAF4E4' }}>
         <Text style={{ color: C.textSecondary }}>{t('home.empty_state')}</Text>
       </View>
     );
@@ -225,7 +225,7 @@ export default function ProfileScreen() {
   const maxCal = Math.max(...weeklyCalories.map(d => d.calories), tdee, 500);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FDFBF7' }}>
+    <View style={{ flex: 1, backgroundColor: '#FAF4E4' }}>
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 48 }}>
 
@@ -273,12 +273,20 @@ export default function ProfileScreen() {
             { label: t('profile.stats_weight'), value: `${profile.weightKg}`, unit: 'kg' },
             { label: 'BMI',                     value: `${profile.bmi ?? '—'}`, unit: '' },
             { label: t('profile.stats_tdee'),   value: `${(tdee / 1000 >= 1 ? (tdee / 1000).toFixed(1) + 'k' : Math.round(tdee))}`, unit: 'kcal' },
-          ].map(item => (
-            <View key={item.label} style={s.statCard}>
-              <Text style={s.statVal}>{item.value}<Text style={s.statUnit}> {item.unit}</Text></Text>
-              <Text style={s.statLbl}>{item.label}</Text>
-            </View>
-          ))}
+          ].map((item, i) => {
+            const tint = cardTintOrder[i % cardTintOrder.length];
+            return (
+              <View
+                key={item.label}
+                style={[s.statCard, { backgroundColor: cardTints[tint], borderColor: withAlpha(cardBorder[tint], 0.5) }]}
+              >
+                <Text style={s.statVal}>
+                  {item.value}<Text style={s.statUnit}> {item.unit}</Text>
+                </Text>
+                <Text style={s.statLbl}>{item.label}</Text>
+              </View>
+            );
+          })}
         </View>
 
         {/* ── Weekly bar chart ── */}
@@ -317,25 +325,39 @@ export default function ProfileScreen() {
             { type: 'food',   icon: 'flame', color: C.amber,   label: t('stats.food_streak') },
             { type: 'water',  icon: 'water', color: C.skyBlue, label: t('stats.water_streak') },
             { type: 'weight', icon: 'scale', color: C.primary, label: t('stats.weight_streak') },
-          ].map(({ type, icon, color, label }) => (
-            <View key={type} style={s.streakCard}>
-              <View style={[s.streakIconBg, { backgroundColor: color + '18' }]}>
+          ].map(({ type, icon, color, label }, i) => {
+            const tint = (['blush', 'sky', 'lavender'] as const)[i % 3];
+            return (
+            <View key={type} style={[s.streakCard, { backgroundColor: cardTints[tint], borderColor: withAlpha(cardBorder[tint], 0.5) }]}>
+              <View style={[s.streakIconBg, { backgroundColor: withAlpha('#FFFFFF', 0.6) }]}>
                 <PhosphorIcon name={icon} size={20} color={color} />
               </View>
-              <Text style={[s.streakNum, { color }]}>{streakMap[type]?.current ?? 0}</Text>
+              <Text style={[s.streakNum, { color: cute.ink }]}>{streakMap[type]?.current ?? 0}</Text>
               <Text style={s.streakUnit}>{t('stats.days')}</Text>
               <Text style={s.streakLbl} numberOfLines={2}>{label}</Text>
             </View>
-          ))}
+            );
+          })}
         </View>
 
         {/* ── Achievements ── */}
         <Text style={s.sec}>{t('stats.achievements')}</Text>
         <View style={s.badgeGrid}>
-          {BADGE_DEFS.map(def => {
+          {BADGE_DEFS.map((def, i) => {
             const unlocked = unlockedBadgeIds.includes(def.id);
+            const tint = cardTintOrder[i % cardTintOrder.length];
             return (
-              <View key={def.id} style={[s.badgeCard, !unlocked && s.badgeLocked]}>
+              <View
+                key={def.id}
+                style={[
+                  s.badgeCard,
+                  {
+                    backgroundColor: unlocked ? cardTints[tint] : cute.card,
+                    borderColor: unlocked ? withAlpha(cardBorder[tint], 0.5) : cute.line,
+                  },
+                  !unlocked && s.badgeLocked,
+                ]}
+              >
                 <View style={[s.badgeIconBg, { backgroundColor: unlocked ? def.color + '18' : C.border + '40' }]}>
                   <PhosphorIcon name={def.icon} size={24} color={unlocked ? def.color : C.border} />
                 </View>
@@ -350,15 +372,19 @@ export default function ProfileScreen() {
 
         {/* ── Tools ── */}
         <Text style={s.sec}>Tools</Text>
-        <TouchableOpacity style={s.toolCard} onPress={() => router.push('/measurements-hidden' as any)} activeOpacity={0.85}>
-          <View style={[s.toolIcon, { backgroundColor: '#FFF0F1' }]}>
-            <Ruler size={22} weight="fill" color="#FF6B8A" />
+        <TouchableOpacity
+          style={[s.toolCard, { backgroundColor: cardTints.peach, borderColor: withAlpha(cardBorder.peach, 0.5) }]}
+          onPress={() => router.push('/measurements-hidden' as any)}
+          activeOpacity={0.85}
+        >
+          <View style={[s.toolIcon, { backgroundColor: withAlpha('#FFFFFF', 0.75) }]}>
+            <Ruler size={22} weight="fill" color={cute.ink} />
           </View>
           <View style={s.toolText}>
             <Text style={s.toolTitle}>Body Measurements</Text>
-            <Text style={s.toolSub}>Track waist, hips, chest & more</Text>
+            <Text style={s.toolSub}>Track waist, hips, chest &amp; more</Text>
           </View>
-          <ArrowRight size={18} color={C.textTertiary} weight="bold" />
+          <ArrowRight size={18} color={cute.ink} weight="bold" />
         </TouchableOpacity>
 
         {/* ── Profile Details ── */}
@@ -445,7 +471,6 @@ const s = StyleSheet.create({
     paddingHorizontal: 18,
     borderWidth: 1,
     borderColor: cute.line,
-    ...cuteShadow.md,
   },
   avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 6 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
@@ -479,8 +504,8 @@ const s = StyleSheet.create({
   // Stats
   statsRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginTop: 16, marginBottom: 6 },
   statCard: {
-    flex: 1, backgroundColor: C.white, borderRadius: 18, padding: 14, alignItems: 'center',
-    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
+    flex: 1, backgroundColor: C.white, borderRadius: radius.xl, padding: 16, alignItems: 'center',
+    borderWidth: 1,
   },
   statVal:  { fontSize: 22, fontWeight: '900', color: C.textPrimary, letterSpacing: -0.5 },
   statUnit: { fontSize: 12, fontWeight: '600', color: C.textSecondary },
@@ -512,8 +537,8 @@ const s = StyleSheet.create({
   // Streaks
   streakRow:  { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 4 },
   streakCard: {
-    flex: 1, backgroundColor: C.white, borderRadius: 18, padding: 14, alignItems: 'center', gap: 4,
-    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    flex: 1, backgroundColor: C.white, borderRadius: radius.xl, padding: 16, alignItems: 'center', gap: 4,
+    borderWidth: 1,
   },
   streakIconBg: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   streakNum:  { fontSize: 22, fontWeight: '900' },
@@ -523,9 +548,9 @@ const s = StyleSheet.create({
   // Badges
   badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 16, marginBottom: 4 },
   badgeCard: {
-    width: '47%', backgroundColor: C.white, borderRadius: 16, padding: 14,
+    width: '47%', backgroundColor: C.white, borderRadius: radius.xl, padding: 16,
     alignItems: 'center', gap: 6,
-    shadowColor: '#3D2C3E', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 1,
+    borderWidth: 1,
   },
   badgeLocked:  { backgroundColor: C.background },
   badgeIconBg:  { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
@@ -537,16 +562,12 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: C.white,
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: radius.xl,
+    padding: 18,
     marginHorizontal: 16,
     marginBottom: 4,
     gap: 12,
-    shadowColor: '#3D2C3E',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
   },
   toolIcon: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   toolText: { flex: 1 },
@@ -573,7 +594,7 @@ const s = StyleSheet.create({
   resetTxt: { fontSize: 14, fontWeight: '700', color: C.coral },
   signOutBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingVertical: 14, borderRadius: 14, backgroundColor: '#FEF2F2',
+    paddingVertical: 14, borderRadius: 14, backgroundColor: '#FDEDE9',
   },
   signOutTxt: { fontSize: 14, fontWeight: '700', color: '#FF6B6B' },
 });

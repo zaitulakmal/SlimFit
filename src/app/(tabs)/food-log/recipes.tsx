@@ -184,7 +184,7 @@ const s = StyleSheet.create({
   calsLabel: { ...typography.label, color: colors.textSecondary },
   macroRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
   macroPill: { ...typography.label, color: colors.textSecondary, backgroundColor: colors.white, paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
-  tagPill: { ...typography.label, color: colors.skyBlue, backgroundColor: '#E3F2FD', paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
+  tagPill: { ...typography.label, color: colors.skyBlue, backgroundColor: '#E8F4FE', paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
   detail: { marginTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.md },
   detailSection: { ...typography.body, color: colors.primary, marginBottom: spacing.xs },
   detailItem: { ...typography.label, color: colors.textPrimary, marginBottom: 4, lineHeight: 18 },

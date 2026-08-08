@@ -268,7 +268,7 @@ export default function RegisterScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FFF7F2' },
+  root: { flex: 1, backgroundColor: '#FAF4E4' },
   headerBg: {
     height: H * 0.32,
     alignItems: 'center',

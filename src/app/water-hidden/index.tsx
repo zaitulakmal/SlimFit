@@ -13,7 +13,7 @@ import Svg, { Path, Rect, ClipPath, Defs, G, Circle as SvgCircle, Stop, RadialGr
 import { Minus, Plus, Drop, CheckCircle, Target, DropHalf } from 'phosphor-react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cute, cuteShadow, radius, withAlpha } from '@/theme/cute';
+import { cute, cuteShadow, radius, withAlpha, cardTints, cardBorder } from '@/theme/cute';
 import { useWaterStore } from '../../stores/waterStore';
 import BottomNav from '../../components/BottomNav';
 
@@ -141,18 +141,18 @@ export default function WaterScreen() {
 
         {/* Stats */}
         <View style={s.statsRow}>
-          <View style={[s.statCard, { backgroundColor: withAlpha(SKY, 0.12) }]}>
-            <Drop size={24} weight="fill" color={SKY} />
+          <View style={[s.statCard, { backgroundColor: cardTints.sky, borderColor: withAlpha(cardBorder.sky, 0.5) }]}>
+            <View style={s.statIconWell}><Drop size={20} weight="fill" color="#FFFFFF" /></View>
             <Text style={[s.statValue, { color: cute.ink }]}>{totalMl}ml</Text>
             <Text style={s.statLabel}>Consumed</Text>
           </View>
-          <View style={[s.statCard, { backgroundColor: withAlpha(cute.butter, 0.18) }]}>
-            <Target size={24} weight="fill" color={cute.warn} />
+          <View style={[s.statCard, { backgroundColor: cardTints.butter, borderColor: withAlpha(cardBorder.butter, 0.5) }]}>
+            <View style={s.statIconWell}><Target size={20} weight="fill" color="#FFFFFF" /></View>
             <Text style={[s.statValue, { color: cute.ink }]}>{goalMl}ml</Text>
             <Text style={s.statLabel}>Goal</Text>
           </View>
-          <View style={[s.statCard, { backgroundColor: withAlpha(MINT, 0.16) }]}>
-            <DropHalf size={24} weight="fill" color={MINT} />
+          <View style={[s.statCard, { backgroundColor: cardTints.mint, borderColor: withAlpha(cardBorder.mint, 0.5) }]}>
+            <View style={s.statIconWell}><DropHalf size={20} weight="fill" color="#FFFFFF" /></View>
             <Text style={[s.statValue, { color: cute.ink }]}>{Math.max(goalMl - totalMl, 0)}ml</Text>
             <Text style={s.statLabel}>Remaining</Text>
           </View>
@@ -160,7 +160,7 @@ export default function WaterScreen() {
 
         {/* Big cute "add a glass" button */}
         <TouchableOpacity
-          style={[s.addGlassBtn, { backgroundColor: SKY }]}
+          style={[s.addGlassBtn, { backgroundColor: cute.action }]}
           onPress={() => handleAdd(STEP_ML)}
           activeOpacity={0.85}
         >
@@ -197,7 +197,7 @@ export default function WaterScreen() {
               <Text style={[s.customBtnText, { color: cute.ink }]}>-250ml</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[s.customBtn, { backgroundColor: SKY, borderColor: SKY }]}
+              style={[s.customBtn, { backgroundColor: cute.action, borderColor: cute.action }]}
               onPress={() => handleAdd(250)}
             >
               <Plus size={20} weight="bold" color="#FFFFFF" />
@@ -247,16 +247,7 @@ const s = StyleSheet.create({
 
   content: { paddingHorizontal: 18, paddingTop: 8, paddingBottom: 100 },
 
-  glassContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: cute.card,
-    borderRadius: radius.xl,
-    paddingVertical: 20,
-    borderWidth: 1,
-    borderColor: cute.line,
-    ...cuteShadow.md,
-  },
+  glassContainer: { alignItems: 'center', marginBottom: 20, paddingVertical: 10 },
   completeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -276,11 +267,16 @@ const s = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    borderRadius: radius.lg,
-    padding: 14,
+    borderRadius: radius.xl,
+    padding: 16,
     alignItems: 'center',
     gap: 6,
-    ...cuteShadow.sm,
+    borderWidth: 1,
+  },
+  statIconWell: {
+    width: 34, height: 34, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: cute.action,
   },
   statValue: { fontSize: 18, fontWeight: '800' },
   statLabel: { fontSize: 11, fontWeight: '600', color: cute.inkSoft },
@@ -291,7 +287,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     height: 58,
-    borderRadius: radius.lg,
+    borderRadius: 999,
     marginBottom: 24,
     ...cuteShadow.md,
   },

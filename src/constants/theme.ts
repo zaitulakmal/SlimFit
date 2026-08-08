@@ -2,19 +2,19 @@ export const colors = {
   white: '#FFFFFF',
   background: '#F6F7FB',
   card: '#FFFFFF',
-  primary: '#4CAF50',
+  primary: '#34C6A0',
   vividGreen: '#00C853',
   coral: '#FF6B6B',
   amber: '#FFB300',
   skyBlue: '#2196F3',
   purple: '#9C27B0',
   textPrimary: '#111827',
-  textSecondary: '#6B7280',
+  textSecondary: '#6E5C6E',
   textTertiary: '#9CA3AF',
   textOnAccent: '#FFFFFF',
   border: '#E9ECF0',
   borderLight: '#F3F4F6',
-  selectedTint: '#E8F5E9',
+  selectedTint: '#DFF7EE',
 } as const;
 
 export const spacing = {

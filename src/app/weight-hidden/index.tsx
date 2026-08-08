@@ -46,11 +46,11 @@ const COLORS = {
   primary: '#FF6B8A',
   secondary: '#F2E7E2',
   accent: '#FFC53D',
-  background: '#FFF8F3',
+  background: '#FAF4E4',
   white: '#FFFFFF',
-  text: '#4A4A4A',
-  textSub: '#7A7A7A',
-  border: '#E8E4DE',
+  text: '#6E5C6E',
+  textSub: '#6E5C6E',
+  border: '#F2E7E2',
 };
 
 // Created once at module scope — building it inside render makes a brand new
@@ -302,8 +302,8 @@ function WeightScreenContent() {
             style={styles.quickBtn}
             onPress={() => router.push('/(tabs)/food-log/scan')}
           >
-            <View style={[styles.quickBtnIcon, { backgroundColor: '#E8F5E9' }]}>
-              <Barcode size={24} color="#4CAF50" weight="bold" />
+            <View style={[styles.quickBtnIcon, { backgroundColor: '#DFF7EE' }]}>
+              <Barcode size={24} color="#34C6A0" weight="bold" />
             </View>
             <Text style={styles.quickBtnLabel}>Scan</Text>
             <Text style={styles.quickBtnSub}>Barcode</Text>
@@ -313,7 +313,7 @@ function WeightScreenContent() {
             style={styles.quickBtn}
             onPress={() => router.push('/(tabs)/food-log/capture')}
           >
-            <View style={[styles.quickBtnIcon, { backgroundColor: '#FFF3E0' }]}>
+            <View style={[styles.quickBtnIcon, { backgroundColor: '#FFF6DB' }]}>
               <Camera size={24} color="#FF9800" weight="bold" />
             </View>
             <Text style={styles.quickBtnLabel}>Camera</Text>
@@ -324,7 +324,7 @@ function WeightScreenContent() {
             style={styles.quickBtn}
             onPress={() => setShowInput(!showInput)}
           >
-            <View style={[styles.quickBtnIcon, { backgroundColor: '#FCE4EC' }]}>
+            <View style={[styles.quickBtnIcon, { backgroundColor: '#FDEDE9' }]}>
               <Keyboard size={24} color="#FF6B8A" weight="bold" />
             </View>
             <Text style={styles.quickBtnLabel}>Manual</Text>
@@ -346,7 +346,7 @@ function WeightScreenContent() {
               <TextInput
                 style={styles.weightInput}
                 placeholder="0.0"
-                placeholderTextColor="#A0A0A0"
+                placeholderTextColor="#A99BA8"
                 keyboardType="decimal-pad"
                 value={inputWeight}
                 onChangeText={setInputWeight}
@@ -469,10 +469,11 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.white,
-    borderRadius: 20,
+    borderRadius: 28,
     padding: spacing.lg,
     marginBottom: spacing.md,
-    ...shadow.md,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -527,10 +528,11 @@ const styles = StyleSheet.create({
   quickBtn: {
     flex: 1,
     backgroundColor: COLORS.white,
-    borderRadius: 16,
+    borderRadius: 28,
     padding: spacing.md,
     alignItems: 'center',
-    ...shadow.sm,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   quickBtnIcon: {
     width: 48,
@@ -551,10 +553,11 @@ const styles = StyleSheet.create({
   },
   inputCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 20,
+    borderRadius: 28,
     padding: spacing.lg,
     marginBottom: spacing.md,
-    ...shadow.md,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   inputHeader: {
     flexDirection: 'row',
@@ -601,7 +604,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputBtnPrimary: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#161616',
   },
   inputBtnText: {
     color: COLORS.white,
@@ -654,9 +657,10 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 20,
+    borderRadius: 28,
     padding: spacing.md,
-    ...shadow.md,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   historyRow: {
     flexDirection: 'row',
