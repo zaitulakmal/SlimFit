@@ -16,7 +16,7 @@ import { useAuthStore } from '../stores/authStore';
 const { width: W } = Dimensions.get('window');
 
 // ─── Colours (Slimora cute palette) ──────────────────────────────────────────
-const BG      = '#FFF7F2';   // soft cream
+const BG      = '#FAF4E4';   // soft cream
 const CORAL1  = '#FF8FA3';
 const CORAL2  = '#FFB1A8';
 const BOWL_DARK  = '#F0C97A';
@@ -217,7 +217,7 @@ export default function SplashScreen() {
         <Defs>
           <LinearGradient id="splashBg" x1="0%" y1="0%" x2="30%" y2="100%">
             <Stop offset="0%"   stopColor="#FFE9EC" />
-            <Stop offset="55%"  stopColor="#FFF7F2" />
+            <Stop offset="55%"  stopColor="#FAF4E4" />
             <Stop offset="100%" stopColor="#E6F6EE" />
           </LinearGradient>
         </Defs>

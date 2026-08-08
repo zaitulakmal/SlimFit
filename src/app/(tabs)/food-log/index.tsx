@@ -24,8 +24,7 @@ import {
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { pastelColors, pastelSpacing, pastelRadius, mealColors } from '../../../constants/pastel-theme';
-import { cute, radius, cuteShadow, withAlpha } from '@/theme/cute';
-import { FoodApple, FoodBroccoli, FoodEgg, FoodCarrot } from '@/components/art/Foodies';
+import { cute, radius, withAlpha, cardTints, cardBorder } from '@/theme/cute';
 import { useFoodStore } from '../../../stores/foodStore';
 import { useProfileStore } from '../../../stores/profileStore';
 import { calculateCalorieTarget } from '../../../constants/tdee';
@@ -35,6 +34,15 @@ const RF = (v: number) => Math.round(v);
 const C = pastelColors;
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
+
+// Meal -> shared card tint, so Food Log uses the same card family as Home and
+// Profile (saturated fill, deeper border, xl corners, no shadow).
+const MEAL_TINT = {
+  breakfast: 'butter',
+  lunch: 'mint',
+  dinner: 'lavender',
+  snack: 'peach',
+} as const;
 
 function MealIcon({ meal, size, color }: { meal: string; size: number; color: string }) {
   switch (meal) {
@@ -63,15 +71,6 @@ function offsetDate(dateStr: string, days: number) {
   return d.toISOString().split('T')[0];
 }
 
-function MealCharacter({ meal, size }: { meal: string; size: number }) {
-  switch (meal) {
-    case 'breakfast': return <FoodEgg size={size} />;
-    case 'lunch': return <FoodApple size={size} />;
-    case 'dinner': return <FoodBroccoli size={size} />;
-    case 'snack': return <FoodCarrot size={size} />;
-    default: return <FoodApple size={size} />;
-  }
-}
 
 function CalorieRing({ consumed, tdee }: { consumed: number; tdee: number }) {
   const size = 84;
@@ -216,6 +215,7 @@ export default function FoodLogScreen() {
           const mealLogs   = getMealLogs(meal);
           const mealCals   = mealLogs.reduce((a, l) => a + Number(l.calories), 0);
           const meta       = mealColors[meal];
+          const tint       = MEAL_TINT[meal];
           const isLast     = idx === MEAL_TYPES.length - 1;
 
           return (
@@ -231,28 +231,29 @@ export default function FoodLogScreen() {
               </View>
 
               {/* Meal card */}
-              <View style={[s.mealCard, { flex: 1 }]}>
-                <View style={[s.mealHeader, { backgroundColor: meta.bg }]}>
+              <View
+                style={[
+                  s.mealCard,
+                  { flex: 1, backgroundColor: cardTints[tint], borderColor: withAlpha(cardBorder[tint], 0.5) },
+                ]}
+              >
+                <View style={s.mealHeader}>
                   <View style={s.mealTitleRow}>
-                    <View style={[s.mealIconBg, { backgroundColor: withAlpha(meta.color, 0.16) }]}>
-                      <MealCharacter meal={meal} size={26} />
+                    <View style={s.mealIconBg}>
+                      <MealIcon meal={meal} size={20} color="#FFFFFF" />
                     </View>
-                    <Text style={[s.mealTitle, { color: meta.color }]}>
-                      {t(`food.meal_${meal}`)}
-                    </Text>
+                    <Text style={s.mealTitle}>{t(`food.meal_${meal}`)}</Text>
                     {mealCals > 0 && (
-                      <View style={[s.calPill, { backgroundColor: `${meta.color}20` }]}>
-                        <Text style={[s.calPillText, { color: meta.color }]}>
-                          {Math.round(mealCals)} kcal
-                        </Text>
+                      <View style={s.calPill}>
+                        <Text style={s.calPillText}>{Math.round(mealCals)} kcal</Text>
                       </View>
                     )}
                   </View>
                   <TouchableOpacity
-                    style={[s.addBtn, { backgroundColor: meta.color }]}
+                    style={s.addBtn}
                     onPress={() => router.push({ pathname: '/(tabs)/food-log/search', params: { mealType: meal } })}
                   >
-                    <PlusCircle size={18} weight="fill" color={C.white} />
+                    <PlusCircle size={18} weight="fill" color="#FFFFFF" />
                   </TouchableOpacity>
                 </View>
 
@@ -264,11 +265,9 @@ export default function FoodLogScreen() {
                   <View>
                     {mealLogs.map((log, logIdx) => (
                       <View key={log.id} style={[s.foodRow, logIdx > 0 && s.foodRowBorder]}>
-                        <View style={[s.foodCalBadge, { backgroundColor: `${meta.color}12` }]}>
-                          <Text style={[s.foodCalBadgeText, { color: meta.color }]}>
-                            {Math.round(Number(log.calories))}
-                          </Text>
-                          <Text style={[s.foodCalUnit, { color: meta.color }]}>kcal</Text>
+                        <View style={s.foodCalBadge}>
+                          <Text style={s.foodCalBadgeText}>{Math.round(Number(log.calories))}</Text>
+                          <Text style={s.foodCalUnit}>kcal</Text>
                         </View>
                         <View style={s.foodInfo}>
                           <Text style={s.foodName} numberOfLines={1}>{log.foodName}</Text>
@@ -286,7 +285,7 @@ export default function FoodLogScreen() {
                           style={s.deleteBtn}
                           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                         >
-                          <Trash size={16} weight="regular" color={C.coral} />
+                          <Trash size={16} weight="regular" color={withAlpha(cute.ink, 0.55)} />
                         </TouchableOpacity>
                       </View>
                     ))}
@@ -303,7 +302,7 @@ export default function FoodLogScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FDFBF7' },
+  root: { flex: 1, backgroundColor: '#FAF4E4' },
 
   header: {
     // paddingTop comes from the safe-area inset so the date row clears the notch.
@@ -331,7 +330,6 @@ const s = StyleSheet.create({
     padding: 18,
     borderWidth: 1,
     borderColor: cute.line,
-    ...cuteShadow.md,
   },
   summaryRight: { flex: 1, gap: 10 },
 
@@ -351,12 +349,9 @@ const s = StyleSheet.create({
   timelineLine: { width: 2, flex: 1, marginTop: 4 },
 
   mealCard: {
-    backgroundColor: cute.card,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: cute.line,
-    ...cuteShadow.sm,
   },
   mealHeader: {
     flexDirection: 'row',
@@ -366,14 +361,14 @@ const s = StyleSheet.create({
     paddingVertical: 14,
   },
   mealTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, flexShrink: 1, marginRight: 8 },
-  mealIconBg:   { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  mealTitle:    { fontSize: 15, fontWeight: '700' },
-  calPill:      { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 },
-  calPillText:  { fontSize: 11, fontWeight: '700' },
-  addBtn:       { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  mealIconBg:   { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: cute.action },
+  mealTitle:    { fontSize: 15, fontWeight: '800', color: cute.ink },
+  calPill:      { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99, backgroundColor: withAlpha('#FFFFFF', 0.6) },
+  calPillText:  { fontSize: 11, fontWeight: '800', color: cute.ink },
+  addBtn:       { width: 36, height: 36, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: cute.action },
 
   emptyMeal: { paddingHorizontal: 16, paddingVertical: 14 },
-  emptyText: { fontSize: 13, color: C.textSecondary, fontStyle: 'italic' },
+  emptyText: { fontSize: 13, color: withAlpha(cute.ink, 0.6), fontStyle: 'italic' },
 
   foodRow: {
     flexDirection: 'row',
@@ -382,7 +377,7 @@ const s = StyleSheet.create({
     paddingVertical: 12,
     gap: 10,
   },
-  foodRowBorder: { borderTopWidth: 1, borderTopColor: C.border },
+  foodRowBorder: { borderTopWidth: 1, borderTopColor: withAlpha('#FFFFFF', 0.55) },
   foodInfo:  { flex: 1 },
   foodName:  { fontSize: 14, fontWeight: '600', color: cute.ink, marginBottom: 2 },
   brandName: { fontSize: 12, fontWeight: '500', color: cute.inkSoft, marginBottom: 4 },
@@ -396,7 +391,8 @@ const s = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     minWidth: 52,
+    backgroundColor: withAlpha('#FFFFFF', 0.7),
   },
-  foodCalBadgeText: { fontSize: 14, fontWeight: '900', lineHeight: 16 },
-  foodCalUnit: { fontSize: 9, fontWeight: '700', marginTop: 1 },
+  foodCalBadgeText: { fontSize: 14, fontWeight: '900', lineHeight: 16, color: cute.ink },
+  foodCalUnit: { fontSize: 9, fontWeight: '700', marginTop: 1, color: withAlpha(cute.ink, 0.7) },
 });

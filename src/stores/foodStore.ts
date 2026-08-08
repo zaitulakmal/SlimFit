@@ -62,15 +62,22 @@ export const useFoodStore = create<FoodState>((set, get) => ({
     const loggedAt = new Date().toISOString();
     await db.insert(foodLogs).values({ ...item, dateStr, loggedAt });
     await get().loadDayLogs(get().currentDateStr);
-    // Update food streak (lazy import to avoid circular deps)
-    try {
-      const { useStatsStore } = await import('./statsStore');
-      await useStatsStore.getState().updateStreak('food', dateStr);
-    } catch {}
-    try {
-      const { reconcileTodayNotifications } = await import('../services/notificationEngine');
-      await reconcileTodayNotifications();
-    } catch {}
+
+    // Everything below is bookkeeping the screen does not wait on. Awaiting it
+    // made "log" feel laggy: reconcileTodayNotifications alone runs seven DB
+    // queries and then reschedules notifications through the native module,
+    // all before the sheet could close. The streak and the schedule can settle
+    // a moment later — Home reloads stats on focus anyway.
+    void (async () => {
+      try {
+        const { useStatsStore } = await import('./statsStore');
+        await useStatsStore.getState().updateStreak('food', dateStr);
+      } catch {}
+      try {
+        const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+        await reconcileTodayNotifications();
+      } catch {}
+    })();
   },
 
   deleteFood: async (id) => {

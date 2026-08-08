@@ -13,7 +13,7 @@ import { colors, typography, spacing, radius } from '../../constants/theme-new';
 import { Mascot } from '../art/Mascot';
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const CONFETTI_COLORS = [colors.primary, colors.accent, '#4CAF50', '#42A5F5', '#AB47BC'];
+const CONFETTI_COLORS = [colors.primary, colors.accent, '#34C6A0', '#8FD3F4', '#9B8BE0'];
 
 function ConfettiPiece({ index }: { index: number }) {
   const startX = (index * 37) % SCREEN_W;

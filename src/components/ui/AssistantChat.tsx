@@ -231,7 +231,7 @@ export function AssistantChat({ visible, onClose }: Props) {
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: '#FDFBF7',
+    backgroundColor: '#FAF4E4',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     height: '82%',

@@ -22,12 +22,14 @@ export const cute = {
   peach: '#FFC9A8',
   butter: '#FFE09A', // sunny accent (kept for chips only)
   lavender: '#C3B4F0',
+  blush: '#FBB8DB', // saturated card pink from the reference
+  action: '#161616', // primary CTA — the reference's near-black
   sky: '#8FD3F4',
   grape: '#9B8BE0',
 
   // Functional
   white: '#FFFFFF',
-  cream: '#FFF8F3', // page background
+  cream: '#FAF4E4', // page background — warm cream from the reference design
   card: '#FFFFFF',
   ink: '#3D2C3E', // warm near-black text
   inkSoft: '#6E5C6E', // muted text
@@ -124,6 +126,42 @@ export const type = {
   body: { fontSize: 14, fontWeight: '500' } as const,
   caption: { fontSize: 12, fontWeight: '600' } as const,
 };
+
+// Card fills, matching the Slimora assistant card: a saturated pastel (not a
+// pale wash), a 1px border one step deeper in the same hue, radius.xl corners
+// and no shadow. `blush` is literally the assistant card's pink, so a stack of
+// these reads as the same family. Baked hexes rather than withAlpha() — alpha
+// over the warm cream page shifts each hue differently and the set ends up
+// looking unevenly weighted.
+export const cardTints = {
+  sky: '#A8D8F5',
+  butter: '#FBE08A',
+  mint: '#A5E8CE',
+  lavender: '#C9B8F2',
+  blush: '#FBB8DB',
+  peach: '#FCC9A6',
+} as const;
+
+/** One step deeper than each fill — used at ~50% alpha for the card border. */
+export const cardBorder = {
+  sky: '#6BB8E0',
+  butter: '#E0BC4A',
+  mint: '#62C7A3',
+  lavender: '#A38EE0',
+  blush: '#E894C4',
+  peach: '#E8A170',
+} as const;
+
+export const cardTintOrder = ['sky', 'butter', 'mint', 'lavender', 'blush', 'peach'] as const;
+
+/**
+ * Shared card shape. Spread this next to a backgroundColor from cardTints and
+ * a borderColor from cardBorder to get the assistant card's look.
+ */
+export const cardStyle = {
+  borderRadius: 28, // radius.xl
+  borderWidth: 1,
+} as const;
 
 // Tiny helper to tint a hex with alpha (for soft tracks / glows).
 export function withAlpha(hex: string, alpha: number): string {

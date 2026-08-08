@@ -22,6 +22,7 @@ import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import {
   Drop,
   Barbell,
+  BookOpenText,
   ChartLineUp,
   ArrowRight,
   PlusCircle,
@@ -30,9 +31,8 @@ import {
   UserCircle,
 } from 'phosphor-react-native';
 
-import { cute, radius, cuteShadow, withAlpha } from '@/theme/cute';
+import { cute, radius, cuteShadow, withAlpha, cardTints, cardBorder } from '@/theme/cute';
 import { MascotBuddy } from '@/components/art/MascotBuddy';
-import { FoodApple } from '@/components/art/Foodies';
 import { MacroDonut } from '@/components/art/MacroDonut';
 import { AssistantChat } from '@/components/ui/AssistantChat';
 
@@ -69,31 +69,34 @@ function ExploreCard({
   title,
   subtitle,
   icon,
-  accentColor,
+  tint,
   onPress,
   index,
 }: {
   title: string;
   subtitle: string;
   icon: React.ReactNode;
-  accentColor: string;
+  tint: keyof typeof cardTints;
   onPress: () => void;
   index: number;
 }) {
   return (
     <Animated.View entering={FadeInUp.delay(index * 70 + 240).springify()}>
       <TouchableOpacity
-        style={[ex.card, { backgroundColor: cute.card }, cuteShadow.md]}
+        style={[
+          ex.card,
+          { backgroundColor: cardTints[tint], borderColor: withAlpha(cardBorder[tint], 0.5) },
+        ]}
         onPress={onPress}
         activeOpacity={0.9}
       >
-        <View style={[ex.iconWrap, { backgroundColor: withAlpha(accentColor, 0.16) }]}>{icon}</View>
+        <View style={ex.iconWrap}>{icon}</View>
         <View style={ex.textWrap}>
           <Text style={ex.title}>{title}</Text>
           <Text style={ex.sub}>{subtitle}</Text>
         </View>
-        <View style={[ex.arrow, { backgroundColor: withAlpha(accentColor, 0.14) }]}>
-          <ArrowRight size={18} color={accentColor} weight="bold" />
+        <View style={ex.arrow}>
+          <ArrowRight size={18} color="#FFFFFF" weight="bold" />
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -104,18 +107,31 @@ const ex = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: radius.lg,
-    padding: 16,
+    borderRadius: radius.xl,
+    padding: 18,
     marginBottom: 12,
     gap: 14,
     borderWidth: 1,
-    borderColor: cute.line,
   },
-  iconWrap: { width: 52, height: 52, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: cute.action,
+  },
   textWrap: { flex: 1 },
-  title: { fontSize: 16, fontWeight: '700', color: cute.ink, marginBottom: 3 },
-  sub: { fontSize: 13, fontWeight: '500', color: cute.inkSoft },
-  arrow: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 16, fontWeight: '800', color: cute.ink, marginBottom: 3 },
+  sub: { fontSize: 13, fontWeight: '500', color: withAlpha(cute.ink, 0.75) },
+  arrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: cute.action,
+  },
 });
 
 // ── Mini bento card ───────────────────────────────────────────────────────────
@@ -248,6 +264,7 @@ export default function HomeScreen() {
     { key: 'fat', label: 'Fat', grams: Number(foodTotals.fatG), kcalPerGram: 9, accent: cute.fat },
   ];
 
+
   // One-line nudge on the card; the real answers come from the chat itself.
   const remainingKcal = Math.max(netBudget - consumed, 0);
   const assistantTeaser =
@@ -288,7 +305,7 @@ export default function HomeScreen() {
             activeOpacity={0.9}
             onPress={() => router.push('/fasting-hidden')}
           >
-            <Text style={s.ctaPrimaryText}>Plan check-up</Text>
+            <Text style={s.ctaPrimaryText}>Fasting plan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.ctaIcon} activeOpacity={0.8} onPress={() => router.push('/water-hidden')}>
             <Drop size={20} color={cute.ink} weight="bold" />
@@ -307,7 +324,7 @@ export default function HomeScreen() {
         {/* AI assistant card */}
         <Animated.View
           entering={FadeInUp.delay(160).springify()}
-          style={[s.assistantCard, { backgroundColor: withAlpha(cute.coral, 0.12) }]}
+          style={[s.assistantCard, { backgroundColor: cute.blush }]}
         >
           <View style={s.assistantTop}>
             <MascotBuddy size={42} mood="happy" animated={false} />
@@ -341,6 +358,7 @@ export default function HomeScreen() {
           <GoalCountdownCard projection={goalProjection} />
         </Animated.View>
 
+
         {/* Explore */}
         <Animated.View entering={FadeInUp.delay(200).springify()} style={s.sectionLabel}>
           <Text style={s.sectionTitle}>Explore</Text>
@@ -349,24 +367,24 @@ export default function HomeScreen() {
         <ExploreCard
           title="Recipes"
           subtitle="Browse healthy meals"
-          icon={<FoodApple size={26} />}
-          accentColor={cute.coral}
+          icon={<BookOpenText size={26} weight="fill" color="#FFFFFF" />}
+          tint="sky"
           onPress={() => router.push('/recipes-hidden')}
           index={0}
         />
         <ExploreCard
           title="Activity"
           subtitle="Log workouts"
-          icon={<Barbell size={26} weight="fill" color={cute.mintDeep} />}
-          accentColor={cute.mint}
+          icon={<Barbell size={26} weight="fill" color="#FFFFFF" />}
+          tint="butter"
           onPress={() => router.push('/activity-hidden')}
           index={1}
         />
         <ExploreCard
           title="Weekly Report"
           subtitle="See how this week went"
-          icon={<ChartLineUp size={26} weight="fill" color={cute.sky} />}
-          accentColor={cute.sky}
+          icon={<ChartLineUp size={26} weight="fill" color="#FFFFFF" />}
+          tint="mint"
           onPress={() => router.push('/weekly-report')}
           index={2}
         />
@@ -416,25 +434,14 @@ const s = StyleSheet.create({
   },
   streakNum: { fontSize: RF(14), fontWeight: '800', color: '#B8860B' },
 
-  donutWrap: {
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    marginTop: RF(10),
-    marginBottom: RF(16),
-    backgroundColor: cute.card,
-    borderRadius: radius.xl,
-    paddingVertical: RF(18),
-    borderWidth: 1,
-    borderColor: cute.line,
-    ...cuteShadow.md,
-  },
+  donutWrap: { alignItems: 'center', marginTop: RF(14), marginBottom: RF(20) },
 
   ctaRow: { flexDirection: 'row', alignItems: 'center', gap: RF(10), width: '100%' },
   ctaPrimary: {
     flex: 1,
-    height: RF(56),
+    height: RF(58),
     borderRadius: 999,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#161616',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: RF(18),
@@ -465,14 +472,14 @@ const s = StyleSheet.create({
     padding: RF(18),
     marginBottom: RF(16),
     borderWidth: 1,
-    borderColor: withAlpha(cute.coral, 0.22),
+    borderColor: withAlpha('#E894C4', 0.5),
   },
   assistantTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: RF(10) },
   assistantName: { fontSize: RF(16), fontWeight: '800', color: cute.ink },
   assistantMsg: { fontSize: RF(14), fontWeight: '500', color: cute.ink, lineHeight: RF(21), marginBottom: RF(14) },
   assistantBtn: {
     alignSelf: 'flex-start',
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#161616',
     paddingHorizontal: RF(20),
     paddingVertical: RF(12),
     borderRadius: 999,

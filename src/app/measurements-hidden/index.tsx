@@ -22,15 +22,15 @@ const { width: W } = Dimensions.get('window');
 
 const C = {
   navy: '#3D2C3E',
-  navyLight: '#243470',
+  navyLight: '#3D2C3E',
   primary: '#FF6B8A',
   amber: '#FFC53D',
-  bg: '#FFF8F3',
+  bg: '#FAF4E4',
   surface: '#FFFFFF',
-  border: '#EDE8DF',
+  border: '#F2E7E2',
   text: '#3D2C3E',
-  textSub: '#7A6A5A',
-  textLight: '#A89880',
+  textSub: '#6E5C6E',
+  textLight: '#A99BA8',
   green: '#34C6A0',
 };
 
@@ -41,7 +41,7 @@ const FIELDS: { key: MeasurementKey; label: string; color: string }[] = [
   { key: 'hipsCm',   label: 'Hips',   color: '#FFA45B' },
   { key: 'chestCm',  label: 'Chest',  color: '#FFC53D' },
   { key: 'armsCm',   label: 'Arms',   color: '#34C6A0' },
-  { key: 'neckCm',   label: 'Neck',   color: '#42A5F5' },
+  { key: 'neckCm',   label: 'Neck',   color: '#8FD3F4' },
 ];
 
 function todayStr() {
@@ -328,14 +328,11 @@ const s = StyleSheet.create({
 
   card: {
     backgroundColor: C.surface,
-    borderRadius: 24,
+    borderRadius: 28,
     padding: 18,
     marginBottom: 14,
-    shadowColor: C.navy,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -351,7 +348,7 @@ const s = StyleSheet.create({
   inputItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9F6F1',
+    backgroundColor: '#FAF4E4',
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -370,9 +367,9 @@ const s = StyleSheet.create({
   inputUnit: { fontSize: 12, fontWeight: '600', color: C.textLight, marginLeft: 4 },
 
   saveBtn: {
-    backgroundColor: C.navy,
-    borderRadius: 16,
-    paddingVertical: 14,
+    backgroundColor: '#161616',
+    borderRadius: 999,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   saveBtnText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF' },
@@ -402,14 +399,11 @@ const s = StyleSheet.create({
 
   historyCard: {
     backgroundColor: C.surface,
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: 28,
+    padding: 16,
     marginBottom: 10,
-    shadowColor: C.navy,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#F2E7E2',
   },
   historyHeader: {
     flexDirection: 'row',
