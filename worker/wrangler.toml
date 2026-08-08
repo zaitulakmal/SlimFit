@@ -1,0 +1,24 @@
+name = "slimora-ai-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+
+# Serve on <name>.<account-subdomain>.workers.dev. The app talks to this URL;
+# auth.ts is what keeps it from being an open door.
+workers_dev = true
+
+# Not a secret — the Firebase project id is already public in the app bundle.
+# auth.ts checks incoming tokens were issued for *this* project specifically,
+# so a valid token from someone else's Firebase project is rejected.
+[vars]
+FIREBASE_PROJECT_ID = "slimora-4ba10"
+
+# Daily per-user AI quotas. Without this binding the Worker still serves
+# traffic (auth is the real gate) but stops counting calls.
+# Created during setup with: wrangler kv namespace create RATE_LIMIT
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "6ca9ec6ade994eae84abef7717b0c4ad"
+
+# Secrets — never in this file. Set with:
+#   wrangler secret put GROQ_KEY
+#   wrangler secret put OPENROUTER_KEY
