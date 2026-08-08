@@ -1,7 +1,7 @@
 {
   "cli": {
     "version": ">= 18.5.0",
-    "appVersionSource": "remote"
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
@@ -28,7 +28,6 @@
       }
     },
     "production": {
-      "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAnv3jSXE8p9SPxya5LtXuD88O5qGZC1SQ",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "slimora-4ba10.firebaseapp.com",
