@@ -7,7 +7,8 @@
     "activity": "Activity",
     "recipes": "Recipes",
     "grocery": "Grocery",
-    "profile": "Profile"
+    "profile": "Profile",
+    "garden": "Garden"
   },
   "home": {
     "greeting_morning": "Good morning, {{name}}",
@@ -249,5 +250,21 @@
     "back": "Go back",
     "cancel": "Cancel",
     "delete": "Delete"
+  },
+  "garden": {
+    "title": "My Garden",
+    "subtitle": "Plant, water & grow cute veggies — and pet your cats!",
+    "cats": "Furry friends",
+    "your_patch": "Your veggie patch",
+    "plot": "Plot {{n}}",
+    "plant": "Plant",
+    "water": "Water",
+    "harvest": "Harvest",
+    "pet": "Pet",
+    "affection": "Affection",
+    "harvested": "Harvested: {{n}} crops",
+    "reset": "Reset garden",
+    "reset_title": "Reset your garden?",
+    "reset_confirm": "This clears all your plots and cat affection."
   }
 }

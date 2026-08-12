@@ -1,6 +1,6 @@
 import { View, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import { ForkKnifeIcon, HouseIcon, UserCircleIcon } from 'phosphor-react-native';
+import { ForkKnifeIcon, HouseIcon, UserCircleIcon, FlowerLotusIcon } from 'phosphor-react-native';
 import { useTranslation } from 'react-i18next';
 import { cute, withAlpha } from '@/theme/cute';
 
@@ -76,6 +76,15 @@ export default function TabLayout() {
           title: t('tabs.profile'),
           tabBarIcon: ({ focused, color }) => (
             <TabIcon icon={UserCircleIcon} focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="garden"
+        options={{
+          title: t('tabs.garden'),
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon={FlowerLotusIcon} focused={focused} color={color} />
           ),
         }}
       />
