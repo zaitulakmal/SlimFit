@@ -176,3 +176,19 @@ export const notificationLog = sqliteTable('notification_log', {
   sentAt: text('sent_at').notNull().$defaultFn(() => new Date().toISOString()),
 });
 export type NotificationLogRow = typeof notificationLog.$inferSelect;
+
+// ---------------------------------------------------------------------------
+// Body measurements — one row per log date
+// ---------------------------------------------------------------------------
+export const bodyMeasurements = sqliteTable('body_measurements', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dateStr: text('date_str').notNull(),
+  waistCm: real('waist_cm'),
+  hipsCm: real('hips_cm'),
+  chestCm: real('chest_cm'),
+  armsCm: real('arms_cm'),
+  neckCm: real('neck_cm'),
+  loggedAt: text('logged_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+export type BodyMeasurement = typeof bodyMeasurements.$inferSelect;
+export type NewBodyMeasurement = typeof bodyMeasurements.$inferInsert;

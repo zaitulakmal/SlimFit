@@ -6,7 +6,10 @@ import {
   onAuthStateChanged,
   updateProfile,
   type User,
-} from 'firebase/auth';
+  // Same inner-package import as src/lib/firebase.ts — mixing it with the
+  // umbrella 'firebase/auth' would load a second copy of the auth SDK and
+  // these functions would be handed an Auth built by the other one.
+} from '@firebase/auth';
 import { auth } from '../lib/firebase';
 
 interface AuthState {

@@ -1,7 +1,7 @@
 {
   "cli": {
     "version": ">= 18.5.0",
-    "appVersionSource": "remote"
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
@@ -13,7 +13,8 @@
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "slimora-4ba10",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "slimora-4ba10.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "290611139443",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06"
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06",
+        "EXPO_PUBLIC_AI_PROXY_URL": "https://slimora-ai-proxy.zaitulakmal02.workers.dev"
       }
     },
     "preview": {
@@ -24,18 +25,20 @@
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "slimora-4ba10",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "slimora-4ba10.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "290611139443",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06"
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06",
+        "EXPO_PUBLIC_AI_PROXY_URL": "https://slimora-ai-proxy.zaitulakmal02.workers.dev"
       }
     },
     "production": {
-      "autoIncrement": true,
+      "environment": "production",
       "env": {
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAnv3jSXE8p9SPxya5LtXuD88O5qGZC1SQ",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "slimora-4ba10.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "slimora-4ba10",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "slimora-4ba10.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "290611139443",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06"
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:290611139443:web:28e093c23e7b06b40b6b06",
+        "EXPO_PUBLIC_AI_PROXY_URL": "https://slimora-ai-proxy.zaitulakmal02.workers.dev"
       }
     }
   },
@@ -43,7 +46,7 @@
     "production": {
       "android": {
         "serviceAccountKeyPath": "./google-play-service-account.json",
-        "track": "internal"
+        "track": "production"
       }
     }
   }

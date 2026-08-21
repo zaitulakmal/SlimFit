@@ -1,83 +1,87 @@
-// Figma: "Modernize Weight Loss Tracker UI"
-// Palette 1 (Dashboard): Ruby #C41E3A · Papyrus #E8DCC4 · Citron #F0C808
+// Slimora palette — single source of truth is src/theme/cute.ts (the Home
+// screen's look). This file used to carry a separate Figma brand (Ruby #C41E3A
+// / Navy #1A2B5C / warm-brown text), which is why screens built on it clashed
+// with Home. Every key is kept so existing screens keep compiling; the values
+// now resolve to the cute palette.
+import { cute, withAlpha } from '@/theme/cute';
 
 export const pastelColors = {
-  // Navy — dark header / accent
-  navy: '#1A2B5C',
-  navyLight: '#243470',
-  navyDark: '#0F1A3C',
+  // Was navy; now the soft ink used across Home so "dark" surfaces match.
+  navy: cute.ink,
+  navyLight: cute.inkSoft,
+  navyDark: '#2C1F2D',
 
-  // Primary — Ruby red
-  primary: '#C41E3A',
-  primaryLight: '#E53558',
-  primaryDark: '#A01830',
+  // Primary — cute coral
+  primary: cute.coral,
+  primaryLight: '#FFB1A8',
+  primaryDark: cute.coralDeep,
 
-  // Accent — Sunny Citron yellow
-  amber: '#F0C808',
-  amberDark: '#D4AF07',
-  amberLight: '#FFF9E6',
+  // Accent — butter
+  amber: cute.carbs,
+  amberDark: '#E0A800',
+  amberLight: '#FFF6DB',
 
-  // Greens (vegetables/success)
-  green: '#10B981',
-  greenLight: '#D1FAE5',
-  greenDark: '#059669',
+  // Greens — cute mint
+  green: cute.mintDeep,
+  greenLight: '#DFF7EE',
+  greenDark: '#25A886',
 
   // Supporting palette
-  coral: '#C41E3A',
-  pink: '#FFEDD5',
-  blue: '#BFDBFE',
-  purple: '#DDD6FE',
-  orange: '#FB923C',
-  yellow: '#F0C808',
-  skyBlue: '#93C5FD',
+  coral: cute.coral,
+  pink: withAlpha(cute.coral, 0.18),
+  blue: cute.sky,
+  purple: cute.lavender,
+  orange: cute.fat,
+  yellow: cute.carbs,
+  skyBlue: cute.water,
 
-  // Neutrals — warm cream
-  white: '#FFFFFF',
-  background: '#F5EFE7',     // warm cream page bg
-  surface: '#FFFFFF',
-  card: '#FFFFFF',
-  border: '#EDE8DF',
-  borderLight: '#F5F0E8',
+  // Neutrals — cute cream
+  white: cute.white,
+  background: cute.cream,
+  surface: cute.card,
+  card: cute.card,
+  border: cute.line,
+  borderLight: '#F8F1ED',
 
   // Text
-  textPrimary: '#3D2B1F',    // warm dark brown
-  textSecondary: '#7A6A5A',
-  textTertiary: '#A89880',
+  textPrimary: cute.ink,
+  textSecondary: cute.inkSoft,
+  textTertiary: cute.inkFaint,
   textOnAccent: '#FFFFFF',
   textOnDark: '#FFFFFF',
-  textOnAmber: '#3D2B1F',    // dark text on yellow buttons
-  textPlaceholder: '#B0A090',
-  text: '#3D2B1F',
+  textOnAmber: cute.ink,
+  textPlaceholder: cute.inkFaint,
+  text: cute.ink,
 
-  // Card tints matching Figma stat cards
-  cardMint: '#D1FAE5',       // green (meals)
-  cardYellow: '#FFF9E6',     // yellow (calories)
-  cardPink: '#FFE4E6',       // pink/red (weight)
-  cardBlue: '#DBEAFE',       // blue (water)
-  cardPurple: '#EDE9FE',     // purple
-  cardOrange: '#FFEDD5',     // orange (burned)
-  cardCoral: '#FFE4E6',
-  cardCream: '#F5EFE7',
+  // Card tints — same hues as the Home bento cards
+  cardMint: withAlpha(cute.mint, 0.16),
+  cardYellow: withAlpha(cute.carbs, 0.16),
+  cardPink: withAlpha(cute.coral, 0.14),
+  cardBlue: withAlpha(cute.water, 0.14),
+  cardPurple: withAlpha(cute.lavender, 0.18),
+  cardOrange: withAlpha(cute.fat, 0.16),
+  cardCoral: withAlpha(cute.coral, 0.14),
+  cardCream: cute.cream,
 
   // Status
-  success: '#10B981',
-  warning: '#F0C808',
-  danger: '#C41E3A',
-  error: '#C41E3A',
-  secondary: '#E8DCC4',
-  selectedTint: '#FFF9E6',
+  success: cute.success,
+  warning: cute.warn,
+  danger: cute.danger,
+  error: cute.danger,
+  secondary: cute.line,
+  selectedTint: withAlpha(cute.coral, 0.12),
 
-  // Header backgrounds per screen (matching Figma)
-  headerTop: '#E8DCC4',      // Dashboard: papyrus beige
-  headerMid: '#F5EFE7',      // warm cream mid
-  headerBottom: '#FFF9E6',   // light citron bottom
+  // Header backgrounds — the cute hero gradient stops
+  headerTop: cute.coral,
+  headerMid: cute.butter,
+  headerBottom: cute.cream,
 
   // Overlay
-  overlay: 'rgba(0,0,0,0.5)',
-  overlayLight: 'rgba(0,0,0,0.25)',
+  overlay: 'rgba(61,44,62,0.45)',
+  overlayLight: 'rgba(61,44,62,0.22)',
 
   // Shadows
-  shadow: '#C41E3A',
+  shadow: '#E0A6A0',
 } as const;
 
 export const pastelSpacing = {
@@ -137,21 +141,21 @@ export const pastelTypography = {
 
 export const pastelShadow = {
   sm: {
-    shadowColor: '#3D2B1F',
+    shadowColor: '#E0A6A0',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
   md: {
-    shadowColor: '#3D2B1F',
+    shadowColor: '#E0A6A0',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.10,
     shadowRadius: 16,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#3D2B1F',
+    shadowColor: '#E0A6A0',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.14,
     shadowRadius: 24,
@@ -160,9 +164,11 @@ export const pastelShadow = {
 } as const;
 
 // Meal type colors — matching Figma tint cards
+// Meal accents drawn from the cute palette so the Food Log reads as the same
+// brand as Home. (`icon` is unused — the screens render <MealCharacter/> art.)
 export const mealColors = {
-  breakfast: { color: '#F59E0B', bg: '#FFF9E6', icon: '🌅' },
-  lunch:     { color: '#10B981', bg: '#D1FAE5', icon: '☀️' },
-  dinner:    { color: '#8B5CF6', bg: '#EDE9FE', icon: '🌙' },
-  snack:     { color: '#FB923C', bg: '#FFEDD5', icon: '☕' },
+  breakfast: { color: '#E0A800', bg: withAlpha(cute.carbs, 0.16) },
+  lunch:     { color: cute.mintDeep, bg: withAlpha(cute.mint, 0.16) },
+  dinner:    { color: cute.grape, bg: withAlpha(cute.lavender, 0.18) },
+  snack:     { color: cute.fat, bg: withAlpha(cute.fat, 0.16) },
 } as const;

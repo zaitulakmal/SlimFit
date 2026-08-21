@@ -57,18 +57,18 @@ const RFV = (n: number) => Math.round(n * (H / 780));
 const C = colors;
 
 const PLANS = [
-  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#A6171C', desc: 'Most popular' },
-  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#F1C045', desc: 'Deeper burn' },
-  { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FF9800', desc: 'Warrior diet' },
+  { label: '16:8', fastingHours: 16, eatHours: 8, color: '#FF6B8A', desc: 'Most popular' },
+  { label: '18:6', fastingHours: 18, eatHours: 6, color: '#FFC53D', desc: 'Deeper burn' },
+  { label: '20:4', fastingHours: 20, eatHours: 4, color: '#FFA45B', desc: 'Warrior diet' },
 ];
 
 // ── fat-burn stages by fasting hour ─────────────────────────────────────────
 function getFatBurnStage(elapsedHours: number) {
-  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#A6171C' };
-  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#F1C045' };
-  if (elapsedHours < 12) return { label: 'Ketosis Starting',   pct: 0.50, color: '#FF9800' };
-  if (elapsedHours < 16) return { label: 'Fat Burning',         pct: 0.75, color: '#4CAF50' };
-  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#A6171C' };
+  if (elapsedHours < 4)  return { label: 'Digesting',      pct: 0.05, color: '#FF6B8A' };
+  if (elapsedHours < 8)  return { label: 'Glycogen Depleting', pct: 0.25, color: '#FFC53D' };
+  if (elapsedHours < 12) return { label: 'Ketosis Starting',   pct: 0.50, color: '#FFA45B' };
+  if (elapsedHours < 16) return { label: 'Fat Burning',         pct: 0.75, color: '#34C6A0' };
+  return                        { label: 'Deep Fat Burn',        pct: 1.00, color: '#FF6B8A' };
 }
 
 // ── Circular fasting clock ───────────────────────────────────────────────────
@@ -132,8 +132,8 @@ function FastingClock({
   const remM = remainingMin % 60;
   const pct = Math.round(progress * 100);
 
-  const ringColor = isFasting ? '#FF8A80' : '#D4EDE3';
-  const ringGlowColor = isFasting ? '#FF5252' : '#88D8B0';
+  const ringColor = isFasting ? '#FF6B8A' : '#CFF0E3';
+  const ringGlowColor = isFasting ? '#FF6B6B' : '#5BD6B4';
 
   return (
     <Animated.View style={[{ width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }, pulseStyle]}>
@@ -145,7 +145,7 @@ function FastingClock({
           </LinearGradient>
           <RadialGradient id="centerGrad" cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor="#FFFFFF" />
-            <Stop offset="100%" stopColor={isFasting ? '#FFF0F0' : '#F5FBF8'} />
+            <Stop offset="100%" stopColor={isFasting ? '#FDEDE9' : '#FAF4E4'} />
           </RadialGradient>
         </Defs>
 
@@ -155,7 +155,7 @@ function FastingClock({
         {/* Track */}
         <SvgCircle
           cx={SIZE / 2} cy={SIZE / 2} r={r}
-          stroke="#E8F4F0" strokeWidth={STROKE} fill="none"
+          stroke="#F2E7E2" strokeWidth={STROKE} fill="none"
         />
 
         {/* Progress arc */}
@@ -182,7 +182,7 @@ function FastingClock({
               key={i}
               cx={cx1} cy={cy1}
               r={isMajor ? RF(4) : RF(2)}
-              fill={isMajor ? (isFasting ? '#FF8A80' : '#56AB91') : '#D4EDE3'}
+              fill={isMajor ? (isFasting ? '#FF6B8A' : '#34C6A0') : '#CFF0E3'}
             />
           );
         })}
@@ -193,7 +193,7 @@ function FastingClock({
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           {isFasting ? (
             <>
-              <Fire size={RF(22)} color="#FF8A80" weight="fill" />
+              <Fire size={RF(22)} color="#FF6B8A" weight="fill" />
               <Text style={styles.clockPct}>{pct}%</Text>
               <Text style={styles.clockElapsed}>
                 {String(elH).padStart(2, '0')}:{String(elM).padStart(2, '0')} elapsed
@@ -204,7 +204,7 @@ function FastingClock({
             </>
           ) : (
             <>
-              <Clock size={RF(24)} color="#56AB91" weight="regular" />
+              <Clock size={RF(24)} color="#34C6A0" weight="regular" />
               <Text style={styles.clockIdleLabel}>{durationHours}h Fast</Text>
               <Text style={styles.clockIdleSub}>Tap Start</Text>
             </>
@@ -256,22 +256,22 @@ function BodyGraphic({ elapsedHours, isFasting }: { elapsedHours: number; isFast
         {/* Body silhouette — base (always shown in neutral color) */}
         <G>
           {/* Head */}
-          <Ellipse cx={60} cy={18} rx={14} ry={16} fill="#D4EDE3" />
+          <Ellipse cx={60} cy={18} rx={14} ry={16} fill="#CFF0E3" />
           {/* Neck */}
-          <Rect x={54} y={32} width={12} height={10} rx={4} fill="#D4EDE3" />
+          <Rect x={54} y={32} width={12} height={10} rx={4} fill="#CFF0E3" />
           {/* Torso */}
           <Path
             d="M30 42 Q20 55 22 90 Q24 115 30 120 L90 120 Q96 115 98 90 Q100 55 90 42 Z"
-            fill="#D4EDE3"
+            fill="#CFF0E3"
           />
           {/* Left arm */}
-          <Path d="M30 44 Q14 60 18 95 Q22 105 28 100 Q30 75 38 55 Z" fill="#D4EDE3" />
+          <Path d="M30 44 Q14 60 18 95 Q22 105 28 100 Q30 75 38 55 Z" fill="#CFF0E3" />
           {/* Right arm */}
-          <Path d="M90 44 Q106 60 102 95 Q98 105 92 100 Q90 75 82 55 Z" fill="#D4EDE3" />
+          <Path d="M90 44 Q106 60 102 95 Q98 105 92 100 Q90 75 82 55 Z" fill="#CFF0E3" />
           {/* Left leg */}
-          <Path d="M38 118 Q32 140 33 175 Q34 195 42 195 Q50 195 52 175 Q54 145 52 118 Z" fill="#D4EDE3" />
+          <Path d="M38 118 Q32 140 33 175 Q34 195 42 195 Q50 195 52 175 Q54 145 52 118 Z" fill="#CFF0E3" />
           {/* Right leg */}
-          <Path d="M82 118 Q88 140 87 175 Q86 195 78 195 Q70 195 68 175 Q66 145 68 118 Z" fill="#D4EDE3" />
+          <Path d="M82 118 Q88 140 87 175 Q86 195 78 195 Q70 195 68 175 Q66 145 68 118 Z" fill="#CFF0E3" />
         </G>
 
         {/* Fat burn overlay — same paths clipped from bottom up */}
@@ -304,7 +304,7 @@ function BodyGraphic({ elapsedHours, isFasting }: { elapsedHours: number; isFast
         )}
       </Svg>
 
-      <Text style={[styles.stageLabel, { color: isFasting ? stage.color : '#A5C4B4' }]}>
+      <Text style={[styles.stageLabel, { color: isFasting ? stage.color : '#A99BA8' }]}>
         {isFasting ? stage.label : 'Not fasting'}
       </Text>
     </View>
@@ -349,7 +349,7 @@ function FastingScreenContent() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <CaretLeft size={RF(22)} color="#2D4A3E" weight="bold" />
+          <CaretLeft size={RF(22)} color="#3D2C3E" weight="bold" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Intermittent Fasting</Text>
         <View style={{ width: RF(40) }} />
@@ -386,11 +386,11 @@ function FastingScreenContent() {
           <View style={styles.stageInfo}>
             <Text style={styles.stageInfoTitle}>Fat Burn Status</Text>
             {[
-              { h: 0,  label: 'Digesting',           color: '#A8E6CF' },
-              { h: 4,  label: 'Glycogen Depleting',   color: '#FFD93D' },
-              { h: 8,  label: 'Ketosis Starting',     color: '#FFB74D' },
-              { h: 12, label: 'Fat Burning',           color: '#FF8A80' },
-              { h: 16, label: 'Deep Fat Burn',         color: '#FF5252' },
+              { h: 0,  label: 'Digesting',           color: '#5BD6B4' },
+              { h: 4,  label: 'Glycogen Depleting',   color: '#FFC53D' },
+              { h: 8,  label: 'Ketosis Starting',     color: '#FFA45B' },
+              { h: 12, label: 'Fat Burning',           color: '#FF6B8A' },
+              { h: 16, label: 'Deep Fat Burn',         color: '#FF6B6B' },
             ].map((s) => {
               const active = isFasting && elapsedHours >= s.h;
               const isCurrent = isFasting && (() => {
@@ -402,9 +402,9 @@ function FastingScreenContent() {
               })();
               return (
                 <View key={s.h} style={[styles.stageRow, isCurrent && styles.stageRowActive]}>
-                  <View style={[styles.stageDot, { backgroundColor: active ? s.color : '#D4EDE3' }]} />
+                  <View style={[styles.stageDot, { backgroundColor: active ? s.color : '#CFF0E3' }]} />
                   <View>
-                    <Text style={[styles.stageRowLabel, { color: active ? s.color : '#A5C4B4' }]}>{s.label}</Text>
+                    <Text style={[styles.stageRowLabel, { color: active ? s.color : '#A99BA8' }]}>{s.label}</Text>
                     <Text style={styles.stageRowHour}>{s.h}h+</Text>
                   </View>
                   {isCurrent && <CheckCircle size={RF(14)} color={s.color} weight="fill" style={{ marginLeft: 'auto' }} />}
@@ -430,10 +430,10 @@ function FastingScreenContent() {
                   onPress={() => store.setDuration(plan.fastingHours)}
                   activeOpacity={0.75}
                 >
-                  <Text style={[styles.planLabel, { color: selected ? plan.color : '#6B8E7A' }]}>
+                  <Text style={[styles.planLabel, { color: selected ? plan.color : '#6E5C6E' }]}>
                     {plan.label}
                   </Text>
-                  <Text style={[styles.planDesc, { color: selected ? plan.color : '#A5C4B4' }]}>
+                  <Text style={[styles.planDesc, { color: selected ? plan.color : '#A99BA8' }]}>
                     {plan.desc}
                   </Text>
                   {selected && (
@@ -470,7 +470,7 @@ function FastingScreenContent() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F5FBF8',
+    backgroundColor: '#FAF4E4',
   },
   header: {
     flexDirection: 'row',
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: RF(20),
     paddingVertical: RFV(14),
-    backgroundColor: '#F5FBF8',
+    backgroundColor: '#FAF4E4',
   },
   backBtn: {
     width: RF(40),
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: RF(18),
     fontWeight: '700',
-    color: '#2D4A3E',
+    color: '#3D2C3E',
   },
   scroll: {
     paddingHorizontal: RF(20),
@@ -510,29 +510,29 @@ const styles = StyleSheet.create({
   clockPct: {
     fontSize: RF(36),
     fontWeight: '800',
-    color: '#FF8A80',
+    color: '#FF6B8A',
     marginTop: RFV(4),
     letterSpacing: -1,
   },
   clockElapsed: {
     fontSize: RF(13),
-    color: '#6B8E7A',
+    color: '#6E5C6E',
     marginTop: RFV(2),
   },
   clockRemaining: {
     fontSize: RF(12),
-    color: '#A5C4B4',
+    color: '#A99BA8',
     marginTop: RFV(2),
   },
   clockIdleLabel: {
     fontSize: RF(28),
     fontWeight: '800',
-    color: '#56AB91',
+    color: '#34C6A0',
     marginTop: RFV(6),
   },
   clockIdleSub: {
     fontSize: RF(13),
-    color: '#A5C4B4',
+    color: '#A99BA8',
     marginTop: RFV(4),
   },
   stageBadge: {
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
   stageInfoTitle: {
     fontSize: RF(13),
     fontWeight: '700',
-    color: '#2D4A3E',
+    color: '#3D2C3E',
     marginBottom: RFV(10),
   },
   stageRow: {
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
     marginBottom: RFV(2),
   },
   stageRowActive: {
-    backgroundColor: '#F5FBF8',
+    backgroundColor: '#FAF4E4',
   },
   stageDot: {
     width: RF(8),
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   },
   stageRowHour: {
     fontSize: RF(10),
-    color: '#A5C4B4',
+    color: '#A99BA8',
   },
   planSection: {
     width: '100%',
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: RF(16),
     fontWeight: '700',
-    color: '#2D4A3E',
+    color: '#3D2C3E',
     marginBottom: RFV(12),
   },
   planRow: {
@@ -622,16 +622,11 @@ const styles = StyleSheet.create({
   planCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: RF(14),
-    padding: RF(12),
-    borderWidth: 1.5,
-    borderColor: '#D4EDE3',
+    borderRadius: 28,
+    padding: RF(14),
+    borderWidth: 1,
+    borderColor: '#CFF0E3',
     position: 'relative',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
   },
   planLabel: {
     fontSize: RF(18),
@@ -659,14 +654,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: RF(10),
-    paddingVertical: RFV(16),
-    borderRadius: RF(16),
+    paddingVertical: RFV(17),
+    borderRadius: 999,
   },
   mainBtnStart: {
-    backgroundColor: '#56AB91',
+    backgroundColor: '#34C6A0',
   },
   mainBtnStop: {
-    backgroundColor: '#FF8A80',
+    backgroundColor: '#FF6B8A',
   },
   mainBtnText: {
     fontSize: RF(16),

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../db';
 import {
   foodLogs,
@@ -30,6 +30,7 @@ interface FoodState {
   loadPresets: () => Promise<void>;
   getTotals: () => FoodTotals;
   getMealLogs: (mealType: string) => FoodLog[];
+  getRecentFoods: (limit?: number) => Promise<FoodLog[]>;
 }
 
 function todayStr() {
@@ -61,15 +62,22 @@ export const useFoodStore = create<FoodState>((set, get) => ({
     const loggedAt = new Date().toISOString();
     await db.insert(foodLogs).values({ ...item, dateStr, loggedAt });
     await get().loadDayLogs(get().currentDateStr);
-    // Update food streak (lazy import to avoid circular deps)
-    try {
-      const { useStatsStore } = await import('./statsStore');
-      await useStatsStore.getState().updateStreak('food', dateStr);
-    } catch {}
-    try {
-      const { reconcileTodayNotifications } = await import('../services/notificationEngine');
-      await reconcileTodayNotifications();
-    } catch {}
+
+    // Everything below is bookkeeping the screen does not wait on. Awaiting it
+    // made "log" feel laggy: reconcileTodayNotifications alone runs seven DB
+    // queries and then reschedules notifications through the native module,
+    // all before the sheet could close. The streak and the schedule can settle
+    // a moment later — Home reloads stats on focus anyway.
+    void (async () => {
+      try {
+        const { useStatsStore } = await import('./statsStore');
+        await useStatsStore.getState().updateStreak('food', dateStr);
+      } catch {}
+      try {
+        const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+        await reconcileTodayNotifications();
+      } catch {}
+    })();
   },
 
   deleteFood: async (id) => {
@@ -102,5 +110,24 @@ export const useFoodStore = create<FoodState>((set, get) => ({
 
   getMealLogs: (mealType) => {
     return get().dayLogs.filter((l) => l.mealType === mealType);
+  },
+
+  getRecentFoods: async (limit = 15) => {
+    const rows = await db
+      .select()
+      .from(foodLogs)
+      .orderBy(desc(foodLogs.loggedAt))
+      .limit(100);
+    const seen = new Set<string>();
+    const unique: FoodLog[] = [];
+    for (const row of rows) {
+      const key = row.foodName.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(row);
+        if (unique.length >= limit) break;
+      }
+    }
+    return unique;
   },
 }));

@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FFE09A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -29,7 +29,8 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
-      "package": "com.zaitul.slimora"
+      "package": "com.zaitul.slimora",
+      "versionCode": 34
     },
     "web": {
       "output": "static",
@@ -42,7 +43,7 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "backgroundColor": "#1B2B45",
+          "backgroundColor": "#FFE09A",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76

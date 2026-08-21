@@ -11,7 +11,7 @@
  *   size             outer diameter in dp (default 200)
  *   strokeWidth      arc stroke width (default 16)
  *   color            arc foreground color
- *   backgroundColor  arc background color (default #E5E7EB)
+ *   backgroundColor  arc background color (default #F2E7E2)
  *   children         content rendered in the ring center
  */
 

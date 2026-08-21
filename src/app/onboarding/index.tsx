@@ -144,9 +144,9 @@ const ctaStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
+    backgroundColor: '#161616',
     height: 56,
-    borderRadius: radius.xl,
+    borderRadius: 999,
     paddingHorizontal: spacing.xl,
   },
   btnDisabled: {

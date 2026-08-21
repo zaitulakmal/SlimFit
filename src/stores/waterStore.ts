@@ -15,17 +15,22 @@ function todayStr(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-async function onWaterGoalProgress(totalMl: number, goalMl: number): Promise<void> {
-  if (totalMl >= goalMl) {
+// Streak + notification bookkeeping after a water change. Deliberately not
+// awaited by callers: reconcileTodayNotifications runs seven DB queries and
+// reschedules native notifications, which made every tap feel laggy.
+function onWaterGoalProgress(totalMl: number, goalMl: number): void {
+  void (async () => {
+    if (totalMl >= goalMl) {
+      try {
+        const { useStatsStore } = await import('./statsStore');
+        await useStatsStore.getState().updateStreak('water', todayStr());
+      } catch {}
+    }
     try {
-      const { useStatsStore } = await import('./statsStore');
-      await useStatsStore.getState().updateStreak('water', todayStr());
+      const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+      await reconcileTodayNotifications();
     } catch {}
-  }
-  try {
-    const { reconcileTodayNotifications } = await import('../services/notificationEngine');
-    await reconcileTodayNotifications();
-  } catch {}
+  })();
 }
 
 interface WaterStore {
@@ -76,7 +81,7 @@ export const useWaterStore = create<WaterStore>((set, get) => ({
         .set({ totalMl: newTotal })
         .where(eq(waterLogs.id, current.id));
       set({ today: { ...current, totalMl: newTotal } });
-      await onWaterGoalProgress(newTotal, current.goalMl);
+      onWaterGoalProgress(newTotal, current.goalMl);
     } catch (err) {
       console.error('[waterStore] addWater error:', err);
     }

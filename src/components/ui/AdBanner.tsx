@@ -1,8 +1,17 @@
 import { View, StyleSheet } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { BANNER_AD_UNIT_ID } from '../../constants/adConfig';
 
+// react-native-google-mobile-ads uses a native TurboModule that is not
+// bundled inside Expo Go. Lazy-require it so the app doesn't crash when
+// running in the simulator via Expo Go; ads simply won't render there.
+let NativeAds: { BannerAd: any; BannerAdSize: any } | null = null;
+try {
+  NativeAds = require('react-native-google-mobile-ads');
+} catch {}
+
 export default function AdBanner() {
+  if (!NativeAds) return null;
+  const { BannerAd, BannerAdSize } = NativeAds;
   return (
     <View style={s.wrap}>
       <BannerAd

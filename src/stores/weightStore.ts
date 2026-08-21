@@ -76,14 +76,17 @@ export const useWeightStore = create<WeightStore>((set, get) => ({
       // Reload after mutation
       await get().loadLogs();
 
-      try {
-        const { useStatsStore } = await import('./statsStore');
-        await useStatsStore.getState().updateStreak('weight', today);
-      } catch {}
-      try {
-        const { reconcileTodayNotifications } = await import('../services/notificationEngine');
-        await reconcileTodayNotifications();
-      } catch {}
+      // Detached — see foodStore.logFood for why this is not awaited.
+      void (async () => {
+        try {
+          const { useStatsStore } = await import('./statsStore');
+          await useStatsStore.getState().updateStreak('weight', today);
+        } catch {}
+        try {
+          const { reconcileTodayNotifications } = await import('../services/notificationEngine');
+          await reconcileTodayNotifications();
+        } catch {}
+      })();
     } catch (err) {
       console.error('[weightStore] logWeight error:', err);
       throw err;

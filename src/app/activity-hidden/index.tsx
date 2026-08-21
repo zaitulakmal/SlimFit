@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors as themeColors, spacing, typography, shadow, radius } from '../../constants/theme';
 import { pastelColors } from '../../constants/pastel-theme';
+import { cute, cardTints, cardBorder, withAlpha } from '@/theme/cute';
 import { useWorkoutStore } from '../../stores/workoutStore';
 import { useProfileStore } from '../../stores/profileStore';
 import { WORKOUT_TYPES, calcCaloriesBurned, type WorkoutType } from '../../data/workout-types';
@@ -159,15 +160,15 @@ function ActivityScreenContent() {
         <Text style={s.screenTitle}>Activity</Text>
 
         {/* Summary card */}
-        <View style={s.summaryCard}>
+        <View style={[s.summaryCard, { backgroundColor: cardTints.peach, borderColor: withAlpha(cardBorder.peach, 0.5) }]}>
           <View style={s.summaryItem}>
-            <Fire size={24} weight="fill" color={C.coral} />
-            <Text style={[s.summaryValue, { color: C.coral }]}>{totalBurned}</Text>
+            <View style={s.summaryIconWell}><Fire size={20} weight="fill" color="#FFFFFF" /></View>
+            <Text style={[s.summaryValue, { color: cute.ink }]}>{totalBurned}</Text>
             <Text style={s.summaryLabel}>Calories Burned</Text>
           </View>
           <View style={s.summaryDivider} />
           <View style={s.summaryItem}>
-            <Clock size={24} weight="regular" color={C.primary} />
+            <View style={s.summaryIconWell}><Clock size={20} weight="fill" color="#FFFFFF" /></View>
             <Text style={s.summaryValue}>
               {todayWorkouts.reduce((a, w) => a + Number(w.durationMin), 0)}
             </Text>
@@ -184,7 +185,7 @@ function ActivityScreenContent() {
         {/* Today's workouts */}
         {todayWorkouts.length > 0 && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>Today's Workouts</Text>
+            <Text style={s.sectionTitle}>Today&apos;s Workouts</Text>
             {todayWorkouts.map((w) => {
               const def = WORKOUT_TYPES.find((x) => x.id === w.activityType);
               return (
@@ -225,10 +226,14 @@ function ActivityScreenContent() {
             {filteredTypes.map((workout) => (
               <TouchableOpacity
                 key={workout.id}
-                style={[s.workoutCard, selectedType?.id === workout.id && s.workoutCardSelected]}
+                style={[
+                  s.workoutCard,
+                  { backgroundColor: cardTints.sky, borderColor: withAlpha(cardBorder.sky, 0.5) },
+                  selectedType?.id === workout.id && s.workoutCardSelected,
+                ]}
                 onPress={() => setSelectedType(workout)}
               >
-                <WorkoutIcon category={workout.category} size={24} color={selectedType?.id === workout.id ? C.white : C.primary} />
+                <WorkoutIcon category={workout.category} size={24} color={selectedType?.id === workout.id ? '#FFFFFF' : cute.ink} />
                 <Text style={[s.workoutCardName, selectedType?.id === workout.id && { color: C.white }]}>
                   {workout.name}
                 </Text>
@@ -310,15 +315,15 @@ const s = StyleSheet.create({
   
   summaryCard: {
     flexDirection: 'row',
-    backgroundColor: C.white,
-    borderRadius: 20,
+    borderRadius: 28,
     padding: 20,
     marginBottom: 24,
-    shadowColor: C.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    borderWidth: 1,
+  },
+  summaryIconWell: {
+    width: 34, height: 34, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#161616',
   },
   summaryItem: { flex: 1, alignItems: 'center', gap: 8 },
   summaryValue: { fontSize: 24, fontWeight: '800', color: C.textPrimary },
@@ -362,14 +367,12 @@ const s = StyleSheet.create({
   },
   workoutCard: {
     width: '30%',
-    backgroundColor: C.white,
-    borderRadius: 16,
+    borderRadius: 28,
     padding: 14,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
   },
-  workoutCardSelected: { backgroundColor: C.primary, borderColor: C.primary },
+  workoutCardSelected: { backgroundColor: '#161616', borderColor: '#161616' },
   workoutCardName: { fontSize: 12, fontWeight: '600', color: C.textPrimary, textAlign: 'center', marginTop: 8 },
   workoutCardMet: { fontSize: 10, fontWeight: '500', color: C.textSecondary, marginTop: 4 },
   
@@ -419,9 +422,9 @@ const s = StyleSheet.create({
     color: C.textPrimary,
   },
   logBtn: {
-    backgroundColor: C.primary,
-    padding: 16,
-    borderRadius: 14,
+    backgroundColor: '#161616',
+    padding: 17,
+    borderRadius: 999,
     alignItems: 'center',
   },
   logBtnText: { fontSize: 16, fontWeight: '700', color: C.white },
