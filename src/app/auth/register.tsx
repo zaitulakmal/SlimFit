@@ -12,54 +12,22 @@ import Animated, {
   withSequence, withRepeat, Easing,
 } from 'react-native-reanimated';
 import Svg, {
-  Ellipse, Path, Circle as SvgCircle,
+  Ellipse, Path,
   Defs, LinearGradient, Stop,
 } from 'react-native-svg';
 import { useAuthStore } from '../../stores/authStore';
+import { SproutMascot } from '@/components/SproutMascot';
 import { colors, spacing } from '../../constants/theme-new';
 
 const { width: W, height: H } = Dimensions.get('window');
 
 const CORAL1 = '#FF8FA3';
 const CORAL2 = '#FFB1A8';
-const BOWL_DARK  = '#F0C97A';
-const BOWL_LIGHT = '#FFE3A3';
-const TOMATO  = '#FF6B8A';
-const TOMATO2 = '#FFB1A8';
 const LEAF1 = '#7BD7B0';
 const LEAF2 = '#9FE3C4';
 const LEAF3 = '#C7EFDD';
 const SKY   = '#7FC8F8';
 const WHITE = '#FFFFFF';
-
-function SaladBowl() {
-  return (
-    <Svg width={140} height={140} viewBox="0 0 220 220">
-      <Defs>
-        <LinearGradient id="bowlGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
-          <Stop offset="0%" stopColor={BOWL_LIGHT} />
-          <Stop offset="100%" stopColor={BOWL_DARK} />
-        </LinearGradient>
-      </Defs>
-      <Ellipse cx={110} cy={195} rx={75} ry={10} fill="rgba(0,0,0,0.10)" />
-      <Path d="M 35,110 Q 35,185 110,185 Q 185,185 185,110 Z" fill="url(#bowlGrad3)" />
-      <Ellipse cx={110} cy={110} rx={75} ry={18} fill={BOWL_LIGHT} />
-      <Ellipse cx={110} cy={110} rx={68} ry={14} fill={BOWL_DARK} opacity={0.3} />
-      <Ellipse cx={80}  cy={95}  rx={28} ry={18} fill={LEAF1} transform="rotate(-25,80,95)" />
-      <Ellipse cx={140} cy={93}  rx={28} ry={18} fill={LEAF2} transform="rotate(20,140,93)" />
-      <Ellipse cx={110} cy={88}  rx={30} ry={16} fill={LEAF3} />
-      <Ellipse cx={68}  cy={105} rx={22} ry={13} fill={LEAF2} transform="rotate(-30,68,105)" />
-      <Ellipse cx={152} cy={103} rx={22} ry={13} fill={LEAF1} transform="rotate(30,152,103)" />
-      <SvgCircle cx={88}  cy={112} r={12} fill={TOMATO} />
-      <SvgCircle cx={88}  cy={112} r={7}  fill={TOMATO2} opacity={0.5} />
-      <SvgCircle cx={132} cy={115} r={11} fill={TOMATO} />
-      <SvgCircle cx={132} cy={115} r={6}  fill={TOMATO2} opacity={0.5} />
-      <Ellipse cx={110} cy={118} rx={26} ry={13} fill={LEAF1} />
-      <Ellipse cx={90}  cy={122} rx={18} ry={10} fill={LEAF3} transform="rotate(-15,90,122)" />
-      <Ellipse cx={130} cy={120} rx={18} ry={10} fill={LEAF2} transform="rotate(15,130,120)" />
-    </Svg>
-  );
-}
 
 function FloatingLeaf({ x, y, size, delay, color }: {
   x: number; y: number; size: number; delay: number; color: string;
@@ -168,7 +136,7 @@ export default function RegisterScreen() {
         <FloatingLeaf x={W-35} y={80}  size={20} delay={600} color={LEAF2} />
 
         <Animated.View style={[s.bowlContainer, bowlStyle]}>
-          <SaladBowl />
+          <SproutMascot size={150} />
           <Text style={s.appName}>Slimora</Text>
         </Animated.View>
       </View>

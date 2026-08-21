@@ -23,6 +23,7 @@ import {
 } from 'phosphor-react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { pastelColors, pastelSpacing, pastelRadius, mealColors } from '../../../constants/pastel-theme';
 import { cute, radius, withAlpha, cardTints, cardBorder } from '@/theme/cute';
 import { useFoodStore } from '../../../stores/foodStore';
@@ -124,6 +125,7 @@ function InlineMacro({ label, value, target, color }: { label: string; value: nu
 export default function FoodLogScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const { dayLogs, currentDateStr, loadDayLogs, deleteFood, getTotals, getMealLogs } = useFoodStore();
   const profile = useProfileStore((s) => s.profile);
 
@@ -208,7 +210,7 @@ export default function FoodLogScreen() {
       {/* Meal sections */}
       <ScrollView
         style={s.scroll}
-        contentContainerStyle={s.scrollContent}
+        contentContainerStyle={[s.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
         showsVerticalScrollIndicator={false}
       >
         {MEAL_TYPES.map((meal, idx) => {

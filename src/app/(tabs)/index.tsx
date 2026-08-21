@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import {
@@ -181,6 +182,7 @@ const mi = StyleSheet.create({
 export default function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const profile = useProfileStore((s) => s.profile);
   const { logs: weightLogs } = useWeightStore();
   const dayLogs = useFoodStore((s) => s.dayLogs);
@@ -275,7 +277,10 @@ export default function HomeScreen() {
         : `${Math.round(remainingKcal).toLocaleString()} kcal left today. Ask me about your food, weight, or goal.`;
 
   return (
-    <ScrollView style={s.root} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={s.root}
+      contentContainerStyle={{ paddingBottom: tabBarHeight + 24 }}
+      showsVerticalScrollIndicator={false}>
       {/* ── HERO: greeting + calorie donut split by macro ── */}
       <View style={[s.header, { paddingTop: insets.top + RF(8) }]}>
         <Animated.View entering={FadeInDown.delay(0).springify()} style={s.greetRow}>
@@ -417,8 +422,6 @@ export default function HomeScreen() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: cute.cream },
-  content: { paddingBottom: 40 },
-
   header: { paddingHorizontal: RF(18), paddingBottom: RF(14), alignItems: 'center' },
   greetRow: { flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: RF(6) },
   greetText: { fontSize: RF(26), fontWeight: '800', color: cute.ink, letterSpacing: -0.6, lineHeight: RF(32) },

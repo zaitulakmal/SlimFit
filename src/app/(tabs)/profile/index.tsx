@@ -17,6 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import {
   PencilSimple, Check, XCircle,
@@ -171,6 +172,7 @@ const row = StyleSheet.create({
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const { profile, updateProfile, setLanguage, resetProfile } = useProfileStore();
   const { logout, user } = useAuthStore();
   const router = useRouter();
@@ -227,7 +229,7 @@ export default function ProfileScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FAF4E4' }}>
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 48 }}>
+        contentContainerStyle={{ paddingBottom: tabBarHeight + 24 }}>
 
         {/* ── Header ── */}
         <View style={[s.header, { paddingTop: insets.top + 12 }]}>

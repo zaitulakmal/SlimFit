@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import {
   Plant,
@@ -169,6 +170,7 @@ function CatCard({ catKey }: { catKey: string }) {
 export default function GardenScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const plots = useGameStore((s) => s.plots);
   const score = useGameStore((s) => s.score);
   const harvests = useGameStore((s) => s.harvests);
@@ -185,7 +187,7 @@ export default function GardenScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: cute.cream }]}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12, paddingBottom: tabBarHeight + 24 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -201,9 +203,10 @@ export default function GardenScreen() {
         </View>
 
         {/* Cats row */}
-        <Text style={styles.sectionLabel}>
-          <FlowerLotus size={16} color={cute.coral} /> {t('garden.cats')}
-        </Text>
+        <View style={styles.sectionLabel}>
+          <FlowerLotus size={16} color={cute.coral} weight="fill" />
+          <Text style={styles.sectionLabelText}>{t('garden.cats')}</Text>
+        </View>
         <View style={styles.catRow}>
           {CATS.map((c) => (
             <CatCard key={c.key} catKey={c.key} />
@@ -211,9 +214,10 @@ export default function GardenScreen() {
         </View>
 
         {/* Plots grid */}
-        <Text style={styles.sectionLabel}>
-          <Plant size={16} color={cute.mintDeep} /> {t('garden.your_patch')}
-        </Text>
+        <View style={styles.sectionLabel}>
+          <Plant size={16} color={cute.mintDeep} weight="fill" />
+          <Text style={styles.sectionLabelText}>{t('garden.your_patch')}</Text>
+        </View>
         <View style={styles.plotGrid}>
           {plots.map((p) => (
             <PlotCard key={p.index} plot={p} />
@@ -262,10 +266,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 6,
+  },
+  sectionLabelText: {
     fontSize: 16,
     fontWeight: '800',
     color: cute.ink,
-    marginTop: 6,
   },
   catRow: { flexDirection: 'row', gap: 12 },
   catCard: {
