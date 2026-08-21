@@ -2,8 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
-import { CaretLeft, ShareNetwork } from 'phosphor-react-native';
+import { CaretLeft, ShareNetwork, ChartBar } from 'phosphor-react-native';
 import { colors, typography, spacing, radius, shadow } from '../constants/theme-new';
+import { cute, cardTints, cardBorder, withAlpha, cardTintOrder } from '@/theme/cute';
 import { useStatsStore } from '../stores/statsStore';
 import { buildWeeklyReport, weeklyReportShareText, type WeeklyReportSummary } from '../services/weeklyReport';
 
@@ -39,20 +40,29 @@ export default function WeeklyReportScreen() {
       {summary && (
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <View style={s.heroCard}>
-            <Text style={s.heroEmoji}>📊</Text>
+            <View style={s.heroIcon}>
+              <ChartBar size={30} weight="fill" color="#FFFFFF" />
+            </View>
             <Text style={s.heroTitle}>Your week at a glance</Text>
           </View>
 
           <View style={s.grid}>
-            <StatTile label="Days Logged" value={`${summary.daysLogged}/7`} />
-            <StatTile label="Avg Calories" value={`${summary.avgCalories}`} />
-            <StatTile label="Water Goal Hit" value={`${Math.round(summary.waterGoalHitRate * 100)}%`} />
-            <StatTile
-              label="Weight Change"
-              value={summary.weightChangeKg === null ? '—' : `${summary.weightChangeKg > 0 ? '+' : ''}${summary.weightChangeKg}kg`}
-            />
-            <StatTile label="Workouts" value={`${summary.workoutCount}`} />
-            <StatTile label="Cal Burned" value={`${summary.caloriesBurned}`} />
+            {[
+              { label: 'Days Logged', value: `${summary.daysLogged}/7` },
+              { label: 'Avg Calories', value: `${summary.avgCalories}` },
+              { label: 'Water Goal Hit', value: `${Math.round(summary.waterGoalHitRate * 100)}%` },
+              {
+                label: 'Weight Change',
+                value:
+                  summary.weightChangeKg === null
+                    ? '—'
+                    : `${summary.weightChangeKg > 0 ? '+' : ''}${summary.weightChangeKg}kg`,
+              },
+              { label: 'Workouts', value: `${summary.workoutCount}` },
+              { label: 'Cal Burned', value: `${summary.caloriesBurned}` },
+            ].map((tile, i) => (
+              <StatTile key={tile.label} label={tile.label} value={tile.value} index={i} />
+            ))}
           </View>
 
           <View style={s.card}>
@@ -76,9 +86,10 @@ export default function WeeklyReportScreen() {
   );
 }
 
-function StatTile({ label, value }: { label: string; value: string }) {
+function StatTile({ label, value, index }: { label: string; value: string; index: number }) {
+  const tint = cardTintOrder[index % cardTintOrder.length];
   return (
-    <View style={s.tile}>
+    <View style={[s.tile, { backgroundColor: cardTints[tint], borderColor: withAlpha(cardBorder[tint], 0.5) }]}>
       <Text style={s.tileValue}>{value}</Text>
       <Text style={s.tileLabel}>{label}</Text>
     </View>
@@ -95,16 +106,20 @@ const s = StyleSheet.create({
   headerTitle: { ...typography.title, color: C.text },
   content: { padding: spacing.md, paddingBottom: spacing['2xl'], gap: spacing.md },
   heroCard: { alignItems: 'center', paddingVertical: spacing.md },
-  heroEmoji: { fontSize: 40 },
+  heroIcon: {
+    width: 60, height: 60, borderRadius: 22,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: cute.action,
+  },
   heroTitle: { ...typography.subtitle, color: C.text, marginTop: spacing.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   tile: {
-    width: '31%', backgroundColor: C.surface, borderRadius: radius.lg, padding: spacing.sm,
-    alignItems: 'center', gap: 4, ...shadow.sm,
+    width: '31%', borderRadius: 28, padding: spacing.sm,
+    alignItems: 'center', gap: 4, borderWidth: 1,
   },
-  tileValue: { ...typography.title, color: C.primary },
-  tileLabel: { ...typography.caption, color: C.textSecondary, textAlign: 'center' },
-  card: { backgroundColor: C.surface, borderRadius: radius.xl, padding: spacing.md, ...shadow.sm, gap: spacing.sm },
+  tileValue: { ...typography.title, color: cute.ink },
+  tileLabel: { ...typography.caption, color: withAlpha(cute.ink, 0.7), textAlign: 'center' },
+  card: { backgroundColor: C.surface, borderRadius: 28, padding: spacing.md, borderWidth: 1, borderColor: '#F2E7E2', gap: spacing.sm },
   sectionTitle: { ...typography.label, color: C.textSecondary },
   streakRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
   streakLabel: { ...typography.body, color: C.text },

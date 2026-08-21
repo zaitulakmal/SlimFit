@@ -79,7 +79,7 @@ export async function initNotificationChannel(): Promise<void> {
       name: 'Daily Reminders',
       importance: Notifications.AndroidImportance.DEFAULT,
       vibrationPattern: [0, 250],
-      lightColor: '#4CAF50',
+      lightColor: '#34C6A0',
     });
   }
 }

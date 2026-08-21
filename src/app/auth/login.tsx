@@ -16,55 +16,18 @@ import Svg, {
   Defs, LinearGradient, Stop,
 } from 'react-native-svg';
 import { useAuthStore } from '../../stores/authStore';
-import { colors, spacing } from '../../constants/theme';
+import { SproutMascot } from '@/components/SproutMascot';
+import { colors, spacing } from '../../constants/theme-new';
 
 const { width: W, height: H } = Dimensions.get('window');
 
-const GREEN1 = '#56AB2F';
-const GREEN2 = '#A8E063';
-const BOWL_DARK  = '#D4A96A';
-const BOWL_LIGHT = '#F0C97A';
-const TOMATO  = '#E53935';
-const TOMATO2 = '#EF9A9A';
-const LEAF1 = '#43A047';
-const LEAF2 = '#66BB6A';
-const LEAF3 = '#A5D6A7';
+const CORAL1 = '#FF8FA3';
+const CORAL2 = '#FFB1A8';
+const LEAF1 = '#7BD7B0';
+const LEAF2 = '#9FE3C4';
+const LEAF3 = '#C7EFDD';
+const SKY   = '#7FC8F8';
 const WHITE = '#FFFFFF';
-
-function SaladBowl() {
-  return (
-    <Svg width={180} height={180} viewBox="0 0 220 220">
-      <Defs>
-        <LinearGradient id="bowlGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-          <Stop offset="0%" stopColor={BOWL_LIGHT} />
-          <Stop offset="100%" stopColor={BOWL_DARK} />
-        </LinearGradient>
-      </Defs>
-      <Ellipse cx={110} cy={195} rx={75} ry={10} fill="rgba(0,0,0,0.10)" />
-      <Path d="M 35,110 Q 35,185 110,185 Q 185,185 185,110 Z" fill="url(#bowlGrad2)" />
-      <Ellipse cx={110} cy={110} rx={75} ry={18} fill={BOWL_LIGHT} />
-      <Ellipse cx={110} cy={110} rx={68} ry={14} fill={BOWL_DARK} opacity={0.3} />
-      <Ellipse cx={80}  cy={95}  rx={28} ry={18} fill={LEAF1} transform="rotate(-25,80,95)" />
-      <Ellipse cx={140} cy={93}  rx={28} ry={18} fill={LEAF2} transform="rotate(20,140,93)" />
-      <Ellipse cx={110} cy={88}  rx={30} ry={16} fill={LEAF3} />
-      <Ellipse cx={68}  cy={105} rx={22} ry={13} fill={LEAF2} transform="rotate(-30,68,105)" />
-      <Ellipse cx={152} cy={103} rx={22} ry={13} fill={LEAF1} transform="rotate(30,152,103)" />
-      <Ellipse cx={110} cy={100} rx={24} ry={12} fill={LEAF2} />
-      <SvgCircle cx={88}  cy={112} r={12} fill={TOMATO} />
-      <SvgCircle cx={88}  cy={112} r={7}  fill={TOMATO2} opacity={0.5} />
-      <SvgCircle cx={132} cy={115} r={11} fill={TOMATO} />
-      <SvgCircle cx={132} cy={115} r={6}  fill={TOMATO2} opacity={0.5} />
-      <Path d="M88,100 Q91,95 88,92" stroke={LEAF1} strokeWidth={2} fill="none" strokeLinecap="round" />
-      <Path d="M132,104 Q135,99 132,96" stroke={LEAF1} strokeWidth={2} fill="none" strokeLinecap="round" />
-      <Ellipse cx={110} cy={118} rx={26} ry={13} fill={LEAF1} />
-      <Ellipse cx={90}  cy={122} rx={18} ry={10} fill={LEAF3} transform="rotate(-15,90,122)" />
-      <Ellipse cx={130} cy={120} rx={18} ry={10} fill={LEAF2} transform="rotate(15,130,120)" />
-      <Path d="M170,60 L170,130" stroke={BOWL_DARK} strokeWidth={5} strokeLinecap="round" />
-      <Path d="M163,60 L163,80 M170,60 L170,80 M177,60 L177,80" stroke={BOWL_DARK} strokeWidth={3} strokeLinecap="round" />
-      <Path d="M163,80 Q170,88 177,80" stroke={BOWL_DARK} strokeWidth={3} fill="none" />
-    </Svg>
-  );
-}
 
 function FloatingLeaf({ x, y, size, delay, color }: {
   x: number; y: number; size: number; delay: number; color: string;
@@ -150,8 +113,8 @@ export default function LoginScreen() {
         <Svg style={StyleSheet.absoluteFillObject} width={W} height={H * 0.45}>
           <Defs>
             <LinearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={GREEN1} />
-              <Stop offset="100%" stopColor={GREEN2} />
+              <Stop offset="0%" stopColor={CORAL1} />
+              <Stop offset="100%" stopColor={CORAL2} />
             </LinearGradient>
           </Defs>
           <Path
@@ -168,7 +131,7 @@ export default function LoginScreen() {
 
         {/* Salad bowl + title */}
         <Animated.View style={[s.bowlContainer, bowlStyle]}>
-          <SaladBowl />
+          <SproutMascot size={180} />
           <Text style={s.appName}>Slimora</Text>
           <Text style={s.tagline}>Your health, your journey</Text>
         </Animated.View>
@@ -231,7 +194,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <View style={s.footer}>
-              <Text style={s.footerText}>Don't have an account? </Text>
+              <Text style={s.footerText}>Don&apos;t have an account? </Text>
               <TouchableOpacity onPress={() => router.replace('/auth/register')}>
                 <Text style={s.footerLink}>Sign Up</Text>
               </TouchableOpacity>
@@ -244,7 +207,7 @@ export default function LoginScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F6FFF0' },
+  root: { flex: 1, backgroundColor: '#FAF4E4' },
 
   // Header
   headerBg: {
@@ -291,11 +254,11 @@ const s = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   errorBox: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#FFE8EE',
     borderRadius: 10,
     padding: spacing.md,
   },
-  errorText: { color: '#DC2626', fontSize: 14 },
+  errorText: { color: '#FF6B6B', fontSize: 14 },
   inputGroup: { gap: 6 },
   label: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
   input: {
@@ -309,7 +272,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.background,
   },
   btn: {
-    backgroundColor: GREEN1,
+    backgroundColor: CORAL1,
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: 'center',
@@ -323,5 +286,5 @@ const s = StyleSheet.create({
     marginTop: spacing.xs,
   },
   footerText: { fontSize: 14, color: colors.textSecondary },
-  footerLink: { fontSize: 14, color: GREEN1, fontWeight: '700' },
+  footerLink: { fontSize: 14, color: CORAL1, fontWeight: '700' },
 });

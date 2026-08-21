@@ -7,7 +7,8 @@
     "activity": "Aktiviti",
     "recipes": "Resipi",
     "grocery": "Kedai",
-    "profile": "Profil"
+    "profile": "Profil",
+    "garden": "Kebun"
   },
   "home": {
     "greeting_morning": "Selamat pagi, {{name}}",
@@ -120,7 +121,8 @@
     "reset_action": "Padam Semua",
     "reset_error": "Gagal set semula. Sila cuba lagi.",
     "edit_save": "Simpan",
-    "edit_cancel": "Batal"
+    "edit_cancel": "Batal",
+    "name_placeholder": "Tambah nama anda"
   },
   "food": {
     "meal_breakfast": "Sarapan",
@@ -248,5 +250,21 @@
     "back": "Kembali",
     "cancel": "Batal",
     "delete": "Padam"
+  },
+  "garden": {
+    "title": "Kebun Saya",
+    "subtitle": "Tanam, siram & tumbuhkan sayur comel — dan belai kucing!",
+    "cats": "Kawan berbulu",
+    "your_patch": "Petak sayur anda",
+    "plot": "Petak {{n}}",
+    "plant": "Tanam",
+    "water": "Siram",
+    "harvest": "Tuai",
+    "pet": "Belai",
+    "affection": "Sayang",
+    "harvested": "Dituai: {{n}} hasil",
+    "reset": "Reset kebun",
+    "reset_title": "Reset kebun anda?",
+    "reset_confirm": "Ini akan padam semua petak dan sayang kucing."
   }
 }

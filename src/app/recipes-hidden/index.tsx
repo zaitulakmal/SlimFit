@@ -45,7 +45,7 @@ const CATS: { key: Category; Icon: React.ComponentType<{ size: number; color: st
 ];
 
 const CAT_BG: Record<string, string> = {
-  breakfast: '#FFF8E1',
+  breakfast: '#FFF6DB',
   lunch:     colors.primarySubtle,
   dinner:    colors.purpleMuted,
   snack:     colors.accentMuted,
@@ -224,8 +224,8 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
     marginHorizontal: spacing.lg, marginBottom: spacing.md,
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
-    backgroundColor: colors.surface, borderRadius: radius.xl,
-    ...shadow.sm,
+    backgroundColor: colors.surface, borderRadius: 999,
+    borderWidth: 1, borderColor: '#F2E7E2',
   },
   searchInput: { flex: 1, ...typography.body, color: colors.text, padding: 0 },
   searchPlaceholder: { color: colors.textPlaceholder },
@@ -244,7 +244,7 @@ const s = StyleSheet.create({
   statsText: { ...typography.bodySm, color: colors.textSecondary },
 
   list: { padding: spacing.lg, gap: spacing.md, paddingBottom: 120 },
-  card: { backgroundColor: colors.surface, borderRadius: radius.xl, overflow: 'hidden', ...shadow.md },
+  card: { backgroundColor: colors.surface, borderRadius: 28, overflow: 'hidden', borderWidth: 1, borderColor: '#F2E7E2' },
   cardBanner: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.lg, paddingVertical: spacing.sm,
